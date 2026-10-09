@@ -5,14 +5,14 @@ public class Presupuesto {
     private int id;
     private int usuarioId;
     private int categoriaId;
-    private double limite;
+    private int limite;
     private String periodo; // "mensual"
     private String mesReferencia; // formato "yyyy-MM"
 
     public Presupuesto() {
     }
 
-    public Presupuesto(int id, int usuarioId, int categoriaId, double limite, String periodo, String mesReferencia) {
+    public Presupuesto(int id, int usuarioId, int categoriaId, int limite, String periodo, String mesReferencia) {
         this.id = id;
         this.usuarioId = usuarioId;
         this.categoriaId = categoriaId;
@@ -45,11 +45,11 @@ public class Presupuesto {
         this.categoriaId = categoriaId;
     }
 
-    public double getLimite() {
+    public int getLimite() {
         return limite;
     }
 
-    public void setLimite(double limite) {
+    public void setLimite(int limite) {
         this.limite = limite;
     }
 

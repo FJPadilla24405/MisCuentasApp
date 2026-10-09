@@ -6,16 +6,17 @@ public class Movimiento {
     private int usuarioId;
     private int cuentaId;
     private int categoriaId;
-    private double importe;
+    private int importe;
     private String tipo; // "ingreso" o "gasto"
     private String fecha; // formato ISO: yyyy-MM-dd
     private String descripcion;
     private boolean sincronizado;
+    private int recurrenteId;
 
     public Movimiento() {
     }
 
-    public Movimiento(int id, int usuarioId, int cuentaId, int categoriaId, double importe,
+    public Movimiento(int id, int usuarioId, int cuentaId, int categoriaId, int importe,
                        String tipo, String fecha, String descripcion, boolean sincronizado) {
         this.id = id;
         this.usuarioId = usuarioId;
@@ -26,6 +27,20 @@ public class Movimiento {
         this.fecha = fecha;
         this.descripcion = descripcion;
         this.sincronizado = sincronizado;
+    }
+    
+    public Movimiento(int id, int usuarioId, int cuentaId, int categoriaId, int importe,
+            String tipo, String fecha, String descripcion, boolean sincronizado, int recurrenteId) {
+    	this.id = id;
+    	this.usuarioId = usuarioId;
+    	this.cuentaId = cuentaId;
+    	this.categoriaId = categoriaId;
+    	this.importe = importe;
+		this.tipo = tipo;
+		this.fecha = fecha;
+		this.descripcion = descripcion;
+		this.sincronizado = sincronizado;
+		this.recurrenteId = recurrenteId;
     }
 
     public int getId() {
@@ -60,11 +75,11 @@ public class Movimiento {
         this.categoriaId = categoriaId;
     }
 
-    public double getImporte() {
+    public int getImporte() {
         return importe;
     }
 
-    public void setImporte(double importe) {
+    public void setImporte(int importe) {
         this.importe = importe;
     }
 
@@ -100,7 +115,15 @@ public class Movimiento {
         this.sincronizado = sincronizado;
     }
 
-    @Override
+    public int getRecurrenteId() {
+		return recurrenteId;
+	}
+
+	public void setRecurrenteId(int recurrenteId) {
+		this.recurrenteId = recurrenteId;
+	}
+
+	@Override
     public String toString() {
         return "Movimiento{id=" + id + ", importe=" + importe + ", tipo='" + tipo + "', fecha='" + fecha + "'}";
     }

@@ -1,7 +1,7 @@
-package dao;
+package service.dao;
 
-import connections.DatabaseManager;
 import models.Categoria;
+import service.connections.DatabaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,13 +24,13 @@ public class CategoriaDAO {
 	 * @return Devuelve la categoría introducida en la base de datos.
 	 */
     public Categoria insertar(Categoria c) {
-        String sql = "INSERT INTO categorias (usuario_id, nombre, tipo, icono, predefinida) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO categorias (usuario_id, nombre, tipo, subcat, predefinida) VALUES (?, ?, ?, ?, ?)";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, c.getUsuarioId());
             ps.setString(2, c.getNombre());
             ps.setString(3, c.getTipo());
-            ps.setString(4, c.getIcono());
+            ps.setString(4, c.getSubcategoria());
             ps.setInt(5, c.isPredefinida() ? 1 : 0);
             ps.executeUpdate();
 
@@ -96,12 +96,12 @@ public class CategoriaDAO {
      * @param c: Categoría para actualizar.
      */
     public void actualizar(Categoria c) {
-        String sql = "UPDATE categorias SET nombre = ?, tipo = ?, icono = ? WHERE id = ?";
+        String sql = "UPDATE categorias SET nombre = ?, tipo = ?, subcat = ? WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, c.getNombre());
             ps.setString(2, c.getTipo());
-            ps.setString(3, c.getIcono());
+            ps.setString(3, c.getSubcategoria());
             ps.setInt(4, c.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -124,13 +124,19 @@ public class CategoriaDAO {
         }
     }
 
+    /**
+     * Método que crea una Categoria con los resultados de la consulta
+     * @param rs: Resultado de la consulta
+     * @return Devuelve una categoria
+     * @throws SQLException
+     */
     private Categoria mapear(ResultSet rs) throws SQLException {
         return new Categoria(
                 rs.getInt("id"),
                 rs.getInt("usuario_id"),
                 rs.getString("nombre"),
                 rs.getString("tipo"),
-                rs.getString("icono"),
+                rs.getString("subcat"),
                 rs.getInt("predefinida") == 1
         );
     }

@@ -1,7 +1,7 @@
-package dao;
+package service.dao;
 
-import connections.DatabaseManager;
 import models.Recurrente;
+import service.connections.DatabaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,19 +14,14 @@ import java.util.List;
 public class RecurrenteDAO {
 
     public Recurrente insertar(Recurrente r) {
-        String sql = "INSERT INTO recurrentes (usuario_id, cuenta_id, categoria_id, importe, tipo, frecuencia, dia_ejecucion, activo, ultima_ejecucion) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO recurrentes (frecuencia, dia_ejecucion, activo, ultima_ejecucion) " +
+                "VALUES (?, ?, ?, ?)";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, r.getUsuarioId());
-            ps.setInt(2, r.getCuentaId());
-            ps.setInt(3, r.getCategoriaId());
-            ps.setDouble(4, r.getImporte());
-            ps.setString(5, r.getTipo());
-            ps.setString(6, r.getFrecuencia());
-            ps.setInt(7, r.getDiaEjecucion());
-            ps.setInt(8, r.isActivo() ? 1 : 0);
-            ps.setString(9, r.getUltimaEjecucion());
+            ps.setString(1, r.getFrecuencia());
+            ps.setInt(2, r.getDiaEjecucion());
+            ps.setInt(3, r.isActivo() ? 1 : 0);
+            ps.setString(4, r.getUltimaEjecucion());
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -41,7 +36,8 @@ public class RecurrenteDAO {
     }
 
     public List<Recurrente> listarActivosPorUsuario(int usuarioId) {
-        String sql = "SELECT * FROM recurrentes WHERE usuario_id = ? AND activo = 1";
+        String sql = "SELECT * FROM recurrentes r WHERE r.activo = 1 " +
+                "AND EXISTS (SELECT 1 FROM movimientos m WHERE m.recurrente_id = r.id AND m.usuario_id = ?)";;
         List<Recurrente> lista = new ArrayList<>();
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -57,15 +53,16 @@ public class RecurrenteDAO {
         }
     }
 
-    /**
+    /** CAMBIAR
      * Recurrentes activos cuya "ultima_ejecucion" no coincide con el mes actual,
      * es decir, los que tocaría generar como movimiento hoy. La comprobación de
      * "¿toca ya?" según el día del mes se hace en la capa de servicio/controlador,
      * que es quien conoce la fecha actual y decide si llamar a MovimientoDAO.
      */
     public List<Recurrente> listarPendientesDelMes(int usuarioId, String mesReferencia) {
-        String sql = "SELECT * FROM recurrentes WHERE usuario_id = ? AND activo = 1 " +
-                "AND (ultima_ejecucion IS NULL OR ultima_ejecucion NOT LIKE ?)";
+        String sql = "SELECT * FROM recurrentes r WHERE r.activo = 1 " +
+                "AND EXISTS (SELECT 1 FROM movimientos m WHERE m.recurrente_id = r.id AND m.usuario_id = ?) " +
+                "AND (r.ultima_ejecucion IS NULL OR r.ultima_ejecucion NOT LIKE ?)";
         List<Recurrente> lista = new ArrayList<>();
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -95,17 +92,13 @@ public class RecurrenteDAO {
     }
 
     public void actualizar(Recurrente r) {
-        String sql = "UPDATE recurrentes SET cuenta_id = ?, categoria_id = ?, importe = ?, tipo = ?, frecuencia = ?, dia_ejecucion = ?, activo = ? WHERE id = ?";
+        String sql = "UPDATE recurrentes SET frecuencia = ?, dia_ejecucion = ?, activo = ? WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, r.getCuentaId());
-            ps.setInt(2, r.getCategoriaId());
-            ps.setDouble(3, r.getImporte());
-            ps.setString(4, r.getTipo());
-            ps.setString(5, r.getFrecuencia());
-            ps.setInt(6, r.getDiaEjecucion());
-            ps.setInt(7, r.isActivo() ? 1 : 0);
-            ps.setInt(8, r.getId());
+            ps.setString(1, r.getFrecuencia());
+            ps.setInt(2, r.getDiaEjecucion());
+            ps.setInt(3, r.isActivo() ? 1 : 0);
+            ps.setInt(4, r.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error actualizando recurrente", e);
@@ -126,11 +119,6 @@ public class RecurrenteDAO {
     private Recurrente mapear(ResultSet rs) throws SQLException {
         return new Recurrente(
                 rs.getInt("id"),
-                rs.getInt("usuario_id"),
-                rs.getInt("cuenta_id"),
-                rs.getInt("categoria_id"),
-                rs.getDouble("importe"),
-                rs.getString("tipo"),
                 rs.getString("frecuencia"),
                 rs.getInt("dia_ejecucion"),
                 rs.getInt("activo") == 1,

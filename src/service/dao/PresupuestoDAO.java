@@ -1,7 +1,7 @@
-package dao;
+package service.dao;
 
-import connections.DatabaseManager;
 import models.Presupuesto;
+import service.connections.DatabaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +20,7 @@ public class PresupuestoDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, p.getUsuarioId());
             ps.setInt(2, p.getCategoriaId());
-            ps.setDouble(3, p.getLimite());
+            ps.setInt(3, p.getLimite());
             ps.setString(4, p.getPeriodo());
             ps.setString(5, p.getMesReferencia());
             ps.executeUpdate();
@@ -76,7 +76,7 @@ public class PresupuestoDAO {
         String sql = "UPDATE presupuestos SET limite = ?, periodo = ? WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setDouble(1, p.getLimite());
+            ps.setInt(1, p.getLimite());
             ps.setString(2, p.getPeriodo());
             ps.setInt(3, p.getId());
             ps.executeUpdate();
@@ -101,7 +101,7 @@ public class PresupuestoDAO {
                 rs.getInt("id"),
                 rs.getInt("usuario_id"),
                 rs.getInt("categoria_id"),
-                rs.getDouble("limite"),
+                rs.getInt("limite"),
                 rs.getString("periodo"),
                 rs.getString("mes_referencia")
         );

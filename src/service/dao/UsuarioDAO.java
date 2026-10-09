@@ -1,7 +1,7 @@
-package dao;
+package service.dao;
 
-import connections.DatabaseManager;
 import models.Usuario;
+import service.connections.DatabaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

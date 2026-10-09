@@ -1,7 +1,7 @@
-package dao;
+package service.dao;
 
-import connections.DatabaseManager;
 import models.Movimiento;
+import service.connections.DatabaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,20 +11,35 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase del DAO para la tabla Movimientos
+ * 
+ * @author Fco. Padilla
+ */
 public class MovimientoDAO {
 
+	/**
+	 * Método que inserta un movimiento en la tabla
+	 * @param m: movimiento a insertar
+	 * @return Devuelve el movimiento insertado
+	 */
     public Movimiento insertar(Movimiento m) {
-        String sql = "INSERT INTO movimientos (usuario_id, cuenta_id, categoria_id, importe, tipo, fecha, descripcion, sincronizado) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+        String sql = "INSERT INTO movimientos (usuario_id, cuenta_id, categoria_id, importe, tipo, fecha, descripcion, sincronizado, recurrente_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, m.getUsuarioId());
             ps.setInt(2, m.getCuentaId());
             ps.setInt(3, m.getCategoriaId());
-            ps.setDouble(4, m.getImporte());
+            ps.setInt(4, m.getImporte());
             ps.setString(5, m.getTipo());
             ps.setString(6, m.getFecha());
             ps.setString(7, m.getDescripcion());
+            if (m.getRecurrenteId() > 0) {
+                ps.setInt(8, m.getRecurrenteId());
+            } else {
+                ps.setNull(8, java.sql.Types.INTEGER);
+            }
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -38,17 +53,33 @@ public class MovimientoDAO {
         }
     }
 
+    /**
+     * Método que cre una lista de los movimientos de una cuenta especifica
+     * @param cuentaId: id de la cuenta
+     * @return Lista con movimientos de una cuenta
+     */
     public List<Movimiento> listarPorCuenta(int cuentaId) {
         String sql = "SELECT * FROM movimientos WHERE cuenta_id = ? ORDER BY fecha DESC";
         return ejecutarListado(sql, cuentaId);
     }
 
+    /**
+     * Método que lista los movimientos por un usuario concreto
+     * @param usuarioId: id del usuario
+     * @return Lista con los movimientos de un usuario
+     */
     public List<Movimiento> listarPorUsuario(int usuarioId) {
         String sql = "SELECT * FROM movimientos WHERE usuario_id = ? ORDER BY fecha DESC";
         return ejecutarListado(sql, usuarioId);
     }
 
-    /** Movimientos de un usuario en un rango de fechas (formato ISO yyyy-MM-dd), útil para informes mensuales. */
+    /**
+     * Movimientos de un usuario en un rango de fechas (formato ISO yyyy-MM-dd).
+     * @param usuarioId: id del usuario
+     * @param fechaInicio: primera fecha del rango de fechas
+     * @param fechaFin: segunda fecha del rango
+     * @return Devuelve una lista de movimientos en el rango de fechas especificado
+     */
     public List<Movimiento> listarPorUsuarioYRango(int usuarioId, String fechaInicio, String fechaFin) {
         String sql = "SELECT * FROM movimientos WHERE usuario_id = ? AND fecha BETWEEN ? AND ? ORDER BY fecha DESC";
         List<Movimiento> lista = new ArrayList<>();
@@ -68,8 +99,14 @@ public class MovimientoDAO {
         }
     }
 
-    /** Suma de gastos de un usuario en una categoría durante un mes concreto (para comparar contra el presupuesto). */
-    public double sumarGastosPorCategoriaYMes(int usuarioId, int categoriaId, String mesReferencia) {
+    /**
+     * Método que suma los gastos de un usuario por su categoria y mes
+     * @param usuarioId: id del usuario
+     * @param categoriaId: id de la categoria
+     * @param mesReferencia: mes del gasto
+     * @return Devuelve la suma de los gastos
+     */
+    public int sumarGastosPorCategoriaYMes(int usuarioId, int categoriaId, String mesReferencia) {
         String sql = "SELECT COALESCE(SUM(importe), 0) AS total FROM movimientos " +
                 "WHERE usuario_id = ? AND categoria_id = ? AND tipo = 'gasto' AND fecha LIKE ?";
         Connection conn = DatabaseManager.getConnection();
@@ -78,7 +115,7 @@ public class MovimientoDAO {
             ps.setInt(2, categoriaId);
             ps.setString(3, mesReferencia + "%"); // mesReferencia con formato "yyyy-MM"
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getDouble("total") : 0.0;
+                return rs.next() ? rs.getInt("total") : 0;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error sumando gastos por categoria", e);
@@ -91,7 +128,7 @@ public class MovimientoDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, m.getCuentaId());
             ps.setInt(2, m.getCategoriaId());
-            ps.setDouble(3, m.getImporte());
+            ps.setInt(3, m.getImporte());
             ps.setString(4, m.getTipo());
             ps.setString(5, m.getFecha());
             ps.setString(6, m.getDescripcion());
@@ -135,11 +172,12 @@ public class MovimientoDAO {
                 rs.getInt("usuario_id"),
                 rs.getInt("cuenta_id"),
                 rs.getInt("categoria_id"),
-                rs.getDouble("importe"),
+                rs.getInt("importe"),
                 rs.getString("tipo"),
                 rs.getString("fecha"),
                 rs.getString("descripcion"),
-                rs.getInt("sincronizado") == 1
+                rs.getInt("sincronizado") == 1,
+                rs.getInt("recurrente_id")
         );
     }
 }

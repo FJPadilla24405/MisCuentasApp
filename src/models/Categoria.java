@@ -6,18 +6,18 @@ public class Categoria {
     private int usuarioId;
     private String nombre;
     private String tipo; // "ingreso" o "gasto"
-    private String icono;
+    private String subcat;
     private boolean predefinida;
 
     public Categoria() {
     }
 
-    public Categoria(int id, int usuarioId, String nombre, String tipo, String icono, boolean predefinida) {
+    public Categoria(int id, int usuarioId, String nombre, String tipo, String subcat, boolean predefinida) {
         this.id = id;
         this.usuarioId = usuarioId;
         this.nombre = nombre;
         this.tipo = tipo;
-        this.icono = icono;
+        this.subcat = subcat;
         this.predefinida = predefinida;
     }
 
@@ -53,12 +53,12 @@ public class Categoria {
         this.tipo = tipo;
     }
 
-    public String getIcono() {
-        return icono;
+    public String getSubcategoria() {
+        return subcat;
     }
 
-    public void setIcono(String icono) {
-        this.icono = icono;
+    public void setSubcategoria(String icono) {
+        this.subcat= icono;
     }
 
     public boolean isPredefinida() {

@@ -6,14 +6,14 @@ public class Cuenta {
     private int usuarioId;
     private String nombre;
     private String tipo; // "banco" o "efectivo"
-    private double saldoInicial;
+    private int saldoInicial;
     private String moneda;
     private boolean activa;
 
     public Cuenta() {
     }
 
-    public Cuenta(int id, int usuarioId, String nombre, String tipo, double saldoInicial, String moneda, boolean activa) {
+    public Cuenta(int id, int usuarioId, String nombre, String tipo, int saldoInicial, String moneda, boolean activa) {
         this.id = id;
         this.usuarioId = usuarioId;
         this.nombre = nombre;
@@ -55,11 +55,11 @@ public class Cuenta {
         this.tipo = tipo;
     }
 
-    public double getSaldoInicial() {
+    public int getSaldoInicial() {
         return saldoInicial;
     }
 
-    public void setSaldoInicial(double saldoInicial) {
+    public void setSaldoInicial(int saldoInicial) {
         this.saldoInicial = saldoInicial;
     }
 

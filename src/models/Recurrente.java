@@ -3,11 +3,6 @@ package models;
 public class Recurrente {
 
     private int id;
-    private int usuarioId;
-    private int cuentaId;
-    private int categoriaId;
-    private double importe;
-    private String tipo; // "ingreso" o "gasto"
     private String frecuencia; // "mensual", "semanal", ...
     private int diaEjecucion;
     private boolean activo;
@@ -16,14 +11,8 @@ public class Recurrente {
     public Recurrente() {
     }
 
-    public Recurrente(int id, int usuarioId, int cuentaId, int categoriaId, double importe, String tipo,
-                       String frecuencia, int diaEjecucion, boolean activo, String ultimaEjecucion) {
+    public Recurrente(int id, String frecuencia, int diaEjecucion, boolean activo, String ultimaEjecucion) {
         this.id = id;
-        this.usuarioId = usuarioId;
-        this.cuentaId = cuentaId;
-        this.categoriaId = categoriaId;
-        this.importe = importe;
-        this.tipo = tipo;
         this.frecuencia = frecuencia;
         this.diaEjecucion = diaEjecucion;
         this.activo = activo;
@@ -36,46 +25,6 @@ public class Recurrente {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getUsuarioId() {
-        return usuarioId;
-    }
-
-    public void setUsuarioId(int usuarioId) {
-        this.usuarioId = usuarioId;
-    }
-
-    public int getCuentaId() {
-        return cuentaId;
-    }
-
-    public void setCuentaId(int cuentaId) {
-        this.cuentaId = cuentaId;
-    }
-
-    public int getCategoriaId() {
-        return categoriaId;
-    }
-
-    public void setCategoriaId(int categoriaId) {
-        this.categoriaId = categoriaId;
-    }
-
-    public double getImporte() {
-        return importe;
-    }
-
-    public void setImporte(double importe) {
-        this.importe = importe;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
     }
 
     public String getFrecuencia() {
@@ -112,6 +61,6 @@ public class Recurrente {
 
     @Override
     public String toString() {
-        return "Recurrente{id=" + id + ", importe=" + importe + ", frecuencia='" + frecuencia + "', activo=" + activo + "}";
+        return "Recurrente{id=" + id + ", frecuencia='" + frecuencia + "', activo=" + activo + "}";
     }
 }
