@@ -1,18 +1,20 @@
 package models;
 
+import java.math.BigDecimal;
+
 public class Presupuesto {
 
     private int id;
     private int usuarioId;
     private int categoriaId;
-    private int limite;
+    private BigDecimal limite;
     private String periodo; // "mensual"
     private String mesReferencia; // formato "yyyy-MM"
 
     public Presupuesto() {
     }
 
-    public Presupuesto(int id, int usuarioId, int categoriaId, int limite, String periodo, String mesReferencia) {
+    public Presupuesto(int id, int usuarioId, int categoriaId, BigDecimal limite, String periodo, String mesReferencia) {
         this.id = id;
         this.usuarioId = usuarioId;
         this.categoriaId = categoriaId;
@@ -45,11 +47,11 @@ public class Presupuesto {
         this.categoriaId = categoriaId;
     }
 
-    public int getLimite() {
+    public BigDecimal getLimite() {
         return limite;
     }
 
-    public void setLimite(int limite) {
+    public void setLimite(BigDecimal limite) {
         this.limite = limite;
     }
 

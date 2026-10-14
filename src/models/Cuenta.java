@@ -1,19 +1,21 @@
 package models;
 
+import java.math.BigDecimal;
+
 public class Cuenta {
 
     private int id;
     private int usuarioId;
     private String nombre;
     private String tipo; // "banco" o "efectivo"
-    private int saldoInicial;
+    private BigDecimal saldoInicial;
     private String moneda;
     private boolean activa;
 
     public Cuenta() {
     }
 
-    public Cuenta(int id, int usuarioId, String nombre, String tipo, int saldoInicial, String moneda, boolean activa) {
+    public Cuenta(int id, int usuarioId, String nombre, String tipo, BigDecimal saldoInicial, String moneda, boolean activa) {
         this.id = id;
         this.usuarioId = usuarioId;
         this.nombre = nombre;
@@ -55,11 +57,11 @@ public class Cuenta {
         this.tipo = tipo;
     }
 
-    public int getSaldoInicial() {
+    public BigDecimal getSaldoInicial() {
         return saldoInicial;
     }
 
-    public void setSaldoInicial(int saldoInicial) {
+    public void setSaldoInicial(BigDecimal saldoInicial) {
         this.saldoInicial = saldoInicial;
     }
 

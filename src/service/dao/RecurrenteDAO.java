@@ -11,8 +11,18 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase del DAO de la tabla Recurrentes
+ * 
+ * @author Fco Padilla
+ */
 public class RecurrenteDAO {
 
+	/**
+	 * Método que inserta una clase recurrente en la base de datos
+	 * @param r: Recurrente a inssertar
+	 * @return Devuelve el recurrente que se ha insertado
+	 */
     public Recurrente insertar(Recurrente r) {
         String sql = "INSERT INTO recurrentes (frecuencia, dia_ejecucion, activo, ultima_ejecucion) " +
                 "VALUES (?, ?, ?, ?)";
@@ -35,6 +45,11 @@ public class RecurrenteDAO {
         }
     }
 
+    /**
+     * Lista los recurrentes activos de un usuario concreto
+     * @param usuarioId: id del usuario
+     * @return Devuelve una lista de movimientos recurrentes
+     */
     public List<Recurrente> listarActivosPorUsuario(int usuarioId) {
         String sql = "SELECT * FROM recurrentes r WHERE r.activo = 1 " +
                 "AND EXISTS (SELECT 1 FROM movimientos m WHERE m.recurrente_id = r.id AND m.usuario_id = ?)";;
@@ -53,11 +68,11 @@ public class RecurrenteDAO {
         }
     }
 
-    /** CAMBIAR
-     * Recurrentes activos cuya "ultima_ejecucion" no coincide con el mes actual,
-     * es decir, los que tocaría generar como movimiento hoy. La comprobación de
-     * "¿toca ya?" según el día del mes se hace en la capa de servicio/controlador,
-     * que es quien conoce la fecha actual y decide si llamar a MovimientoDAO.
+    /**
+     * Metodo que lista los movimientos recurrentes que todavia no se han ejecutado un mes concreto
+     * @param usuarioId: id del usuario
+     * @param mesReferencia: mes que se ejecuta el recurrente
+     * @return Devuelve una lista con movimientos recurrentes que no se han ejecutado
      */
     public List<Recurrente> listarPendientesDelMes(int usuarioId, String mesReferencia) {
         String sql = "SELECT * FROM recurrentes r WHERE r.activo = 1 " +
@@ -79,6 +94,11 @@ public class RecurrenteDAO {
         }
     }
 
+    /**
+     * Método que marca un movimiento recurrente como completado
+     * @param id: id del movimiento recurrente
+     * @param fechaEjecucion: fecha en la que se ejecuta el movimiento
+     */
     public void marcarEjecutado(int id, String fechaEjecucion) {
         String sql = "UPDATE recurrentes SET ultima_ejecucion = ? WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
@@ -91,6 +111,10 @@ public class RecurrenteDAO {
         }
     }
 
+    /**
+     * Método que actualiza los datos de un movimiento recurrente
+     * @param r: movimiento recurrente con datos actualizados
+     */
     public void actualizar(Recurrente r) {
         String sql = "UPDATE recurrentes SET frecuencia = ?, dia_ejecucion = ?, activo = ? WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
@@ -105,6 +129,10 @@ public class RecurrenteDAO {
         }
     }
 
+    /**
+     * Método que desactiva un movimiento recurrente
+     * @param id: id del movimiento
+     */
     public void desactivar(int id) {
         String sql = "UPDATE recurrentes SET activo = 0 WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
@@ -116,6 +144,12 @@ public class RecurrenteDAO {
         }
     }
 
+    /**
+     * Método que crea un movimiento recurrente con los resultados de una consulta
+     * @param rs: resultado de la consulta
+     * @return Devuelve un objeto recurrente con los datos de la consulta
+     * @throws SQLException
+     */
     private Recurrente mapear(ResultSet rs) throws SQLException {
         return new Recurrente(
                 rs.getInt("id"),

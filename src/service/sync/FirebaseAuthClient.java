@@ -47,18 +47,21 @@ public class FirebaseAuthClient {
         }
     }
 
-    // URL para la api
+ 
     private static final String URL = "https://identitytoolkit.googleapis.com/v1";
-    // Api key
-    private static final String KEY = "AIzaSyC9d99b_3juyWxt_EK70yxHUw1iWSHwFas";
 
-    // cliente http para mandar y recibir informacion web
-    private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
-
+    private final String apiKey;
     /**
-     * Constructor base
+     * cliente http para mandar y recibir informacion web
      */
-    public FirebaseAuthClient() {};
+    private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+    
+    /**
+     * Constructor con apikey
+     */
+    public FirebaseAuthClient(String apiKey) {
+    	this.apiKey = apiKey;
+    };
 
     /**
      * Crea una cuenta nueva en Firebase Authentication y devuelve ya la sesión iniciada con ella.
@@ -74,9 +77,9 @@ public class FirebaseAuthClient {
 
     /**
      * Inicia sesión con una cuenta que ya existe.
-     * @param email
-     * @param password
-     * @return
+     * @param email: email de la cuenta
+     * @param password: contraseña de la cuenta
+     * @return Sesion de esos datos
      * @throws IOException
      * @throws InterruptedException
      */
@@ -86,10 +89,10 @@ public class FirebaseAuthClient {
 
     /**
      * Registro y login son la misma petición; solo cambia la operación de la URL.
-     * @param operacion
-     * @param email
-     * @param password
-     * @return
+     * @param operacion: operacion que hacer en la url
+     * @param email: email de la cuenta
+     * @param password: contraseña de la cuenta
+     * @return Sesion con los datos
      * @throws IOException
      * @throws InterruptedException
      */
@@ -107,7 +110,7 @@ public class FirebaseAuthClient {
         cuerpo.put("password", password);
         cuerpo.put("returnSecureToken", Boolean.TRUE);
 
-        HttpRequest req = HttpRequest.newBuilder(URI.create(URL + "/" + operacion + "?key=" + KEY))
+        HttpRequest req = HttpRequest.newBuilder(URI.create(URL + "/" + operacion + "?key=" + apiKey))
                 .timeout(Duration.ofSeconds(30))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(Json.escribir(cuerpo), StandardCharsets.UTF_8))
@@ -124,6 +127,8 @@ public class FirebaseAuthClient {
     /**
      * Firebase responde los errores así: {"error":{"code":400,"message":"EMAIL_EXISTS", ...}}
      * (a veces con texto detrás: "WEAK_PASSWORD : Password should be at least 6 characters").
+     * @param cuerpo: cuerpo del error
+     * @return Devuelve el error traducido
      */
     private AuthException traducirError(String cuerpo) {
         String codigo = "UNKNOWN";

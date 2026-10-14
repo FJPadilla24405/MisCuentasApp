@@ -1,12 +1,14 @@
 package models;
 
+import java.math.BigDecimal;
+
 public class Movimiento {
 
     private int id;
     private int usuarioId;
     private int cuentaId;
     private int categoriaId;
-    private int importe;
+    private BigDecimal importe;
     private String tipo; // "ingreso" o "gasto"
     private String fecha; // formato ISO: yyyy-MM-dd
     private String descripcion;
@@ -16,7 +18,7 @@ public class Movimiento {
     public Movimiento() {
     }
 
-    public Movimiento(int id, int usuarioId, int cuentaId, int categoriaId, int importe,
+    public Movimiento(int id, int usuarioId, int cuentaId, int categoriaId, BigDecimal importe,
                        String tipo, String fecha, String descripcion, boolean sincronizado) {
         this.id = id;
         this.usuarioId = usuarioId;
@@ -29,7 +31,7 @@ public class Movimiento {
         this.sincronizado = sincronizado;
     }
     
-    public Movimiento(int id, int usuarioId, int cuentaId, int categoriaId, int importe,
+    public Movimiento(int id, int usuarioId, int cuentaId, int categoriaId, BigDecimal importe,
             String tipo, String fecha, String descripcion, boolean sincronizado, int recurrenteId) {
     	this.id = id;
     	this.usuarioId = usuarioId;
@@ -75,11 +77,11 @@ public class Movimiento {
         this.categoriaId = categoriaId;
     }
 
-    public int getImporte() {
+    public BigDecimal getImporte() {
         return importe;
     }
 
-    public void setImporte(int importe) {
+    public void setImporte(BigDecimal importe) {
         this.importe = importe;
     }
 

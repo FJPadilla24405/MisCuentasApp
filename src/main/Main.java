@@ -19,6 +19,7 @@ import service.sync.FirebaseClient;
 import service.sync.SyncService;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -70,18 +71,18 @@ public class Main extends Application {
 		);
 		System.out.println("Usuario: " + usuario);
 
-		Cuenta cuenta = cuentaDAO.insertar(new Cuenta(0, usuario.getId(), "Efectivo", "efectivo", 10000, "EUR", true));
+		Cuenta cuenta = cuentaDAO.insertar(new Cuenta(0, usuario.getId(), "Efectivo", "efectivo", new BigDecimal(100), "EUR", true));
 		System.out.println("Cuenta creada: " + cuenta);
 
 		Categoria categoria = categoriaDAO.insertar(new Categoria(0, usuario.getId(), "Comida", "gasto", null, false));
 		System.out.println("Categoría creada: " + categoria);
 
 		Movimiento movimiento = movimientoDAO.insertar(
-				new Movimiento(0, usuario.getId(), cuenta.getId(), categoria.getId(), 1550, "gasto", "2026-09-30", "Almuerzo", false)
+				new Movimiento(0, usuario.getId(), cuenta.getId(), categoria.getId(), new BigDecimal("15.50"), "gasto", "2026-09-30", "Almuerzo", false)
 		);
 		System.out.println("Movimiento creado: " + movimiento);
 
-		int saldo = cuentaDAO.calcularSaldo(cuenta.getId());
+		BigDecimal saldo = cuentaDAO.calcularSaldo(cuenta.getId());
 		System.out.println("Saldo de la cuenta '" + cuenta.getNombre() + "': " + saldo + " " + cuenta.getMoneda());
 	}
 
@@ -107,7 +108,8 @@ public class Main extends Application {
 				}
 			}
 
-			FirebaseAuthClient.Sesion sesion = new FirebaseAuthClient().iniciarSesion(p.getProperty("email").trim(), p.getProperty("password"));
+			FirebaseAuthClient.Sesion sesion = new FirebaseAuthClient(p.getProperty("apiKey").trim())
+					.iniciarSesion(p.getProperty("email").trim(), p.getProperty("password"));
 			System.out.println("[Firebase] Sesión iniciada. uid=" + sesion.uid());
 
 			FirebaseClient firebase = new FirebaseClient(p.getProperty("dbUrl").trim(), sesion.idToken());
@@ -133,9 +135,9 @@ public class Main extends Application {
 
 		// Datos de ejemplo solo si todavía no tiene cuentas, para no duplicarlos en cada arranque
 		if (cuentaDAO.listarPorUsuario(usuario.getId()).isEmpty()) {
-			Cuenta cuenta = cuentaDAO.insertar(new Cuenta(0, usuario.getId(), "Efectivo", "efectivo", 10000, "EUR", true));
+			Cuenta cuenta = cuentaDAO.insertar(new Cuenta(0, usuario.getId(), "Efectivo", "efectivo", new BigDecimal("100.00"), "EUR", true));
 			Categoria categoria = categoriaDAO.insertar(new Categoria(0, usuario.getId(), "Comida", "gasto", null, false));
-			movimientoDAO.insertar(new Movimiento(0, usuario.getId(), cuenta.getId(), categoria.getId(), 1550,
+			movimientoDAO.insertar(new Movimiento(0, usuario.getId(), cuenta.getId(), categoria.getId(), new BigDecimal("15.50"),
 					"gasto", "2026-09-30", "Almuerzo", false));
 		}
 

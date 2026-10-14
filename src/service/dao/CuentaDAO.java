@@ -3,6 +3,7 @@ package service.dao;
 import models.Cuenta;
 import service.connections.DatabaseManager;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,7 +32,7 @@ public class CuentaDAO {
             ps.setInt(1, c.getUsuarioId());
             ps.setString(2, c.getNombre());
             ps.setString(3, c.getTipo());
-            ps.setInt(4, c.getSaldoInicial());
+            Dinero.escribir(ps, 4, c.getSaldoInicial());
             ps.setString(5, c.getMoneda());
             ps.setInt(6, c.isActiva() ? 1 : 0);
             ps.executeUpdate();
@@ -96,8 +97,8 @@ public class CuentaDAO {
      * @param cuentaId: Id de la cuenta para el cálculo
      * @return Devuelve el saldo calculado
      */
-    public int calcularSaldo(int cuentaId) {
-        String sql = "SELECT c.saldo_inicial + " +
+    public BigDecimal calcularSaldo(int cuentaId) {
+        String sql = "SELECT COALESCE(c.saldo_inicial, 0) + " +
                 "COALESCE((SELECT SUM(importe) FROM movimientos WHERE cuenta_id = ? AND tipo = 'ingreso'), 0) - " +
                 "COALESCE((SELECT SUM(importe) FROM movimientos WHERE cuenta_id = ? AND tipo = 'gasto'), 0) AS saldo " +
                 "FROM cuentas c WHERE c.id = ?";
@@ -107,7 +108,7 @@ public class CuentaDAO {
             ps.setInt(2, cuentaId);
             ps.setInt(3, cuentaId);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getInt("saldo") : 0;
+                return rs.next() ? Dinero.leer(rs, "saldo") : Dinero.CERO;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error calculando saldo", e);
@@ -124,7 +125,7 @@ public class CuentaDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, c.getNombre());
             ps.setString(2, c.getTipo());
-            ps.setInt(3, c.getSaldoInicial());
+            Dinero.escribir(ps, 3, c.getSaldoInicial());
             ps.setString(4, c.getMoneda());
             ps.setInt(5, c.isActiva() ? 1 : 0);
             ps.setInt(6, c.getId());
@@ -161,7 +162,7 @@ public class CuentaDAO {
                 rs.getInt("usuario_id"),
                 rs.getString("nombre"),
                 rs.getString("tipo"),
-                rs.getInt("saldo_inicial"),
+                Dinero.leer(rs, "saldo_inicial"),
                 rs.getString("moneda"),
                 rs.getInt("activa") == 1
         );

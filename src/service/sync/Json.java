@@ -8,6 +8,8 @@ import java.util.Map;
 /**
  * Lector/escritor de JSON mínimo, sin dependencias externas.
  * Tipos usados: Map (objeto), List (array), String, Long, Double, Boolean y null.
+ * 
+ * @author Fco Javier
  */
 final class Json {
  

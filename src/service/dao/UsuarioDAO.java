@@ -12,8 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Clase que representa el DAO de la tabla Usuarios
+ * 
+ * @author Fco Padilla
+ */
 public class UsuarioDAO {
 
+	/**
+	 * Método que inserta un usuario
+	 * @param u: usuario a insertar
+	 * @return Devuelve el usuario insertado
+	 */
     public Usuario insertar(Usuario u) {
         String sql = "INSERT INTO usuarios (firebase_uid, nombre, email, moneda, tema) VALUES (?, ?, ?, ?, ?)";
         Connection conn = DatabaseManager.getConnection();
@@ -36,6 +46,11 @@ public class UsuarioDAO {
         }
     }
 
+    /**
+     * Busca un usuario por su firebase uid
+     * @param firebaseUid: el id del usuario en firebase
+     * @return Usuario con el uid de firebase especificado si existe
+     */
     public Optional<Usuario> buscarPorFirebaseUid(String firebaseUid) {
         String sql = "SELECT * FROM usuarios WHERE firebase_uid = ?";
         Connection conn = DatabaseManager.getConnection();
@@ -52,6 +67,11 @@ public class UsuarioDAO {
         }
     }
 
+    /**
+     * Busca un usuario por su id
+     * @param id: id del usuario
+     * @return Usuario con el id especificado si existe
+     */
     public Optional<Usuario> buscarPorId(int id) {
         String sql = "SELECT * FROM usuarios WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
@@ -68,6 +88,10 @@ public class UsuarioDAO {
         }
     }
 
+    /**
+     * Lista todos los usuarios de la base de datos
+     * @return Devuelve una lista de todos los usuarios registrados
+     */
     public List<Usuario> listarTodos() {
         String sql = "SELECT * FROM usuarios";
         List<Usuario> lista = new ArrayList<>();
@@ -82,6 +106,10 @@ public class UsuarioDAO {
         }
     }
 
+    /**
+     * Actualiza los datos de un usuario en la base de datos
+     * @param u: usuario con datos nuevos
+     */
     public void actualizar(Usuario u) {
         String sql = "UPDATE usuarios SET nombre = ?, email = ?, moneda = ?, tema = ? WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
@@ -97,6 +125,10 @@ public class UsuarioDAO {
         }
     }
 
+    /**
+     * Elimina un usuario de la base de datos
+     * @param id: id del usuario
+     */
     public void eliminar(int id) {
         String sql = "DELETE FROM usuarios WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
@@ -108,6 +140,12 @@ public class UsuarioDAO {
         }
     }
 
+    /**
+     * Método que crea un usuario con los resultados de la consulta
+     * @param rs: Resultado de la consulta
+     * @return Devuelve un usuario
+     * @throws SQLException
+     */
     private Usuario mapear(ResultSet rs) throws SQLException {
         return new Usuario(
                 rs.getInt("id"),

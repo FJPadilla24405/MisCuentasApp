@@ -3,6 +3,7 @@ package service.dao;
 import models.Movimiento;
 import service.connections.DatabaseManager;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,7 +32,7 @@ public class MovimientoDAO {
             ps.setInt(1, m.getUsuarioId());
             ps.setInt(2, m.getCuentaId());
             ps.setInt(3, m.getCategoriaId());
-            ps.setInt(4, m.getImporte());
+            Dinero.escribir(ps, 4, m.getImporte());
             ps.setString(5, m.getTipo());
             ps.setString(6, m.getFecha());
             ps.setString(7, m.getDescripcion());
@@ -106,7 +107,7 @@ public class MovimientoDAO {
      * @param mesReferencia: mes del gasto
      * @return Devuelve la suma de los gastos
      */
-    public int sumarGastosPorCategoriaYMes(int usuarioId, int categoriaId, String mesReferencia) {
+    public BigDecimal sumarGastosPorCategoriaYMes(int usuarioId, int categoriaId, String mesReferencia) {
         String sql = "SELECT COALESCE(SUM(importe), 0) AS total FROM movimientos " +
                 "WHERE usuario_id = ? AND categoria_id = ? AND tipo = 'gasto' AND fecha LIKE ?";
         Connection conn = DatabaseManager.getConnection();
@@ -115,20 +116,24 @@ public class MovimientoDAO {
             ps.setInt(2, categoriaId);
             ps.setString(3, mesReferencia + "%"); // mesReferencia con formato "yyyy-MM"
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getInt("total") : 0;
+                return rs.next() ? Dinero.leer(rs, "total") : Dinero.CERO;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error sumando gastos por categoria", e);
         }
     }
 
+    /**
+     * Método que actualiza un movimiento
+     * @param m: movimiento a actualizar
+     */
     public void actualizar(Movimiento m) {
         String sql = "UPDATE movimientos SET cuenta_id = ?, categoria_id = ?, importe = ?, tipo = ?, fecha = ?, descripcion = ?, sincronizado = 0 WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, m.getCuentaId());
             ps.setInt(2, m.getCategoriaId());
-            ps.setInt(3, m.getImporte());
+            Dinero.escribir(ps, 3, m.getImporte());
             ps.setString(4, m.getTipo());
             ps.setString(5, m.getFecha());
             ps.setString(6, m.getDescripcion());
@@ -139,6 +144,10 @@ public class MovimientoDAO {
         }
     }
 
+    /**
+     * Método que elimina un movimiento
+     * @param id: id del movimiento a eliminar
+     */
     public void eliminar(int id) {
         String sql = "DELETE FROM movimientos WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
@@ -150,6 +159,12 @@ public class MovimientoDAO {
         }
     }
 
+    /**
+     * Lista movimientos por parametro
+     * @param sql: Sentencia sql
+     * @param parametro: Parametro que añadir
+     * @return Devuelve la lista de movimientos
+     */
     private List<Movimiento> ejecutarListado(String sql, int parametro) {
         List<Movimiento> lista = new ArrayList<>();
         Connection conn = DatabaseManager.getConnection();
@@ -166,13 +181,19 @@ public class MovimientoDAO {
         }
     }
 
+    /**
+     * Crea un objeto movimiento con el resultado de una consulta
+     * @param rs: Resultado de la consulta
+     * @return Devuelve el movimiento creado
+     * @throws SQLException
+     */
     private Movimiento mapear(ResultSet rs) throws SQLException {
         return new Movimiento(
                 rs.getInt("id"),
                 rs.getInt("usuario_id"),
                 rs.getInt("cuenta_id"),
                 rs.getInt("categoria_id"),
-                rs.getInt("importe"),
+                Dinero.leer(rs, "importe"),
                 rs.getString("tipo"),
                 rs.getString("fecha"),
                 rs.getString("descripcion"),

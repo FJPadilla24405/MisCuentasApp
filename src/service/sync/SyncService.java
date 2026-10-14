@@ -325,7 +325,12 @@ public class SyncService {
         return sb.toString();
     }
 
-    /** Los nodos vacíos no se escriben (Firebase los eliminaría igualmente). */
+    /**
+     * Los nodos vacíos no se escriben (Firebase los eliminaría igualmente).
+     * @param raiz
+     * @param clave
+     * @param seccion
+     */
     private void colocar(Map<String, Object> raiz, String clave, Map<String, Object> seccion) {
         if (!seccion.isEmpty()) {
             raiz.put(clave, seccion);

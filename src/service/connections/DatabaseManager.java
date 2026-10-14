@@ -83,7 +83,9 @@ public class DatabaseManager {
         }
     }
 
-    /** Cierra la conexión. Llamar al salir de la aplicación. */
+    /**
+     * Cierra la conexión. Llamar al salir de la aplicación.
+     */
     public static synchronized void cerrar() {
         if (connection != null) {
             try {
