@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Ventana con las condiciones de uso y la política de privacidad. Los textos se cargan desde assets/legal/ -->
+<BorderPane prefHeight="640.0" prefWidth="760.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LegalController">
+   <top>
+      <HBox alignment="CENTER_LEFT" styleClass="cabecera">
+         <children>
+            <Label styleClass="cabecera-titulo" text="Información legal" />
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <TabPane fx:id="tabs" styleClass="legal-tabs" tabClosingPolicy="UNAVAILABLE">
+         <tabs>
+            <Tab fx:id="tabCondiciones" text="Condiciones de uso">
+               <content>
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="legal-scroll">
+                     <content>
+                        <VBox fx:id="contenidoCondiciones" spacing="10.0" styleClass="legal-contenido" />
+                     </content>
+                  </ScrollPane>
+               </content>
+            </Tab>
+            <Tab fx:id="tabPrivacidad" text="Política de privacidad">
+               <content>
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="legal-scroll">
+                     <content>
+                        <VBox fx:id="contenidoPrivacidad" spacing="10.0" styleClass="legal-contenido" />
+                     </content>
+                  </ScrollPane>
+               </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" styleClass="legal-pie">
+         <children>
+            <Button mnemonicParsing="false" onAction="#cerrar" prefWidth="120.0" styleClass="boton-primario" text="Cerrar" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

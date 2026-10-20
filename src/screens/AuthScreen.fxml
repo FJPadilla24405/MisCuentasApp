@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Pantalla de acceso: cabecera + hueco central donde se intercambian los paneles de login y registro -->
+<BorderPane prefHeight="680.0" prefWidth="1000.0" stylesheets="@styles/application.css" styleClass="auth-raiz" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AuthController">
+   <top>
+      <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="cabecera">
+         <children>
+            <StackPane styleClass="logo">
+               <children>
+                  <Group>
+                     <children>
+                        <SVGPath content="M12 21 V11 M12 12 C12 8 9 6 5 6 C5 10 8 12 12 12 Z M12 14 C12 11 14.5 9 18 9 C18 12.5 15.5 14 12 14 Z" scaleX="0.8333" scaleY="0.8333" styleClass="icono" />
+                     </children>
+                  </Group>
+               </children>
+            </StackPane>
+            <Label styleClass="cabecera-titulo" text="MisCuentas" />
+         </children>
+      </HBox>
+   </top>
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="auth-scroll">
+         <content>
+            <StackPane alignment="CENTER">
+               <children>
+                  <StackPane maxWidth="400.0" minWidth="300.0">
+                     <padding>
+                        <Insets bottom="32.0" left="24.0" right="24.0" top="32.0" />
+                     </padding>
+                     <children>
+                        <fx:include fx:id="login" source="panels/LoginPanel.fxml" />
+                        <fx:include fx:id="registro" source="panels/RegistroPanel.fxml" />
+                        <fx:include fx:id="recuperar" source="panels/RecuperarPanel.fxml" />
+                     </children>
+                  </StackPane>
+               </children>
+            </StackPane>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Panel de inicio de sesión (lo usa AuthScreen.fxml con fx:include) -->
+<VBox fx:id="raiz" spacing="16.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.LoginController">
+   <children>
+      <Label styleClass="panel-titulo" text="Qué bueno verte de nuevo." wrapText="true" />
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Usuario" />
+            <HBox fx:id="cajaUsuario" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <TextField fx:id="txtUsuario" onAction="#iniciarSesion" promptText="Tu nombre de usuario" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+                  <Group>
+                     <children>
+                        <SVGPath content="M20 21 V19 A4 4 0 0 0 16 15 H8 A4 4 0 0 0 4 19 V21 M12 3 A4 4 0 1 0 12 11 A4 4 0 1 0 12 3 Z" scaleX="0.75" scaleY="0.75" styleClass="icono" />
+                     </children>
+                  </Group>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Email" />
+            <HBox fx:id="cajaEmail" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <TextField fx:id="txtEmail" onAction="#iniciarSesion" promptText="tucorreo@email.com" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+                  <Group>
+                     <children>
+                        <SVGPath content="M4 4 H20 A2 2 0 0 1 22 6 V18 A2 2 0 0 1 20 20 H4 A2 2 0 0 1 2 18 V6 A2 2 0 0 1 4 4 Z M22 6 L12 13 L2 6" scaleX="0.75" scaleY="0.75" styleClass="icono" />
+                     </children>
+                  </Group>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Contraseña" />
+            <HBox fx:id="cajaPassword" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <!-- Dos campos apilados que comparten el texto: el controlador alterna cuál se ve -->
+                  <StackPane alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                     <children>
+                        <PasswordField fx:id="txtPasswordOculto" onAction="#iniciarSesion" promptText="Tu contraseña" styleClass="campo-input" />
+                        <TextField fx:id="txtPasswordVisible" managed="false" onAction="#iniciarSesion" promptText="Tu contraseña" styleClass="campo-input" visible="false" />
+                     </children>
+                  </StackPane>
+                  <StackPane onMouseClicked="#alternarPassword" styleClass="icono-boton">
+                     <children>
+                        <Group>
+                           <children>
+                              <SVGPath fx:id="iconoOjo" content="M2 12 C2 12 5.5 5 12 5 C18.5 5 22 12 22 12 C22 12 18.5 19 12 19 C5.5 19 2 12 2 12 Z M12 9 A3 3 0 1 0 12 15 A3 3 0 1 0 12 9 Z" scaleX="0.75" scaleY="0.75" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </children>
+                  </StackPane>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <HBox alignment="CENTER_RIGHT">
+         <VBox.margin>
+            <Insets top="-8.0" />
+         </VBox.margin>
+         <children>
+            <Hyperlink onAction="#irARecuperar" styleClass="enlace" text="¿Olvidaste tu contraseña?" />
+         </children>
+      </HBox>
+
+      <Label fx:id="lblError" managed="false" styleClass="mensaje-error" visible="false" wrapText="true" />
+
+      <Button fx:id="btnEntrar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#iniciarSesion" styleClass="boton-primario" text="Iniciar sesión" />
+
+      <HBox alignment="CENTER" spacing="5.0">
+         <children>
+            <Label styleClass="texto-suave" text="¿Aún no tienes cuenta?" />
+            <Hyperlink onAction="#irARegistro" styleClass="enlace" text="Crear una cuenta" />
+         </children>
+      </HBox>
+
+      <HBox alignment="CENTER">
+         <children>
+            <Label graphicTextGap="6.0" styleClass="texto-suave-pequeno" text="Un acceso seguro a tu espacio personal.">
+               <graphic>
+                  <Group>
+                     <children>
+                        <SVGPath content="M5 11 H19 A1 1 0 0 1 20 12 V20 A1 1 0 0 1 19 21 H5 A1 1 0 0 1 4 20 V12 A1 1 0 0 1 5 11 Z M8 11 V7 A4 4 0 0 1 16 7 V11" scaleX="0.58" scaleY="0.58" styleClass="icono" />
+                     </children>
+                  </Group>
+               </graphic>
+            </Label>
+         </children>
+      </HBox>
+   </children>
+</VBox>

@@ -1,4 +1,4 @@
-package service.dao;
+package util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,7 +11,7 @@ import java.sql.SQLException;
  *
  * @author Fco Padilla
  */
-final class Dinero {
+public final class Dinero {
 
     /**
      * Decimales de un importe.
@@ -26,7 +26,7 @@ final class Dinero {
     /**
      * 0.00, para devolver cuando no hay filas o el valor es NULL.
      */
-    static final BigDecimal CERO = BigDecimal.ZERO.setScale(ESCALA);
+    public static final BigDecimal CERO = BigDecimal.ZERO.setScale(ESCALA);
 
     /**
      * Constructor base vacio
@@ -42,7 +42,7 @@ final class Dinero {
      * @return Devuelve el valor del decimal en bigdecimal
      * @throws SQLException
      */
-    static BigDecimal leer(ResultSet rs, String columna) throws SQLException {
+    public static BigDecimal leer(ResultSet rs, String columna) throws SQLException {
         BigDecimal valor = rs.getBigDecimal(columna);
         return valor == null ? CERO : valor.setScale(ESCALA, RoundingMode.HALF_UP);
     }
@@ -54,7 +54,7 @@ final class Dinero {
      * @param valor: valor del importe
      * @throws SQLException
      */
-    static void escribir(PreparedStatement ps, int indice, BigDecimal valor) throws SQLException {
+    public static void escribir(PreparedStatement ps, int indice, BigDecimal valor) throws SQLException {
         ps.setBigDecimal(indice, normalizar(valor));
     }
 
@@ -64,7 +64,7 @@ final class Dinero {
      * @return Devuelve el valor redondeado
      * @throws IllegalArgumentException si el importe es null o tiene demasiadas cifras
      */
-    static BigDecimal normalizar(BigDecimal valor) {
+    public static BigDecimal normalizar(BigDecimal valor) {
         if (valor == null) {
             throw new IllegalArgumentException("El importe no puede ser null");
         }

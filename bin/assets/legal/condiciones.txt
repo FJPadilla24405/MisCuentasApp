@@ -1,0 +1,52 @@
+# Condiciones de uso
+Última actualización: {{fecha}}
+
+## 1. Qué regulan estas condiciones
+Estas condiciones regulan el uso de MisCuentas, una aplicación de escritorio para llevar el control de tus finanzas personales (cuentas, movimientos, categorías y presupuestos). Su titular es {{titular}}, con correo de contacto {{correo}}.
+Al marcar la casilla de aceptación al crear tu cuenta declaras que has leído estas condiciones y la Política de privacidad, y que las aceptas.
+
+## 2. Requisitos para usar MisCuentas
+- Tener al menos 14 años.
+- Facilitar un correo electrónico válido y datos veraces al registrarte.
+
+## 3. Tu cuenta
+- Eres responsable de mantener en secreto tu contraseña y de lo que se haga con tu cuenta.
+- Si sospechas que alguien la ha usado sin permiso, cambia la contraseña con la opción "¿Olvidaste tu contraseña?" y avísanos en {{correo}}.
+- Si olvidas la contraseña, puedes crear una nueva con el enlace que Firebase envía a tu correo.
+
+## 4. Qué es y qué no es MisCuentas
+MisCuentas es una herramienta de organización personal. No es una entidad financiera, no gestiona tu dinero, no se conecta a tus bancos y no ofrece asesoramiento financiero, fiscal ni contable.
+Los saldos, totales y presupuestos se calculan a partir de lo que tú introduces, así que su exactitud depende de que tus datos sean correctos. Las decisiones que tomes a partir de ellos son responsabilidad tuya.
+
+## 5. Funcionamiento con y sin conexión
+- Tus datos se guardan en tu equipo. La sincronización con la nube necesita conexión a internet.
+- Si entras sin conexión (por ejemplo, porque no se puede validar tu contraseña con Firebase), la aplicación solo comprueba que el usuario y el correo coinciden con una cuenta guardada en ese equipo. Quien tenga acceso a tu equipo y conozca esos dos datos podría abrir tus datos locales. Protege tu equipo y bloquea la sesión del sistema cuando no lo uses.
+- Los cambios hechos sin conexión no están en la nube hasta que sincronices.
+- Al sincronizar, la copia de un lado sustituye a la del otro: al subir, tus datos locales sustituyen a los de la nube, y al descargar, los de la nube sustituyen a los locales. Sincroniza con regularidad y evita modificar la misma cuenta en varios equipos a la vez sin sincronizar entre medias.
+
+## 6. Uso aceptable
+No puedes usar MisCuentas para fines ilícitos, intentar acceder a cuentas o datos de otras personas, eludir las medidas de seguridad ni interferir en el funcionamiento de la aplicación o de los servicios que utiliza.
+
+## 7. Disponibilidad y copias de seguridad
+MisCuentas se ofrece sin garantía de funcionamiento ininterrumpido. La sincronización depende de servicios de terceros (Google Firebase) que pueden sufrir interrupciones. Te recomendamos hacer copias de seguridad periódicas de tus datos; la base de datos local está en la carpeta .miscuentas de tu usuario del sistema.
+
+## 8. Propiedad intelectual
+La aplicación, su diseño y sus textos pertenecen a su titular. Te concedemos una licencia de uso personal, no exclusiva, intransferible y revocable. Los datos que introduces siguen siendo tuyos.
+
+## 9. Precio
+En la actualidad MisCuentas se ofrece de forma gratuita. Si en el futuro se añadieran funciones de pago, se informaría con claridad antes y no se cobraría nada sin tu consentimiento.
+
+## 10. Responsabilidad
+MisCuentas se ofrece "tal cual". En la medida en que la ley lo permite, el titular no responde de pérdidas de datos, de errores causados por datos mal introducidos ni de fallos de servicios de terceros. Esto no limita los derechos que la ley reconoce a los consumidores ni excluye la responsabilidad que no pueda excluirse legalmente.
+
+## 11. Baja y suspensión
+Puedes dejar de usar MisCuentas cuando quieras y pedir la eliminación de tu cuenta escribiendo a {{correo}} (consulta la Política de privacidad). Podemos suspender las cuentas que incumplan estas condiciones.
+
+## 12. Cambios en las condiciones
+Podemos modificar estas condiciones. La versión vigente es la que figura aquí, con su fecha de actualización, y si el cambio es importante te lo comunicaremos de forma visible. Si sigues usando MisCuentas después, se entiende que aceptas los cambios; si no estás de acuerdo, puedes darte de baja.
+
+## 13. Datos personales
+El tratamiento de tus datos personales se explica en la Política de privacidad.
+
+## 14. Ley aplicable
+Estas condiciones se rigen por la legislación española. Si eres consumidor, conservas los derechos que te reconoce la normativa de consumidores, incluida la posibilidad de acudir a los tribunales de tu domicilio. En los demás casos serán competentes los juzgados y tribunales que correspondan según la ley.

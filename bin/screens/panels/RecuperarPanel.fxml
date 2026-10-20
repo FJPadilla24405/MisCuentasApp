@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Panel "¿Olvidaste tu contraseña?" (lo usa AuthScreen.fxml con fx:include) -->
+<VBox spacing="16.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.RecuperarController">
+   <children>
+      <Label styleClass="panel-titulo" text="¿Olvidaste tu contraseña?" wrapText="true" />
+      <Label styleClass="texto-formulario" text="Escribe el email de tu cuenta y te enviaremos un enlace para crear una contraseña nueva." wrapText="true" />
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Email" />
+            <HBox fx:id="cajaEmail" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <TextField fx:id="txtEmail" onAction="#enviar" promptText="tucorreo@email.com" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+                  <Group>
+                     <children>
+                        <SVGPath content="M4 4 H20 A2 2 0 0 1 22 6 V18 A2 2 0 0 1 20 20 H4 A2 2 0 0 1 2 18 V6 A2 2 0 0 1 4 4 Z M22 6 L12 13 L2 6" scaleX="0.75" scaleY="0.75" styleClass="icono" />
+                     </children>
+                  </Group>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <Label fx:id="lblError" managed="false" styleClass="mensaje-error" visible="false" wrapText="true" />
+      <Label fx:id="lblOk" managed="false" styleClass="mensaje-ok" visible="false" wrapText="true" />
+
+      <Button fx:id="btnEnviar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#enviar" styleClass="boton-primario" text="Enviar enlace" />
+
+      <HBox alignment="CENTER">
+         <children>
+            <Hyperlink onAction="#irALogin" styleClass="enlace" text="Volver a iniciar sesión" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

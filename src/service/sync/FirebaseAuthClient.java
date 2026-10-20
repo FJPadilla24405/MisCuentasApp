@@ -88,6 +88,34 @@ public class FirebaseAuthClient {
     }
 
     /**
+     * Pide a Firebase que envíe al correo un enlace para crear una contraseña nueva.
+     * El correo lo envía Firebase; la aplicación nunca llega a ver la contraseña nueva.
+     * @param email: email de la cuenta
+     * @throws IOException si no hay conexión o Firebase rechaza la petición (AuthException)
+     * @throws InterruptedException
+     */
+    public void enviarCorreoRecuperacion(String email) throws IOException, InterruptedException {
+        if (email == null || email.isBlank()) {
+            throw new AuthException("MISSING_EMAIL", "Escribe tu correo electrónico.");
+        }
+
+        Map<String, Object> cuerpo = new LinkedHashMap<>();
+        cuerpo.put("requestType", "PASSWORD_RESET");
+        cuerpo.put("email", email.trim());
+
+        HttpRequest req = HttpRequest.newBuilder(URI.create(URL + "/accounts:sendOobCode?key=" + apiKey))
+                .timeout(Duration.ofSeconds(30))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(Json.escribir(cuerpo), StandardCharsets.UTF_8))
+                .build();
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        if (resp.statusCode() != 200) {
+            throw traducirError(resp.body());
+        }
+    }
+
+    /**
      * Registro y login son la misma petición; solo cambia la operación de la URL.
      * @param operacion: operacion que hacer en la url
      * @param email: email de la cuenta
@@ -147,6 +175,7 @@ public class FirebaseAuthClient {
             case "EMAIL_NOT_FOUND", "INVALID_PASSWORD", "INVALID_LOGIN_CREDENTIALS" -> "Correo o contraseña incorrectos.";
             case "USER_DISABLED" -> "Esta cuenta está deshabilitada.";
             case "TOO_MANY_ATTEMPTS_TRY_LATER" -> "Demasiados intentos. Inténtalo de nuevo más tarde.";
+            case "RESET_PASSWORD_EXCEED_LIMIT" -> "Has pedido demasiados correos de recuperación. Inténtalo de nuevo más tarde.";
             case "OPERATION_NOT_ALLOWED" -> "El acceso con correo y contraseña no está activado en el proyecto de Firebase.";
             case "API_KEY_INVALID" -> "La clave de API de Firebase no es válida.";
             default -> "No se pudo completar la operación (" + codigo + ").";

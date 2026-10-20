@@ -1,0 +1,307 @@
+/* ===== MisCuentas: estilos globales ===== */
+
+.root {
+    /* Paleta (sacada de la maqueta) */
+    -mc-cabecera: #153f30;
+    -mc-verde: #287a57;
+    -mc-verde-hover: #1f6347;
+    -mc-titulo: #1b3a2d;
+    -mc-texto: #2b3a33;
+    -mc-suave: #6b7a72;
+    -mc-borde: #dbe3df;
+    -mc-tramo: #e2e8e2;
+    -mc-aviso: #d98a1b;
+    -mc-error: #c0392b;
+
+    -fx-font-family: "Segoe UI", "Inter", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: white;
+}
+
+/* ----- Cabecera ----- */
+.cabecera {
+    -fx-background-color: -mc-cabecera;
+    -fx-padding: 0 28 0 28;
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+    -fx-max-height: 56;
+}
+.cabecera-titulo {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.logo {
+    -fx-background-color: rgba(255, 255, 255, 0.14);
+    -fx-background-radius: 20;
+    -fx-min-width: 34;
+    -fx-min-height: 34;
+    -fx-pref-width: 34;
+    -fx-pref-height: 34;
+}
+.logo .icono {
+    -fx-stroke: white;
+}
+
+/* ----- Contenedor de la pantalla de acceso ----- */
+.auth-raiz {
+    -fx-background-color: white;
+}
+.auth-scroll,
+.auth-scroll > .viewport {
+    -fx-background: white;
+    -fx-background-color: white;
+    -fx-padding: 0;
+}
+
+/* ----- Textos ----- */
+.panel-titulo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 6 0;
+    -fx-wrap-text: true;
+}
+.texto-suave {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+.texto-suave-pequeno {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 11px;
+}
+.mensaje-error {
+    -fx-text-fill: -mc-error;
+    -fx-font-size: 12px;
+}
+
+/* ----- Campos ----- */
+.campo-etiqueta {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 11px;
+}
+.campo-caja {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 8;
+    -fx-padding: 0 12 0 12;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+}
+.campo-caja.enfocado {
+    -fx-border-color: -mc-verde;
+}
+.campo-caja.error {
+    -fx-border-color: -mc-error;
+}
+.campo-input,
+.campo-input:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+    -fx-text-fill: -mc-texto;
+    -fx-prompt-text-fill: #9aa8a0;
+    -fx-highlight-fill: #cfe5da;
+    -fx-highlight-text-fill: -mc-texto;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.icono {
+    -fx-fill: transparent;
+    -fx-stroke: #7a8a82;
+    -fx-stroke-width: 2;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+}
+.icono-boton {
+    -fx-cursor: hand;
+}
+.icono-boton:hover .icono {
+    -fx-stroke: -mc-verde;
+}
+
+/* ----- Medidor de contraseña ----- */
+.tramo {
+    -fx-background-color: -mc-tramo;
+    -fx-background-radius: 2;
+    -fx-min-height: 4;
+    -fx-pref-height: 4;
+    -fx-max-height: 4;
+}
+.tramo.lleno {
+    -fx-background-color: -mc-verde;
+}
+.tramo.debil {
+    -fx-background-color: -mc-aviso;
+}
+.medidor-texto {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 11px;
+}
+.medidor-texto.debil {
+    -fx-text-fill: -mc-aviso;
+}
+
+/* ----- Casilla ----- */
+.check-box {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 12px;
+}
+.check-box > .box {
+    -fx-background-color: white;
+    -fx-background-radius: 4;
+    -fx-background-insets: 0;
+    -fx-border-color: #b9c6bf;
+    -fx-border-radius: 4;
+    -fx-padding: 3 4 3 4;
+}
+.check-box:selected > .box {
+    -fx-background-color: -mc-verde;
+    -fx-border-color: -mc-verde;
+}
+.check-box > .box > .mark {
+    -fx-background-color: transparent;
+}
+.check-box:selected > .box > .mark {
+    -fx-background-color: white;
+}
+
+/* ----- Botones y enlaces ----- */
+.boton-primario {
+    -fx-background-color: -mc-verde;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-cursor: hand;
+}
+.boton-primario:hover,
+.boton-primario:focused {
+    -fx-background-color: -mc-verde-hover;
+}
+.boton-primario:disabled {
+    -fx-opacity: 0.7;
+}
+.boton-secundario {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 8;
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-cursor: hand;
+}
+.boton-secundario:hover {
+    -fx-background-color: #f3f6f4;
+}
+.enlace,
+.enlace:visited {
+    -fx-text-fill: -mc-verde;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 0;
+    -fx-border-color: transparent;
+}
+.enlace:hover {
+    -fx-underline: true;
+}
+
+/* ----- Popups (Alert) ----- */
+.dialog-pane {
+    -fx-background-color: white;
+}
+.dialog-pane > .header-panel {
+    -fx-background-color: white;
+    -fx-padding: 20 24 0 24;
+}
+.dialog-pane > .header-panel > .label {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+.dialog-pane > .content.label {
+    -fx-text-fill: -mc-texto;
+    -fx-padding: 10 24 18 24;
+}
+.dialog-pane > .button-bar > .container {
+    -fx-background-color: white;
+    -fx-padding: 0 24 20 24;
+}
+.dialog-pane .button {
+    -fx-padding: 0 18 0 18;
+}
+
+/* ===== Recuperar contraseña y textos de formulario ===== */
+.mensaje-ok {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 12px;
+}
+.texto-formulario {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 12px;
+}
+
+/* ===== Ventana legal (condiciones y privacidad) ===== */
+.legal-scroll,
+.legal-scroll > .viewport {
+    -fx-background: white;
+    -fx-background-color: white;
+    -fx-padding: 0;
+}
+.legal-contenido {
+    -fx-padding: 20 28 24 28;
+}
+.legal-titulo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+.legal-h2 {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 0 0;
+}
+.legal-parrafo {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+    -fx-line-spacing: 3;
+}
+.legal-vineta {
+    -fx-padding: 0 0 0 6;
+}
+.legal-pie {
+    -fx-padding: 12 24 16 24;
+    -fx-border-color: -mc-borde transparent transparent transparent;
+}
+.legal-tabs > .tab-header-area > .tab-header-background {
+    -fx-background-color: white;
+}
+.legal-tabs > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent -mc-borde transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 6 16 6 16;
+}
+.legal-tabs > .tab-header-area > .headers-region > .tab:selected {
+    -fx-border-color: transparent transparent -mc-verde transparent;
+}
+.legal-tabs .tab-label {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 13px;
+}
+.legal-tabs .tab:selected .tab-label {
+    -fx-text-fill: -mc-verde;
+    -fx-font-weight: bold;
+}
+.legal-tabs .tab .focus-indicator {
+    -fx-border-color: transparent;
+}

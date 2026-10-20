@@ -68,6 +68,27 @@ public class UsuarioDAO {
     }
 
     /**
+     * Busca un usuario por su email (sin distinguir mayúsculas)
+     * @param email: correo del usuario
+     * @return Usuario con ese email si existe
+     */
+    public Optional<Usuario> buscarPorEmail(String email) {
+        String sql = "SELECT * FROM usuarios WHERE LOWER(email) = LOWER(?)";
+        Connection conn = DatabaseManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapear(rs));
+                }
+            }
+            return Optional.empty();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error buscando usuario por email", e);
+        }
+    }
+
+    /**
      * Busca un usuario por su id
      * @param id: id del usuario
      * @return Usuario con el id especificado si existe
