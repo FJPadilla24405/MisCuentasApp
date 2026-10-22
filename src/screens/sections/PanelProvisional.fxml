@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Panel que se muestra mientras un apartado no tiene su FXML en screens/sections/ -->
+<VBox alignment="CENTER" spacing="8.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PanelProvisionalController">
+   <children>
+      <Label fx:id="lblTitulo" styleClass="panel-titulo" text="Apartado" />
+      <Label fx:id="lblDetalle" styleClass="texto-suave" text="Este apartado todavía no está hecho." />
+   </children>
+</VBox>

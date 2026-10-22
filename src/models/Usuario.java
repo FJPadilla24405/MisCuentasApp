@@ -2,6 +2,12 @@ package models;
 
 public class Usuario {
 
+    /**
+     * Las cuentas creadas solo en este equipo no tienen cuenta en Firebase. Como usuarios.firebase_uid es
+     * NOT NULL y UNIQUE, se les da un identificador propio que empieza por este prefijo.
+     */
+    public static final String PREFIJO_UID_LOCAL = "local-";
+
     private int id;
     private String firebaseUid;
     private String nombre;
@@ -35,6 +41,11 @@ public class Usuario {
 
     public void setFirebaseUid(String firebaseUid) {
         this.firebaseUid = firebaseUid;
+    }
+
+    /** @return true si es una cuenta creada solo en este equipo (sin Firebase: no se puede sincronizar). */
+    public boolean isSoloLocal() {
+        return firebaseUid != null && firebaseUid.startsWith(PREFIJO_UID_LOCAL);
     }
 
     public String getNombre() {

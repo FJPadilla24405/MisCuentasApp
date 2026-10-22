@@ -9,7 +9,7 @@ Esta política explica qué datos personales trata MisCuentas, para qué, durant
 
 ## 2. Qué datos tratamos
 - Datos de la cuenta: nombre de usuario, correo electrónico y contraseña. La contraseña la gestiona únicamente Firebase Authentication (Google); MisCuentas no la guarda en tu equipo ni en sus propios archivos.
-- Identificador de tu cuenta en Firebase (uid), que enlaza tu cuenta con tus datos en la nube.
+- Identificador de tu cuenta en Firebase (uid), que enlaza tu cuenta con tus datos en la nube. Si eliges crear una cuenta solo en este equipo, no se crea ninguna cuenta en Firebase, no se te pide contraseña y se genera un identificador interno que no sale de tu equipo.
 - Los datos económicos que tú introduces: cuentas (nombre, tipo, saldo inicial y moneda), categorías, movimientos (importe, tipo, fecha, descripción y categoría), presupuestos y movimientos recurrentes.
 - Tus preferencias: moneda y tema (claro u oscuro).
 - Datos técnicos de conexión, como la dirección IP, que los servidores de Google reciben cuando la aplicación se comunica con Firebase.
@@ -17,16 +17,17 @@ MisCuentas no se conecta a tus bancos, no accede a claves bancarias ni a número
 
 ## 3. Para qué los usamos y con qué base legal
 - Crear tu cuenta, identificarte y permitirte usar la aplicación. Base legal: ejecución del contrato de uso que aceptas al registrarte (art. 6.1.b RGPD).
-- Guardar y sincronizar tus datos en la nube para que no los pierdas y puedas recuperarlos. Base legal: art. 6.1.b RGPD.
+- Guardar y sincronizar tus datos en la nube para que no los pierdas y puedas recuperarlos (solo si tu cuenta usa Firebase). Base legal: art. 6.1.b RGPD.
 - Enviarte el correo para crear una contraseña nueva cuando lo solicitas. Base legal: art. 6.1.b RGPD.
 - Mantener la seguridad del servicio y evitar usos abusivos. Base legal: interés legítimo (art. 6.1.f RGPD).
 No usamos tus datos para publicidad, no elaboramos perfiles comerciales, no tomamos decisiones automatizadas sobre ti y no vendemos tus datos.
 
 ## 4. Dónde se guardan tus datos
 - En tu equipo: la aplicación guarda una base de datos SQLite en la carpeta .miscuentas de tu usuario del sistema. La aplicación no cifra esta copia local, así que su protección depende de la seguridad de tu equipo y de tu usuario.
-- En la nube: al sincronizar, tus datos se guardan en Firebase Realtime Database, un servicio de Google, en un servidor de la Unión Europea (región europe-west1, Bélgica). Tu correo y tu contraseña se gestionan en Firebase Authentication.
+- En la nube (solo si tu cuenta usa Firebase): al sincronizar, tus datos se guardan en Firebase Realtime Database, un servicio de Google, en un servidor de la Unión Europea (región europe-west1, Bélgica). Tu correo y tu contraseña se gestionan en Firebase Authentication.
 - Google actúa como encargado del tratamiento por cuenta del responsable. Algunos datos de autenticación o técnicos pueden tratarse en servidores de Google situados fuera del Espacio Económico Europeo; esas transferencias se amparan en las cláusulas contractuales tipo de la Comisión Europea y, cuando proceda, en el Marco de Privacidad de Datos UE-EE. UU.
 - Si usas MisCuentas sin conexión, tus datos solo permanecen en tu equipo hasta que vuelvas a sincronizar.
+- Si creas una cuenta solo en este equipo, tus datos no se envían nunca a Firebase ni a ningún otro servidor, y no hay copia en la nube: si pierdes el equipo o borras la carpeta .miscuentas, no se pueden recuperar.
 
 ## 5. Con quién compartimos tus datos
 Con nadie más, salvo Google como proveedor técnico (apartado anterior) y las autoridades cuando una ley nos obligue a ello.

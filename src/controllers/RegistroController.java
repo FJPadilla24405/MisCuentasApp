@@ -14,6 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import models.Usuario;
 import service.auth.AuthService;
@@ -30,7 +31,7 @@ import util.Contrasena;
 public class RegistroController {
 
     private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
-    /** Longitud máxima de nombre y email, la misma que los VARCHAR(50) del esquema. */
+    // Longitud máxima de nombre y email, la misma que los VARCHAR(50) del esquema.
     private static final int MAX = 50;
 
     @FXML private HBox cajaUsuario;
@@ -47,6 +48,9 @@ public class RegistroController {
     @FXML private Region tramo4;
     @FXML private Label lblMedidor;
     @FXML private CheckBox chkTerminos;
+    @FXML private CheckBox chkSoloLocal;
+    @FXML private Label lblSoloLocal;
+    @FXML private VBox bloquePassword;
     @FXML private Label lblError;
     @FXML private Button btnCrear;
 
@@ -64,19 +68,28 @@ public class RegistroController {
         Campos.configurar(cajaPassword, txtPasswordOculto, txtPasswordVisible);
         txtPasswordOculto.textProperty().addListener((obs, antes, ahora) -> actualizarMedidor(ahora));
         chkTerminos.selectedProperty().addListener((obs, antes, ahora) -> ocultarError());
+        chkSoloLocal.selectedProperty().addListener((obs, antes, ahora) -> cambiarModo(ahora));
     }
 
-    // ---------------------------------------------------------------- lo que le dice AuthController
-
+    /**
+     * Cambia al panel del login
+     * @param accion: cambio de panel
+     */
     public void setAlIrALogin(Runnable accion) {
         this.alIrALogin = accion;
     }
 
+    /**
+     * Accede al resto de la aplicacion
+     * @param accion: cambio de pantalla
+     */
     public void setAlAcceder(Consumer<Usuario> accion) {
         this.alAcceder = accion;
     }
 
-    /** Se llama al volver a este panel: quita errores y la contraseña escrita. */
+    /**
+     * Se llama al volver a este panel: quita errores y la contraseña escrita.
+     */
     public void reiniciar() {
         ocultarError();
         txtPasswordOculto.clear();
@@ -85,32 +98,48 @@ public class RegistroController {
         Campos.marcarError(cajaPassword, false);
     }
 
+    /**
+     * Hace que el panel sea interactuable
+     */
     public void enfocar() {
         Platform.runLater(txtUsuario::requestFocus);
     }
 
-    // ---------------------------------------------------------------- acciones del FXML
-
+    /**
+     * Cambia al panel de login
+     */
     @FXML
     private void irALogin() {
         alIrALogin.run();
     }
 
+    /**
+     * Muestra el dialog con condiciones
+     */
     @FXML
     private void verCondiciones() {
         LegalController.mostrar(chkTerminos.getScene().getWindow(), false);
     }
 
+    /**
+     * Muestra el dialog con privacidad
+     */
     @FXML
     private void verPrivacidad() {
         LegalController.mostrar(chkTerminos.getScene().getWindow(), true);
     }
 
+    /**
+     * Muestra o deja de mostrar la contraseña que se este introduciendo
+     */
     @FXML
     private void alternarPassword() {
         Campos.alternarContrasena(txtPasswordOculto, txtPasswordVisible, iconoOjo);
     }
 
+    /**
+     * Peticion a firebase para registrar un nuevo usuario en auth
+     */
     @FXML
     private void registrar() {
         ocultarError();
@@ -129,7 +158,8 @@ public class RegistroController {
             mostrarError("Escribe un email válido (máximo " + MAX + " caracteres).");
             return;
         }
-        if (!Contrasena.cumpleMinimos(clave)) {
+        boolean soloLocal = chkSoloLocal.isSelected();
+        if (!soloLocal && !Contrasena.cumpleMinimos(clave)) {
             Campos.marcarError(cajaPassword, true);
             mostrarError("La contraseña debe tener al menos 8 caracteres, con letras y números.");
             return;
@@ -141,6 +171,17 @@ public class RegistroController {
         if (auth.existeEmailLocal(correo)) {
             Campos.marcarError(cajaEmail, true);
             mostrarError("Ya existe una cuenta con ese email en este equipo.");
+            return;
+        }
+
+        if (soloLocal) {
+            // Sin Firebase ni red: es una consulta e inserción rápidas en SQLite
+            try {
+                alAcceder.accept(auth.registrarSoloLocal(nombre, correo));
+            } catch (AuthException a) {
+                Campos.marcarError(cajaEmail, true);
+                mostrarError(a.getMessage());
+            }
             return;
         }
 
@@ -174,8 +215,10 @@ public class RegistroController {
         hebra.start();
     }
 
-    // ---------------------------------------------------------------- ayudas
-
+    /**
+     * Medidor de contraseña segura
+     * @param pw: contraseña que se introduce
+     */
     private void actualizarMedidor(String pw) {
         Contrasena.Fortaleza f = Contrasena.evaluar(pw);
         for (int i = 0; i < tramos.length; i++) {
@@ -191,17 +234,45 @@ public class RegistroController {
         lblMedidor.setText(f.mensaje());
     }
 
+    /**
+     * Con "solo en este equipo" desaparece la contraseña y el botón cambia de texto.
+     * @param soloLocal: si el usuario es solo en local o no
+     */
+    private void cambiarModo(boolean soloLocal) {
+        ocultarError();
+        bloquePassword.setVisible(!soloLocal);
+        bloquePassword.setManaged(!soloLocal);
+        lblSoloLocal.setVisible(soloLocal);
+        lblSoloLocal.setManaged(soloLocal);
+        if (soloLocal) {
+            txtPasswordOculto.clear();
+            Campos.marcarError(cajaPassword, false);
+        }
+        btnCrear.setText(soloLocal ? "Crear cuenta en este equipo" : "Crear mi cuenta");
+    }
+
+    /**
+     * Deshabilita el boton si se esta registrando
+     * @param si: true deshabilita false habilita
+     */
     private void ocupado(boolean si) {
         btnCrear.setDisable(si);
         btnCrear.setText(si ? "Creando tu cuenta…" : "Crear mi cuenta");
     }
 
+    /**
+     * Muestra el texto del error
+     * @param texto: error
+     */
     private void mostrarError(String texto) {
         lblError.setText(texto);
         lblError.setVisible(true);
         lblError.setManaged(true);
     }
 
+    /**
+     * Oculta el texto del error
+     */
     private void ocultarError() {
         lblError.setText("");
         lblError.setVisible(false);

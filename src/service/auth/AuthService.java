@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * Lógica de registro e inicio de sesión, separada de las pantallas.
@@ -84,6 +85,23 @@ public class AuthService {
                 throw e;
             }
         }
+    }
+
+    /**
+     * Crea una cuenta solo en este equipo: sin contraseña, sin Firebase y sin conexión.
+     * Deja la sesión iniciada (sin Firebase). Más adelante no se podrá sincronizar.
+     * @return El usuario local creado
+     * @throws AuthException si ya hay un usuario local con ese email
+     */
+    public Usuario registrarSoloLocal(String nombre, String email) throws AuthException {
+        String correo = email.trim().toLowerCase(Locale.ROOT);
+        if (existeEmailLocal(correo)) {
+            throw new AuthException("EMAIL_EXISTS_LOCAL", "Ya existe una cuenta con ese correo en este equipo.");
+        }
+        String uidLocal = Usuario.PREFIJO_UID_LOCAL + UUID.randomUUID();
+        Usuario usuario = usuarioDAO.insertar(new Usuario(0, uidLocal, nombre.trim(), correo, "EUR", "claro"));
+        SesionActual.iniciarSinConexion(usuario);
+        return usuario;
     }
 
     /** La apiKey se lee de assets/firebase.properties (dentro de la aplicación, el usuario no configura nada). */

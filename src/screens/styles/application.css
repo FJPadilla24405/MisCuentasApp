@@ -305,3 +305,162 @@
 .legal-tabs .tab .focus-indicator {
     -fx-border-color: transparent;
 }
+
+/* ===== Pantalla principal y barra lateral ===== */
+.root {
+    -mc-fondo: #f5f7f5;
+    -mc-activo: #e3efe8;
+    -mc-hover: #f0f4f1;
+    -mc-borde-suave: #e6ebe8;
+}
+.main-raiz,
+.contenido-fondo {
+    -fx-background-color: -mc-fondo;
+}
+.barra-lateral {
+    -fx-background-color: white;
+    -fx-border-color: transparent -mc-borde-suave transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+.barra-cabecera {
+    -fx-padding: 22 20 18 20;
+}
+.logo-barra {
+    -fx-background-color: -mc-cabecera;
+    -fx-background-radius: 10;
+    -fx-min-width: 38;
+    -fx-min-height: 38;
+    -fx-pref-width: 38;
+    -fx-pref-height: 38;
+}
+.logo-barra .icono {
+    -fx-stroke: white;
+}
+.barra-titulo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 21px;
+}
+.barra-scroll,
+.barra-scroll > .viewport {
+    -fx-background: white;
+    -fx-background-color: white;
+    -fx-padding: 0;
+}
+.barra-contenido {
+    -fx-background-color: white;
+    -fx-padding: 0 12 12 12;
+}
+.barra-seccion {
+    -fx-text-fill: #8a9a92;
+    -fx-font-size: 10px;
+    -fx-padding: 16 8 6 8;
+}
+
+/* Filas de la barra: apartados, cuentas y "Añadir cuenta" */
+.nav-item {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-padding: 0 12 0 12;
+    -fx-min-height: 36;
+    -fx-pref-height: 36;
+    -fx-alignment: CENTER_LEFT;
+    -fx-graphic-text-gap: 10;
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+.nav-item:hover,
+.nav-item:focused {
+    -fx-background-color: -mc-hover;
+}
+.nav-item.activo,
+.nav-item.activo:hover,
+.nav-item.activo:focused {
+    -fx-background-color: -mc-activo;
+    -fx-text-fill: -mc-cabecera;
+}
+.nav-item.activo .icono {
+    -fx-stroke: -mc-cabecera;
+}
+.nav-cuenta-nombre {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+}
+.nav-item.activo .nav-cuenta-nombre {
+    -fx-text-fill: -mc-cabecera;
+}
+.nav-saldo {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+
+/* Pie de la barra: perfil y usuario */
+.barra-pie {
+    -fx-padding: 10 12 14 12;
+    -fx-border-color: -mc-borde-suave transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+.barra-usuario {
+    -fx-padding: 6 4 0 12;
+}
+.avatar {
+    -fx-background-color: #d8eadf;
+    -fx-background-radius: 16;
+    -fx-min-width: 32;
+    -fx-min-height: 32;
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+}
+.avatar-texto {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+.usuario-nombre {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.usuario-detalle {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 11px;
+}
+.boton-icono {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-padding: 6;
+    -fx-cursor: hand;
+}
+.boton-icono:hover,
+.boton-icono:focused {
+    -fx-background-color: -mc-hover;
+}
+
+/* Ventana "Añadir cuenta": selector de tipo */
+.opcion-tipo {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 8;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-graphic-text-gap: 8;
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+.opcion-tipo:hover {
+    -fx-background-color: -mc-hover;
+}
+.opcion-tipo:selected {
+    -fx-background-color: -mc-activo;
+    -fx-border-color: -mc-verde;
+    -fx-text-fill: -mc-cabecera;
+}
+.opcion-tipo:selected .icono {
+    -fx-stroke: -mc-cabecera;
+}
+

@@ -43,6 +43,11 @@ public final class SesionActual {
         return firebase != null;
     }
 
+    /** @return true si quien ha entrado tiene una cuenta solo local (sin Firebase). */
+    public static boolean isSoloLocal() {
+        return usuario != null && usuario.isSoloLocal();
+    }
+
     public static void cerrar() {
         usuario = null;
         firebase = null;

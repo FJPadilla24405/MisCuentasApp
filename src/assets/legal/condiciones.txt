@@ -13,6 +13,7 @@ Al marcar la casilla de aceptación al crear tu cuenta declaras que has leído e
 - Eres responsable de mantener en secreto tu contraseña y de lo que se haga con tu cuenta.
 - Si sospechas que alguien la ha usado sin permiso, cambia la contraseña con la opción "¿Olvidaste tu contraseña?" y avísanos en {{correo}}.
 - Si olvidas la contraseña, puedes crear una nueva con el enlace que Firebase envía a tu correo.
+- Puedes crear una cuenta solo en este equipo, sin contraseña y sin Firebase. Esa cuenta no se puede sincronizar ni recuperar: si pierdes el equipo o borras la carpeta .miscuentas, pierdes los datos. Como no tiene contraseña, quien tenga acceso a tu equipo y conozca tu usuario y tu email podrá abrirla.
 
 ## 4. Qué es y qué no es MisCuentas
 MisCuentas es una herramienta de organización personal. No es una entidad financiera, no gestiona tu dinero, no se conecta a tus bancos y no ofrece asesoramiento financiero, fiscal ni contable.

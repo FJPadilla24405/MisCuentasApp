@@ -51,7 +51,14 @@
          </children>
       </VBox>
 
-      <VBox spacing="8.0">
+      <VBox spacing="6.0">
+         <children>
+            <CheckBox fx:id="chkSoloLocal" mnemonicParsing="false" text="Crear la cuenta solo en este equipo (sin contraseña ni nube)" />
+            <Label fx:id="lblSoloLocal" managed="false" styleClass="texto-suave-pequeno" text="Tus datos solo se guardarán en este equipo: no se sincronizan y no se pueden recuperar si lo pierdes. Quien tenga acceso a tu equipo y conozca tu usuario y email podrá abrirlos." visible="false" wrapText="true" />
+         </children>
+      </VBox>
+
+      <VBox fx:id="bloquePassword" spacing="8.0">
          <children>
             <VBox spacing="6.0">
                <children>

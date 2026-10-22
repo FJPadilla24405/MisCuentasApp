@@ -397,5 +397,8 @@ public class SyncService {
         if (usuario == null || usuario.getFirebaseUid() == null || usuario.getFirebaseUid().isBlank()) {
             throw new IllegalArgumentException("El usuario no tiene firebase_uid");
         }
+        if (usuario.isSoloLocal()) {
+            throw new IllegalArgumentException("Es una cuenta solo local: no tiene cuenta en Firebase y no se puede sincronizar");
+        }
     }
 }

@@ -27,7 +27,7 @@ public class AuthController {
     @FXML private RegistroController registroController;
     @FXML private RecuperarController recuperarController;
 
-    /** Panel que se está viendo ahora. */
+    // Panel que se está viendo ahora.
     private Node actual;
     private boolean animando = false;
 
@@ -51,13 +51,18 @@ public class AuthController {
     /**
      * Qué hacer cuando el login o el registro han ido bien (la sesión ya está en SesionActual).
      * Lo llama quien carga esta pantalla, normalmente Main.
+     * @param alAcceder: pasa a la siguiente pantalla
      */
     public void setAlAcceder(Consumer<Usuario> alAcceder) {
         loginController.setAlAcceder(alAcceder);
         registroController.setAlAcceder(alAcceder);
     }
 
-    /** Desvanece el panel actual y hace entrar el indicado deslizándose desde el lado dado. */
+    /**
+     * Desvanece el panel actual y hace entrar el indicado deslizándose desde el lado dado.
+     * @param entrante: panel entrante
+     * @param desdeX: coordenada desde la que sale
+     */
     private void cambiar(Node entrante, double desdeX) {
         if (animando || entrante == actual) {
             return;
@@ -92,11 +97,19 @@ public class AuthController {
         salida.play();
     }
 
+    /**
+     * Oculta el panel
+     * @param n: panel a ocultar
+     */
     private void ocultar(Node n) {
         n.setVisible(false);
         n.setManaged(false);
     }
 
+    /**
+     * Reinicia el panel
+     * @param panel: panel a reiniciar
+     */
     private void reiniciar(Node panel) {
         if (panel == login) {
             loginController.reiniciar();
@@ -107,6 +120,10 @@ public class AuthController {
         }
     }
 
+    /**
+     * Hace que el panel sea interactuable
+     * @param panel: panel a enfocar
+     */
     private void enfocar(Node panel) {
         if (panel == login) {
             loginController.enfocar();

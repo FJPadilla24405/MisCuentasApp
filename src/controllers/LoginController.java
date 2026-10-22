@@ -35,7 +35,7 @@ import util.Campos;
  */
 public class LoginController {
 
-    /** Códigos de Firebase que significan "esas credenciales no valen". */
+    // Códigos de Firebase que significan "esas credenciales no valen".
     private static final Set<String> CREDENCIALES_INCORRECTAS =
             Set.of("INVALID_LOGIN_CREDENTIALS", "INVALID_PASSWORD", "EMAIL_NOT_FOUND");
 
@@ -64,22 +64,33 @@ public class LoginController {
         Campos.configurar(cajaPassword, txtPasswordOculto, txtPasswordVisible);
     }
 
-    // ---------------------------------------------------------------- lo que le dice AuthController
-
+    /**
+     * Cambia al panel de registro
+     * @param accion: cambio de panel
+     */
     public void setAlIrARegistro(Runnable accion) {
         this.alIrARegistro = accion;
     }
 
-    /** Recibe el email que ya se había escrito, para que el panel de recuperar lo muestre relleno. */
+    /**
+     * Recibe el email que ya se había escrito, para que el panel de recuperar lo muestre relleno.
+     * @param accion: cambio de panel
+     */
     public void setAlIrARecuperar(Consumer<String> accion) {
         this.alIrARecuperar = accion;
     }
 
+    /**
+     * Accede al resto de la aplicacion
+     * @param accion: cambio de pantalla
+     */
     public void setAlAcceder(Consumer<Usuario> accion) {
         this.alAcceder = accion;
     }
 
-    /** Se llama al volver a este panel: quita errores y la contraseña escrita. */
+    /**
+     * Se llama al volver a este panel: quita errores y la contraseña escrita.
+     */
     public void reiniciar() {
         ocultarError();
         txtPasswordOculto.clear();
@@ -88,27 +99,40 @@ public class LoginController {
         Campos.marcarError(cajaPassword, false);
     }
 
+    /**
+     * Permite que el campo sea interactuable
+     */
     public void enfocar() {
         Platform.runLater(txtUsuario::requestFocus);
     }
 
-    // ---------------------------------------------------------------- acciones del FXML
-
+    /**
+     * Va al panel de registro
+     */
     @FXML
     private void irARegistro() {
         alIrARegistro.run();
     }
 
+    /**
+     * Va al panel de recuperar contraseña
+     */
     @FXML
     private void irARecuperar() {
         alIrARecuperar.accept(txtEmail.getText().trim());
     }
 
+    /**
+     * Muestra o no la contraseña que se esta escribiendo
+     */
     @FXML
     private void alternarPassword() {
         Campos.alternarContrasena(txtPasswordOculto, txtPasswordVisible, iconoOjo);
     }
 
+    /**
+     * Recoge los datos insertados en los campos e inicia sesion
+     */
     @FXML
     private void iniciarSesion() {
         ocultarError();
@@ -125,12 +149,8 @@ public class LoginController {
             Campos.marcarError(cajaEmail, true);
             completo = false;
         }
-        if (clave.isEmpty()) {
-            Campos.marcarError(cajaPassword, true);
-            completo = false;
-        }
         if (!completo) {
-            mostrarError("Rellena el usuario, el email y la contraseña.");
+            mostrarError("Rellena el usuario y el email.");
             return;
         }
 
@@ -143,12 +163,30 @@ public class LoginController {
             return;
         }
 
+        // Cuenta creada solo en este equipo: no tiene contraseña ni Firebase, se entra directamente
+        if (local.get().isSoloLocal()) {
+            SesionActual.iniciarSinConexion(local.get());
+            alAcceder.accept(local.get());
+            return;
+        }
+
+        // Cuenta con Firebase: hace falta la contraseña
+        if (clave.isEmpty()) {
+            Campos.marcarError(cajaPassword, true);
+            mostrarError("Escribe tu contraseña.");
+            return;
+        }
+
         // Paso 2: Firebase (red, en segundo plano)
         comprobarFirebase(local.get(), correo, clave);
     }
 
-    // ---------------------------------------------------------------- Firebase
-
+    /**
+     * Comprueba que existe una cuenta de firebase 
+     * @param local: nombre de usuario
+     * @param correo: correo del usuario
+     * @param clave: contraseña de firebase
+     */
     private void comprobarFirebase(Usuario local, String correo, String clave) {
         ocupado(true);
         Task<Sesion> tarea = new Task<>() {
@@ -166,12 +204,18 @@ public class LoginController {
             ocupado(false);
             tratarFalloFirebase(local, correo, clave, tarea.getException());
         });
-        Thread hebra = new Thread(tarea, "login-firebase");
-        hebra.setDaemon(true);
-        hebra.start();
+        Thread hilo = new Thread(tarea, "login-firebase");
+        hilo.setDaemon(true);
+        hilo.start();
     }
 
-    /** Pregunta si seguir sin conexión o reintentar, según el motivo del fallo. */
+    /**
+     * Pregunta si seguir sin conexión o reintentar, según el motivo del fallo.
+     * @param local: nombre del usuario
+     * @param correo: correo del usuario
+     * @param clave: contraseña del firebase
+     * @param fallo: tipo de fallo en el inicio de sesion
+     */
     private void tratarFalloFirebase(Usuario local, String correo, String clave, Throwable fallo) {
         boolean contrasenaIncorrecta = fallo instanceof AuthException a
                 && CREDENCIALES_INCORRECTAS.contains(a.getCodigo());
@@ -203,7 +247,12 @@ public class LoginController {
         }
     }
 
-    /** @return true si el usuario elige "Continuar sin conexión"; cerrar el popup equivale a reintentar. */
+    /**
+     * @return true si el usuario elige "Continuar sin conexión"; cerrar el popup equivale a reintentar.
+     * @param titulo: titulo del dialog
+     * @param mensaje: mensaje del dialog
+     * @return Devuelve true para continuar o false para reintentar
+     */
     private boolean preguntarContinuarSinConexion(String titulo, String mensaje) {
         ButtonType reintentar = new ButtonType("Reintentar", ButtonBar.ButtonData.CANCEL_CLOSE);
         ButtonType continuar = new ButtonType("Continuar sin conexión", ButtonBar.ButtonData.OK_DONE);
@@ -222,19 +271,28 @@ public class LoginController {
         return popup.showAndWait().filter(b -> b == continuar).isPresent();
     }
 
-    // ---------------------------------------------------------------- ayudas
-
+    /**
+     * Deshabilita el boton si se esta iniciando sesion
+     * @param si: si se esta comprobando el inicio o no
+     */
     private void ocupado(boolean si) {
         btnEntrar.setDisable(si);
         btnEntrar.setText(si ? "Comprobando…" : "Iniciar sesión");
     }
 
+    /**
+     * Muestra el error que ha sucedido
+     * @param texto: texto del error
+     */
     private void mostrarError(String texto) {
         lblError.setText(texto);
         lblError.setVisible(true);
         lblError.setManaged(true);
     }
 
+    /**
+     * Oculta el error
+     */
     private void ocultarError() {
         lblError.setText("");
         lblError.setVisible(false);

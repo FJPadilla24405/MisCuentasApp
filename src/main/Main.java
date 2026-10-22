@@ -1,13 +1,13 @@
 package main;
 
 import controllers.AuthController;
+import controllers.MainController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import models.Usuario;
 import service.auth.SesionActual;
@@ -17,42 +17,90 @@ public class Main extends Application {
 
 	private Stage ventana;
 
+	/**
+	 * Arranca la aplicación en la pantalla de acceso
+	 * @param primaryStage: ventana principal
+	 */
 	@Override
 	public void start(Stage primaryStage) {
 		try {
 			ventana = primaryStage;
-
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/AuthScreen.fxml"));
-			Parent raiz = loader.load();
-			AuthController acceso = loader.getController();
-			acceso.setAlAcceder(this::mostrarPantallaPrincipal);
-
-			primaryStage.setTitle("MisCuentas");
-			primaryStage.setMinWidth(560);
-			primaryStage.setMinHeight(560);
-			primaryStage.setScene(new Scene(raiz, 1000, 680));
-			primaryStage.show();
+			ventana.setTitle("MisCuentas");
+			mostrarAcceso();
+			ventana.show();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Se llama cuando el login o el registro han ido bien. De momento solo enseña un saludo:
-	 * aquí hay que cargar el FXML de la pantalla general de la aplicación.
+	 * Muestra la pantalla de login y registro
+	 * @throws Exception si no se puede cargar el FXML
 	 */
-	private void mostrarPantallaPrincipal(Usuario usuario) {
-		Label saludo = new Label("Hola, " + usuario.getNombre());
-		saludo.getStyleClass().add("panel-titulo");
-		Label modo = new Label(SesionActual.isConectado() ? "Conectado a Firebase" : "Sin conexión a Firebase");
-		modo.getStyleClass().add("texto-suave");
-
-		VBox provisional = new VBox(8, saludo, modo);
-		provisional.setAlignment(Pos.CENTER);
-		provisional.getStylesheets().add(getClass().getResource("/screens/styles/application.css").toExternalForm());
-		ventana.getScene().setRoot(provisional);
+	private void mostrarAcceso() throws Exception {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/AuthScreen.fxml"));
+		Parent raiz = loader.load();
+		AuthController acceso = loader.getController();
+		acceso.setAlAcceder(this::mostrarPrincipal);
+		ponerPantalla(raiz, 1000, 680, 560, 560);
 	}
 
+	/**
+	 * Muestra la pantalla principal (barra lateral y contenido) cuando el login o el registro han ido bien
+	 * @param usuario: usuario que ha entrado
+	 */
+	private void mostrarPrincipal(Usuario usuario) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/MainScreen.fxml"));
+			Parent raiz = loader.load();
+			MainController principal = loader.getController();
+			principal.setAlCerrarSesion(this::cerrarSesion);
+			ponerPantalla(raiz, 1280, 800, 980, 620);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Cierra la sesión y vuelve a la pantalla de acceso
+	 */
+	private void cerrarSesion() {
+		try {
+			SesionActual.cerrar();
+			mostrarAcceso();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Cambia lo que se ve en la ventana y ajusta su tamaño (sin salirse de la pantalla)
+	 * @param raiz: contenido nuevo
+	 * @param ancho: ancho deseado
+	 * @param alto: alto deseado
+	 * @param minAncho: ancho mínimo
+	 * @param minAlto: alto mínimo
+	 */
+	private void ponerPantalla(Parent raiz, double ancho, double alto, double minAncho, double minAlto) {
+		Rectangle2D pantalla = Screen.getPrimary().getVisualBounds();
+		double anchoFinal = Math.min(ancho, pantalla.getWidth());
+		double altoFinal = Math.min(alto, pantalla.getHeight());
+
+		if (ventana.getScene() == null) {
+			ventana.setScene(new Scene(raiz, anchoFinal, altoFinal));
+		} else {
+			ventana.getScene().setRoot(raiz);
+		}
+		ventana.setMinWidth(Math.min(minAncho, anchoFinal));
+		ventana.setMinHeight(Math.min(minAlto, altoFinal));
+		ventana.setWidth(anchoFinal);
+		ventana.setHeight(altoFinal);
+		ventana.centerOnScreen();
+	}
+
+	/**
+	 * Cierra la conexión con la base de datos al salir
+	 */
 	@Override
 	public void stop() {
 		DatabaseManager.cerrar();

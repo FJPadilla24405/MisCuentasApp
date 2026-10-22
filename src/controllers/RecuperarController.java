@@ -27,7 +27,7 @@ import util.Campos;
 public class RecuperarController {
 
     private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
-    /** Segundos que hay que esperar para poder pedir otro correo (evita pulsar sin parar). */
+    // Segundos que hay que esperar para poder pedir otro correo (evita pulsar sin parar).
     private static final int ESPERA = 30;
 
     @FXML private HBox cajaEmail;
@@ -45,20 +45,27 @@ public class RecuperarController {
         Campos.configurar(cajaEmail, txtEmail);
     }
 
-    // ---------------------------------------------------------------- lo que le dice AuthController
-
+    /**
+     * Cambia el panel del login
+     * @param accion: cambio de panel
+     */
     public void setAlIrALogin(Runnable accion) {
         this.alIrALogin = accion;
     }
 
-    /** Rellena el email con el que ya se había escrito en el login (si había algo). */
+    /**
+     * Rellena el email con el que ya se había escrito en el login (si había algo).
+     * @param email: email del usuario
+     */
     public void setEmail(String email) {
         if (email != null && !email.isBlank()) {
             txtEmail.setText(email.trim());
         }
     }
 
-    /** Se llama al salir de este panel: quita los mensajes y para la espera. */
+    /**
+     * Se llama al salir de este panel: quita los mensajes y para la espera.
+     */
     public void reiniciar() {
         ocultar(lblError);
         ocultar(lblOk);
@@ -70,17 +77,24 @@ public class RecuperarController {
         btnEnviar.setText("Enviar enlace");
     }
 
+    /**
+     * Permite que el campo sea interactuable
+     */
     public void enfocar() {
         Platform.runLater(txtEmail::requestFocus);
     }
 
-    // ---------------------------------------------------------------- acciones del FXML
-
+    /**
+     * Cambia al panel de inicio de sesion
+     */
     @FXML
     private void irALogin() {
         alIrALogin.run();
     }
 
+    /**
+     * Manda la peticion de recuperar cuenta con el email introducido
+     */
     @FXML
     private void enviar() {
         if (btnEnviar.isDisabled()) {
@@ -127,9 +141,9 @@ public class RecuperarController {
         hebra.start();
     }
 
-    // ---------------------------------------------------------------- ayudas
-
-    /** Deja el botón bloqueado ESPERA segundos, con la cuenta atrás en el texto. */
+    /**
+     * Deja el botón bloqueado ESPERA segundos, con la cuenta atrás en el texto.
+     */
     private void iniciarEspera() {
         int[] restantes = { ESPERA };
         btnEnviar.setText("Reenviar en " + restantes[0] + " s");
@@ -146,12 +160,21 @@ public class RecuperarController {
         cuentaAtras.play();
     }
 
+    /**
+     * Pone visible un texto
+     * @param etiqueta: etiqueta a poner visible
+     * @param texto: texto del label
+     */
     private void mostrar(Label etiqueta, String texto) {
         etiqueta.setText(texto);
         etiqueta.setVisible(true);
         etiqueta.setManaged(true);
     }
 
+    /**
+     * Oculta un texto
+     * @param etiqueta: etiqueta que se oculta ocultosamente
+     */
     private void ocultar(Label etiqueta) {
         etiqueta.setText("");
         etiqueta.setVisible(false);
