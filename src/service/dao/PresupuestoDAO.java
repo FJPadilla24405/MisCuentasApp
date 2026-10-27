@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Clase del DAO para la tabla Movimientos
+ * Clase del DAO para la tabla Presupuesto
  * 
  * @author Fco. Padilla
  */
@@ -50,7 +50,7 @@ public class PresupuestoDAO {
     /**
      * Lista los presupuestos de un usuario concreto de un mes
      * @param usuarioId: id del usuario
-     * @param mesReferencia: mes en el que esta activo el presupuesto
+     * @param mesReferencia: mes en el que está activo el presupuesto
      * @return Devuelve la lista de presupuestos del usuario de un mismo mes
      */
     public List<Presupuesto> listarPorUsuarioYMes(int usuarioId, String mesReferencia) {
@@ -72,9 +72,9 @@ public class PresupuestoDAO {
     }
 
     /**
-     * Método que puede o no devolver un presupuesto de un usuario concreto en una categoria y mes especifico
+     * Método que puede o no devolver un presupuesto de un usuario concreto en una categoría y mes específico
      * @param usuarioId: id del usuario
-     * @param categoriaId: id de la categoria
+     * @param categoriaId: id de la categoría
      * @param mesReferencia: mes del presupuesto
      * @return Devuelve un presupuesto si existe
      */

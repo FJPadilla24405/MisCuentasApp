@@ -14,7 +14,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import models.Usuario;
 import service.auth.AuthService;
@@ -23,8 +22,10 @@ import util.Campos;
 import util.Contrasena;
 
 /**
- * Controlador de RegistroPanel.fxml. Crea la cuenta en Firebase (hace falta conexión, porque de ahí
- * sale el uid que se guarda en usuarios.firebase_uid) y después el usuario en la base de datos local.
+ * Controlador de RegistroPanel.fxml. Pide nombre de usuario, email y contraseña, y la casilla de cuenta
+ * offline. Una cuenta online se crea en Firebase (hace falta conexión, porque de ahí sale el uid) y una
+ * cuenta offline solo en este equipo. En los dos casos se guarda en la base de datos local la huella de
+ * la contraseña (nunca la contraseña).
  *
  * @author Fco Padilla
  */
@@ -50,7 +51,6 @@ public class RegistroController {
     @FXML private CheckBox chkTerminos;
     @FXML private CheckBox chkSoloLocal;
     @FXML private Label lblSoloLocal;
-    @FXML private VBox bloquePassword;
     @FXML private Label lblError;
     @FXML private Button btnCrear;
 
@@ -80,7 +80,7 @@ public class RegistroController {
     }
 
     /**
-     * Accede al resto de la aplicacion
+     * Accede al resto de la aplicación
      * @param accion: cambio de pantalla
      */
     public void setAlAcceder(Consumer<Usuario> accion) {
@@ -130,7 +130,7 @@ public class RegistroController {
     }
 
     /**
-     * Muestra o deja de mostrar la contraseña que se este introduciendo
+     * Muestra o deja de mostrar la contraseña que se esté introduciendo
      */
     @FXML
     private void alternarPassword() {
@@ -138,7 +138,7 @@ public class RegistroController {
     }
 
     /**
-     * Peticion a firebase para registrar un nuevo usuario en auth
+     * Petición a firebase para registrar un nuevo usuario en auth
      */
     @FXML
     private void registrar() {
@@ -159,7 +159,7 @@ public class RegistroController {
             return;
         }
         boolean soloLocal = chkSoloLocal.isSelected();
-        if (!soloLocal && !Contrasena.cumpleMinimos(clave)) {
+        if (!Contrasena.cumpleMinimos(clave)) {
             Campos.marcarError(cajaPassword, true);
             mostrarError("La contraseña debe tener al menos 8 caracteres, con letras y números.");
             return;
@@ -174,22 +174,13 @@ public class RegistroController {
             return;
         }
 
-        if (soloLocal) {
-            // Sin Firebase ni red: es una consulta e inserción rápidas en SQLite
-            try {
-                alAcceder.accept(auth.registrarSoloLocal(nombre, correo));
-            } catch (AuthException a) {
-                Campos.marcarError(cajaEmail, true);
-                mostrarError(a.getMessage());
-            }
-            return;
-        }
-
+        // Calcular la huella de la contraseña y hablar con Firebase tardan: se hace en segundo plano
         ocupado(true);
         Task<Usuario> tarea = new Task<>() {
             @Override
             protected Usuario call() throws Exception {
-                return auth.registrar(nombre, correo, clave);
+                return soloLocal ? auth.registrarSoloLocal(nombre, correo, clave)
+                        : auth.registrar(nombre, correo, clave);
             }
         };
         tarea.setOnSucceeded(e -> {
@@ -200,17 +191,17 @@ public class RegistroController {
             ocupado(false);
             Throwable fallo = tarea.getException();
             if (fallo instanceof AuthException a) {
-                if ("EMAIL_EXISTS".equals(a.getCodigo())) {
+                if ("EMAIL_EXISTS".equals(a.getCodigo()) || "EMAIL_EXISTS_LOCAL".equals(a.getCodigo())) {
                     Campos.marcarError(cajaEmail, true);
                 }
                 mostrarError(a.getMessage());
             } else if (fallo instanceof IOException) {
-                mostrarError("No se ha podido conectar con Firebase. Para crear la cuenta necesitas conexión a internet.");
+                mostrarError("No se ha podido conectar con Firebase. Para crear una cuenta online necesitas conexión a internet; también puedes crear una cuenta offline.");
             } else {
                 mostrarError("No se pudo crear la cuenta: " + fallo);
             }
         });
-        Thread hebra = new Thread(tarea, "registro-firebase");
+        Thread hebra = new Thread(tarea, "registro");
         hebra.setDaemon(true);
         hebra.start();
     }
@@ -235,29 +226,31 @@ public class RegistroController {
     }
 
     /**
-     * Con "solo en este equipo" desaparece la contraseña y el botón cambia de texto.
-     * @param soloLocal: si el usuario es solo en local o no
+     * Con "cuenta offline" aparece el aviso de que no se sincroniza y cambia el texto del botón.
+     * La contraseña se pide siempre.
+     * @param soloLocal: si la cuenta es offline (solo en este equipo) o no
      */
     private void cambiarModo(boolean soloLocal) {
         ocultarError();
-        bloquePassword.setVisible(!soloLocal);
-        bloquePassword.setManaged(!soloLocal);
         lblSoloLocal.setVisible(soloLocal);
         lblSoloLocal.setManaged(soloLocal);
-        if (soloLocal) {
-            txtPasswordOculto.clear();
-            Campos.marcarError(cajaPassword, false);
-        }
-        btnCrear.setText(soloLocal ? "Crear cuenta en este equipo" : "Crear mi cuenta");
+        btnCrear.setText(textoBoton());
     }
 
     /**
-     * Deshabilita el boton si se esta registrando
+     * @return Devuelve el texto del botón según sea una cuenta offline u online
+     */
+    private String textoBoton() {
+        return chkSoloLocal.isSelected() ? "Crear cuenta offline" : "Crear mi cuenta";
+    }
+
+    /**
+     * Deshabilita el botón si se está registrando
      * @param si: true deshabilita false habilita
      */
     private void ocupado(boolean si) {
         btnCrear.setDisable(si);
-        btnCrear.setText(si ? "Creando tu cuenta…" : "Crear mi cuenta");
+        btnCrear.setText(si ? "Creando tu cuenta…" : textoBoton());
     }
 
     /**

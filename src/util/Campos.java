@@ -13,9 +13,14 @@ import javafx.scene.shape.SVGPath;
  */
 public final class Campos {
 
-    // Trazos de los iconos que cambian en tiempo de ejecución (el resto están escritos en los FXML)
+    /**
+     * Trazo del icono de ojo que cambia en tiempo de ejecución
+     */
     public static final String OJO = "M2 12 C2 12 5.5 5 12 5 C18.5 5 22 12 22 12 C22 12 18.5 19 12 19 C5.5 19 2 12 2 12 Z "
             + "M12 9 A3 3 0 1 0 12 15 A3 3 0 1 0 12 9 Z";
+    /**
+     * Trazo del icono de ojo tachado que cambia en tiempo de ejecución
+     */
     public static final String OJO_TACHADO = OJO + " M3 3 L21 21";
 
     // No se instancia
@@ -40,7 +45,11 @@ public final class Campos {
         }
     }
 
-    /** Pone o quita el borde rojo de una caja. */
+    /**
+     * Pone o quita el borde rojo de una caja.
+     * @param caja: caja de la que cambia el borde
+     * @param error: marca que se ponga en rojo o no
+     */
     public static void marcarError(HBox caja, boolean error) {
         caja.getStyleClass().remove("error");
         if (error) {
@@ -48,12 +57,21 @@ public final class Campos {
         }
     }
 
-    /** Un campo de contraseña y otro de texto comparten lo escrito; solo cambia cuál de los dos se ve. */
+    /**
+     * Un campo de contraseña y otro de texto comparten lo escrito; solo cambia cuál de los dos se ve
+     * @param oculto: campo oculto
+     * @param visible: texto visible
+     */
     public static void enlazarContrasena(PasswordField oculto, TextField visible) {
         visible.textProperty().bindBidirectional(oculto.textProperty());
     }
 
-    /** Muestra u oculta la contraseña y cambia el icono del ojo. */
+    /**
+     * Muestra u oculta la contraseña y cambia el icono del ojo.
+     * @param oculto: campo oculto
+     * @param visible: campo visible
+     * @param iconoOjo: icono que cambia según se muestre el campo visible o el oculto
+     */
     public static void alternarContrasena(PasswordField oculto, TextField visible, SVGPath iconoOjo) {
         boolean mostrar = !visible.isVisible();
         visible.setVisible(mostrar);

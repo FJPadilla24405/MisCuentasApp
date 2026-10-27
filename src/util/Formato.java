@@ -18,7 +18,7 @@ public final class Formato {
     private static final Locale ES = Locale.forLanguageTag("es-ES");
 
     /**
-     * Constructor base vacio
+     * Constructor base vacío
      */
     private Formato() {
     }

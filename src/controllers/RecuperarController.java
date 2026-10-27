@@ -85,7 +85,7 @@ public class RecuperarController {
     }
 
     /**
-     * Cambia al panel de inicio de sesion
+     * Cambia al panel de inicio de sesión
      */
     @FXML
     private void irALogin() {
@@ -93,7 +93,7 @@ public class RecuperarController {
     }
 
     /**
-     * Manda la peticion de recuperar cuenta con el email introducido
+     * Manda la petición de recuperar cuenta con el email introducido
      */
     @FXML
     private void enviar() {

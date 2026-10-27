@@ -25,7 +25,7 @@ public class UsuarioDAO {
 	 * @return Devuelve el usuario insertado
 	 */
     public Usuario insertar(Usuario u) {
-        String sql = "INSERT INTO usuarios (firebase_uid, nombre, email, moneda, tema) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO usuarios (firebase_uid, nombre, email, moneda, tema, password_hash) VALUES (?, ?, ?, ?, ?, ?)";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, u.getFirebaseUid());
@@ -33,6 +33,7 @@ public class UsuarioDAO {
             ps.setString(3, u.getEmail());
             ps.setString(4, u.getMoneda());
             ps.setString(5, u.getTema());
+            ps.setString(6, u.getPasswordHash());
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -147,6 +148,23 @@ public class UsuarioDAO {
     }
 
     /**
+     * Guarda la huella de la contraseña de un usuario (al cambiarla o al migrar una cuenta antigua)
+     * @param id: id del usuario
+     * @param passwordHash: huella calculada con ContrasenaLocal.hashear
+     */
+    public void actualizarPasswordHash(int id, String passwordHash) {
+        String sql = "UPDATE usuarios SET password_hash = ? WHERE id = ?";
+        Connection conn = DatabaseManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, passwordHash);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error actualizando la contraseña del usuario", e);
+        }
+    }
+
+    /**
      * Elimina un usuario de la base de datos
      * @param id: id del usuario
      */
@@ -168,7 +186,7 @@ public class UsuarioDAO {
      * @throws SQLException
      */
     private Usuario mapear(ResultSet rs) throws SQLException {
-        return new Usuario(
+        Usuario u = new Usuario(
                 rs.getInt("id"),
                 rs.getString("firebase_uid"),
                 rs.getString("nombre"),
@@ -176,5 +194,7 @@ public class UsuarioDAO {
                 rs.getString("moneda"),
                 rs.getString("tema")
         );
+        u.setPasswordHash(rs.getString("password_hash"));
+        return u;
     }
 }

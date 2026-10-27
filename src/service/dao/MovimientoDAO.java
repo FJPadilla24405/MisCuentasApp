@@ -56,7 +56,7 @@ public class MovimientoDAO {
     }
 
     /**
-     * Método que cre una lista de los movimientos de una cuenta especifica
+     * Método que crea una lista de los movimientos de una cuenta específica
      * @param cuentaId: id de la cuenta
      * @return Lista con movimientos de una cuenta
      */
@@ -102,9 +102,9 @@ public class MovimientoDAO {
     }
 
     /**
-     * Método que suma los gastos de un usuario por su categoria y mes
+     * Método que suma los gastos de un usuario por su categoría y mes
      * @param usuarioId: id del usuario
-     * @param categoriaId: id de la categoria
+     * @param categoriaId: id de la categoría
      * @param mesReferencia: mes del gasto
      * @return Devuelve la suma de los gastos
      */
@@ -161,9 +161,9 @@ public class MovimientoDAO {
     }
 
     /**
-     * Lista movimientos por parametro
+     * Lista movimientos por parámetro
      * @param sql: Sentencia sql
-     * @param parametro: Parametro que añadir
+     * @param parametro: Parámetro que añadir
      * @return Devuelve la lista de movimientos
      */
     private List<Movimiento> ejecutarListado(String sql, int parametro) {

@@ -20,7 +20,7 @@ public class RecurrenteDAO {
 
 	/**
 	 * Método que inserta una clase recurrente en la base de datos
-	 * @param r: Recurrente a inssertar
+	 * @param r: Recurrente a insertar
 	 * @return Devuelve el recurrente que se ha insertado
 	 */
     public Recurrente insertar(Recurrente r) {
@@ -69,7 +69,7 @@ public class RecurrenteDAO {
     }
 
     /**
-     * Metodo que lista los movimientos recurrentes que todavia no se han ejecutado un mes concreto
+     * Método que lista los movimientos recurrentes que todavía no se han ejecutado un mes concreto
      * @param usuarioId: id del usuario
      * @param mesReferencia: mes que se ejecuta el recurrente
      * @return Devuelve una lista con movimientos recurrentes que no se han ejecutado

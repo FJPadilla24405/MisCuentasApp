@@ -12,8 +12,8 @@ Al marcar la casilla de aceptación al crear tu cuenta declaras que has leído e
 ## 3. Tu cuenta
 - Eres responsable de mantener en secreto tu contraseña y de lo que se haga con tu cuenta.
 - Si sospechas que alguien la ha usado sin permiso, cambia la contraseña con la opción "¿Olvidaste tu contraseña?" y avísanos en {{correo}}.
-- Si olvidas la contraseña, puedes crear una nueva con el enlace que Firebase envía a tu correo.
-- Puedes crear una cuenta solo en este equipo, sin contraseña y sin Firebase. Esa cuenta no se puede sincronizar ni recuperar: si pierdes el equipo o borras la carpeta .miscuentas, pierdes los datos. Como no tiene contraseña, quien tenga acceso a tu equipo y conozca tu usuario y tu email podrá abrirla.
+- Si olvidas la contraseña de una cuenta online, puedes crear una nueva con el enlace que Firebase envía a tu correo. Después, inicia sesión con conexión para que también se actualice en tu equipo.
+- Puedes crear una cuenta offline: solo en este equipo y sin Firebase. Tiene contraseña, pero no se puede sincronizar ni recuperar: si pierdes el equipo o borras la carpeta .miscuentas pierdes los datos, y si olvidas la contraseña no hay forma de restablecerla.
 
 ## 4. Qué es y qué no es MisCuentas
 MisCuentas es una herramienta de organización personal. No es una entidad financiera, no gestiona tu dinero, no se conecta a tus bancos y no ofrece asesoramiento financiero, fiscal ni contable.
@@ -21,7 +21,7 @@ Los saldos, totales y presupuestos se calculan a partir de lo que tú introduces
 
 ## 5. Funcionamiento con y sin conexión
 - Tus datos se guardan en tu equipo. La sincronización con la nube necesita conexión a internet.
-- Si entras sin conexión (por ejemplo, porque no se puede validar tu contraseña con Firebase), la aplicación solo comprueba que el usuario y el correo coinciden con una cuenta guardada en ese equipo. Quien tenga acceso a tu equipo y conozca esos dos datos podría abrir tus datos locales. Protege tu equipo y bloquea la sesión del sistema cuando no lo uses.
+- Puedes iniciar sesión sin conexión (marcando esa opción o cuando no hay internet). En ese caso la aplicación comprueba tu email y tu contraseña con la huella guardada en tu equipo, sin consultar a Firebase. Los datos de tu equipo no están cifrados: protege tu equipo y bloquea la sesión del sistema cuando no lo uses.
 - Los cambios hechos sin conexión no están en la nube hasta que sincronices.
 - Al sincronizar, la copia de un lado sustituye a la del otro: al subir, tus datos locales sustituyen a los de la nube, y al descargar, los de la nube sustituyen a los locales. Sincroniza con regularidad y evita modificar la misma cuenta en varios equipos a la vez sin sincronizar entre medias.
 

@@ -52,7 +52,7 @@ public class FirebaseAuthClient {
 
     private final String apiKey;
     /**
-     * cliente http para mandar y recibir informacion web
+     * cliente http para mandar y recibir información web
      */
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     
@@ -67,7 +67,7 @@ public class FirebaseAuthClient {
      * Crea una cuenta nueva en Firebase Authentication y devuelve ya la sesión iniciada con ella.
      * @param email: Email de la cuenta
      * @param password: Contraseña de la cuenta
-     * @return Sesion de esos datos
+     * @return Sesión de esos datos
      * @throws IOException
      * @throws InterruptedException
      */
@@ -79,7 +79,7 @@ public class FirebaseAuthClient {
      * Inicia sesión con una cuenta que ya existe.
      * @param email: email de la cuenta
      * @param password: contraseña de la cuenta
-     * @return Sesion de esos datos
+     * @return Sesión de esos datos
      * @throws IOException
      * @throws InterruptedException
      */
@@ -117,10 +117,10 @@ public class FirebaseAuthClient {
 
     /**
      * Registro y login son la misma petición; solo cambia la operación de la URL.
-     * @param operacion: operacion que hacer en la url
+     * @param operacion: operación que hacer en la url
      * @param email: email de la cuenta
      * @param password: contraseña de la cuenta
-     * @return Sesion con los datos
+     * @return Sesión con los datos
      * @throws IOException
      * @throws InterruptedException
      */

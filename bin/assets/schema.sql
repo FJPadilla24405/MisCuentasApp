@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nombre VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
     moneda CHAR(3) DEFAULT 'EUR',
-    tema VARCHAR(10) DEFAULT 'claro'
+    tema VARCHAR(10) DEFAULT 'claro',
+    password_hash VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS cuentas (

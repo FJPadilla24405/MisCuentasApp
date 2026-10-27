@@ -19,35 +19,60 @@ public final class SesionActual {
     private SesionActual() {
     }
 
-    /** Entrada con Firebase validado. */
+    /**
+     * Entrada con Firebase validado
+     * @param u: usuario que inicia sesión
+     * @param sesion: sesión del authclient
+     */
     public static void iniciar(Usuario u, FirebaseAuthClient.Sesion sesion) {
         usuario = u;
         firebase = sesion;
     }
 
-    /** Entrada sin conexión: solo se ha comprobado la base de datos local. */
+    /**
+     * Entrada sin conexión: solo se ha comprobado la base de datos local.
+     * @param u: usuario que inicia sin conexión
+     */
     public static void iniciarSinConexion(Usuario u) {
         usuario = u;
         firebase = null;
     }
 
+    /**
+     * Devuelve el usuario de la sesión actual
+     * @return Devuelve el usuario
+     */
     public static Usuario getUsuario() {
         return usuario;
     }
 
+    /**
+     * Devuelve la sesión actual de firebase
+     * @return Devuelve la sesión de firebase
+     */
     public static FirebaseAuthClient.Sesion getFirebase() {
         return firebase;
     }
 
+    /**
+     * Método que devuelve si el usuario logeado tiene conexión a firebase o no
+     * @return Devuelve true si está conectado, false si no lo está
+     */
     public static boolean isConectado() {
         return firebase != null;
     }
 
-    /** @return true si quien ha entrado tiene una cuenta solo local (sin Firebase). */
+    /**
+     * Devuelve si el usuario es solo local
+     * @return Devuelve true si quien ha entrado tiene una cuenta solo local (sin Firebase).
+     */
     public static boolean isSoloLocal() {
         return usuario != null && usuario.isSoloLocal();
     }
 
+    /**
+     * Cierra la sesión actual
+     */
     public static void cerrar() {
         usuario = null;
         firebase = null;

@@ -28,9 +28,7 @@ public final class Dinero {
      */
     public static final BigDecimal CERO = BigDecimal.ZERO.setScale(ESCALA);
 
-    /**
-     * Constructor base vacio
-     */
+    // Constructor base vacío
     private Dinero() {
     }
 
@@ -38,7 +36,7 @@ public final class Dinero {
      * Lee una columna monetaria como BigDecimal con 2 decimales. Un NULL se lee como 0.00.
      * El redondeo también limpia los restos de coma flotante de resultados de SUM().
      * @param rs: resultado de la consulta
-     * @param columna: columna donde esta el campo
+     * @param columna: columna donde está el campo
      * @return Devuelve el valor del decimal en bigdecimal
      * @throws SQLException
      */

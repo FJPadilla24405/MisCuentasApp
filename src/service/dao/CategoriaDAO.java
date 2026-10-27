@@ -125,9 +125,9 @@ public class CategoriaDAO {
     }
 
     /**
-     * Método que crea una Categoria con los resultados de la consulta
+     * Método que crea una Categoría con los resultados de la consulta
      * @param rs: Resultado de la consulta
-     * @return Devuelve una categoria
+     * @return Devuelve una categoría
      * @throws SQLException
      */
     private Categoria mapear(ResultSet rs) throws SQLException {

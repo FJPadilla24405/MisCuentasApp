@@ -67,6 +67,10 @@ public final class TextoLegal {
         return nodos;
     }
 
+    /**
+     * Lee los datos del archivo properties
+     * @return Devuelve las propiedades en un objeto properties
+     */
     private static Properties leerDatos() {
         Properties p = new Properties();
         try (InputStream in = TextoLegal.class.getResourceAsStream(DATOS)) {
@@ -79,6 +83,12 @@ public final class TextoLegal {
         return p;
     }
 
+    /**
+     * Sustituye los campos por defecto del archivo legal por los datos del properties
+     * @param texto: texto que hay que sustituir
+     * @param datos: datos correctos
+     * @return Devuelve un string con los marcadores reemplazados por datos reales
+     */
     private static String sustituir(String texto, Properties datos) {
         for (String clave : new String[] { "titular", "correo", "fecha" }) {
             String valor = datos.getProperty(clave);
@@ -89,6 +99,12 @@ public final class TextoLegal {
         return texto;
     }
 
+    /**
+     * Método que crea un label que muestra texto legal
+     * @param texto: texto que se ve en pantalla
+     * @param clase: estilos
+     * @return Devuelve el label con el texto y estilos especificados
+     */
     private static Label etiqueta(String texto, String clase) {
         Label l = new Label(texto);
         l.getStyleClass().add(clase);
@@ -99,6 +115,11 @@ public final class TextoLegal {
         return l;
     }
 
+    /**
+     * Crea una viñeta visual
+     * @param texto: texto que se mostrará
+     * @return Devuelve un HBox con el símbolo · y el texto alineados
+     */
     private static HBox viñeta(String texto) {
         Label punto = new Label("•");
         punto.getStyleClass().add("legal-parrafo");

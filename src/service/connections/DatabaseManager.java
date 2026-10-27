@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -43,6 +44,7 @@ public class DatabaseManager {
                     st.execute("PRAGMA foreign_keys = ON;");
                 }
                 aplicarEsquema();
+                migrar();
             } catch (IOException | SQLException e) {
                 throw new RuntimeException("No se pudo inicializar la base de datos", e);
             }
@@ -53,6 +55,7 @@ public class DatabaseManager {
     /**
      * Lee assets/schema.sql desde el classpath y ejecuta cada línea.
      * Usa CREATE TABLE IF NOT EXISTS para que no pete cada vez que llamemos al método.
+     * @throws SQLException
      */
     private static void aplicarEsquema() throws SQLException {
         String sql = leerRecurso("/assets/schema.sql");
@@ -67,9 +70,32 @@ public class DatabaseManager {
     }
 
     /**
+     * Pone al día una base de datos creada con una versión anterior del esquema. CREATE TABLE IF NOT EXISTS
+     * no añade columnas a una tabla que ya existe, así que aquí se añaden las que falten.
+     * Por ahora: usuarios.password_hash (huella de la contraseña local).
+     * @throws SQLException
+     */
+    private static void migrar() throws SQLException {
+        boolean tieneHuella = false;
+        try (Statement st = connection.createStatement();
+                ResultSet rs = st.executeQuery("PRAGMA table_info(usuarios)")) {
+            while (rs.next()) {
+                if ("password_hash".equalsIgnoreCase(rs.getString("name"))) {
+                    tieneHuella = true;
+                }
+            }
+        }
+        if (!tieneHuella) {
+            try (Statement st = connection.createStatement()) {
+                st.execute("ALTER TABLE usuarios ADD COLUMN password_hash VARCHAR(255)");
+            }
+        }
+    }
+
+    /**
      * Intenta leer un archivo dentro del proyecto comprobando que exista. Usado para leer el .sql
      * @param ruta: Ruta del archivo que queremos procesar.
-     * @return Devuelve un string con el contenido completo del archivo leido.
+     * @return Devuelve un string con el contenido completo del archivo leído.
      */
     private static String leerRecurso(String ruta) {
         try (InputStream is = DatabaseManager.class.getResourceAsStream(ruta)) {

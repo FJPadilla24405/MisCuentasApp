@@ -8,6 +8,9 @@ package util;
  */
 public final class Contrasena {
 
+	/**
+	 * Texto que se muestra en la pantalla de ayuda
+	 */
     public static final String AYUDA = "Mínimo 8 caracteres, con letras y números.";
 
     /**
@@ -23,14 +26,26 @@ public final class Contrasena {
     private Contrasena() {
     }
 
-    /** @return true si cumple lo mínimo para poder registrarse. */
+    /**
+     * Comprueba que la contraseña introducida cumple los requisitos mínimos para ser segura
+     * @param pw: contraseña
+     * @return Devuelve true si cumple lo mínimo para poder registrarse.
+     */
     public static boolean cumpleMinimos(String pw) {
         return pw != null && pw.length() >= 8
                 && pw.chars().anyMatch(Character::isLetter)
                 && pw.chars().anyMatch(Character::isDigit);
     }
 
-    /** Calcula cuánto se rellena la barra y qué texto se muestra. */
+    /** 
+     * Calcula cuánto se rellena la barra y qué texto se muestra. 
+     * <ul>
+     * 	<li>Barra rellena (nivel 1): carácter cualquiera</li>
+     * 	<li>Barra rellena (nivel 2): letras y números/símbolos</li>
+     * 	<li>Barra rellena (nivel 3): letras minúsculas, números y símbolos</li>
+     * 	<li>Barra rellena (nivel 4): letras minúsculas y mayúsculas, dígitos, num total caract y símbolos</li>
+     * <ul>
+     * */
     public static Fortaleza evaluar(String pw) {
         if (pw == null || pw.isEmpty()) {
             return new Fortaleza(0, false, AYUDA);

@@ -1,7 +1,5 @@
 package controllers;
 
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
@@ -11,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -20,34 +19,30 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import models.Usuario;
 import service.auth.AuthService;
+import service.auth.AuthService.ResultadoLogin;
 import service.auth.SesionActual;
-import service.sync.FirebaseAuthClient.AuthException;
-import service.sync.FirebaseAuthClient.Sesion;
 import util.Campos;
 
 /**
- * Controlador de LoginPanel.fxml.
- * Paso 1: usuario y email deben coincidir con la base de datos local (si no, no se entra).
- * Paso 2: email y contraseña se validan en Firebase; si fallan o no hay conexión, un popup deja
- * elegir entre reintentar o continuar sin conexión.
+ * Controlador de LoginPanel.fxml. Pide email y contraseña.
+ * Primero se comprueba la contraseña con la huella guardada en este equipo y, si la cuenta es online y
+ * no se ha marcado "Iniciar sesión sin conexión", se valida también en Firebase. Con una contraseña
+ * incorrecta no se entra. Si no hay conexión con Firebase, un popup deja elegir entre reintentar o
+ * continuar sin conexión.
+ * La lógica está en AuthService.iniciarSesion; este controlador solo recoge los datos y muestra el resultado.
  *
  * @author Fco Padilla
  */
 public class LoginController {
 
-    // Códigos de Firebase que significan "esas credenciales no valen".
-    private static final Set<String> CREDENCIALES_INCORRECTAS =
-            Set.of("INVALID_LOGIN_CREDENTIALS", "INVALID_PASSWORD", "EMAIL_NOT_FOUND");
-
     @FXML private VBox raiz;
-    @FXML private HBox cajaUsuario;
     @FXML private HBox cajaEmail;
     @FXML private HBox cajaPassword;
-    @FXML private TextField txtUsuario;
     @FXML private TextField txtEmail;
     @FXML private PasswordField txtPasswordOculto;
     @FXML private TextField txtPasswordVisible;
     @FXML private SVGPath iconoOjo;
+    @FXML private CheckBox chkSinConexion;
     @FXML private Label lblError;
     @FXML private Button btnEntrar;
 
@@ -56,10 +51,12 @@ public class LoginController {
     private Consumer<String> alIrARecuperar = email -> { };
     private Consumer<Usuario> alAcceder = u -> { };
 
+    /**
+     * Prepara los campos: une la contraseña oculta con la visible y quita el error al escribir
+     */
     @FXML
     private void initialize() {
         Campos.enlazarContrasena(txtPasswordOculto, txtPasswordVisible);
-        Campos.configurar(cajaUsuario, txtUsuario);
         Campos.configurar(cajaEmail, txtEmail);
         Campos.configurar(cajaPassword, txtPasswordOculto, txtPasswordVisible);
     }
@@ -81,7 +78,7 @@ public class LoginController {
     }
 
     /**
-     * Accede al resto de la aplicacion
+     * Accede al resto de la aplicación
      * @param accion: cambio de pantalla
      */
     public void setAlAcceder(Consumer<Usuario> accion) {
@@ -94,7 +91,6 @@ public class LoginController {
     public void reiniciar() {
         ocultarError();
         txtPasswordOculto.clear();
-        Campos.marcarError(cajaUsuario, false);
         Campos.marcarError(cajaEmail, false);
         Campos.marcarError(cajaPassword, false);
     }
@@ -103,7 +99,7 @@ public class LoginController {
      * Permite que el campo sea interactuable
      */
     public void enfocar() {
-        Platform.runLater(txtUsuario::requestFocus);
+        Platform.runLater(txtEmail::requestFocus);
     }
 
     /**
@@ -123,7 +119,7 @@ public class LoginController {
     }
 
     /**
-     * Muestra o no la contraseña que se esta escribiendo
+     * Muestra o no la contraseña que se está escribiendo
      */
     @FXML
     private void alternarPassword() {
@@ -131,127 +127,122 @@ public class LoginController {
     }
 
     /**
-     * Recoge los datos insertados en los campos e inicia sesion
+     * Recoge el email y la contraseña y comprueba el inicio de sesión
      */
     @FXML
     private void iniciarSesion() {
         ocultarError();
-        String nombre = txtUsuario.getText().trim();
         String correo = txtEmail.getText().trim();
         String clave = txtPasswordOculto.getText();
 
         boolean completo = true;
-        if (nombre.isEmpty()) {
-            Campos.marcarError(cajaUsuario, true);
-            completo = false;
-        }
         if (correo.isEmpty()) {
             Campos.marcarError(cajaEmail, true);
             completo = false;
         }
-        if (!completo) {
-            mostrarError("Rellena el usuario y el email.");
-            return;
-        }
-
-        // Paso 1: base de datos local (consulta rápida a SQLite)
-        Optional<Usuario> local = auth.buscarUsuarioLocal(nombre, correo);
-        if (local.isEmpty()) {
-            Campos.marcarError(cajaUsuario, true);
-            Campos.marcarError(cajaEmail, true);
-            mostrarError("El usuario y el email no coinciden con ninguna cuenta de este equipo.");
-            return;
-        }
-
-        // Cuenta creada solo en este equipo: no tiene contraseña ni Firebase, se entra directamente
-        if (local.get().isSoloLocal()) {
-            SesionActual.iniciarSinConexion(local.get());
-            alAcceder.accept(local.get());
-            return;
-        }
-
-        // Cuenta con Firebase: hace falta la contraseña
         if (clave.isEmpty()) {
             Campos.marcarError(cajaPassword, true);
-            mostrarError("Escribe tu contraseña.");
+            completo = false;
+        }
+        if (!completo) {
+            mostrarError("Rellena el email y la contraseña.");
             return;
         }
-
-        // Paso 2: Firebase (red, en segundo plano)
-        comprobarFirebase(local.get(), correo, clave);
+        comprobar(correo, clave, chkSinConexion.isSelected());
     }
 
     /**
-     * Comprueba que existe una cuenta de firebase 
-     * @param local: nombre de usuario
-     * @param correo: correo del usuario
-     * @param clave: contraseña de firebase
+     * Lanza la comprobación en segundo plano (calcular la huella y consultar Firebase tardan) y
+     * trata el resultado cuando termina.
+     * @param correo: email escrito
+     * @param clave: contraseña escrita
+     * @param sinConexion: true si se ha marcado iniciar sesión sin conexión
      */
-    private void comprobarFirebase(Usuario local, String correo, String clave) {
+    private void comprobar(String correo, String clave, boolean sinConexion) {
         ocupado(true);
-        Task<Sesion> tarea = new Task<>() {
+        Task<ResultadoLogin> tarea = new Task<>() {
             @Override
-            protected Sesion call() throws Exception {
-                return auth.iniciarSesionFirebase(correo, clave);
+            protected ResultadoLogin call() throws Exception {
+                return auth.iniciarSesion(correo, clave, sinConexion);
             }
         };
         tarea.setOnSucceeded(e -> {
             ocupado(false);
-            SesionActual.iniciar(local, tarea.getValue());
-            alAcceder.accept(local);
+            tratarResultado(tarea.getValue(), correo, clave);
         });
         tarea.setOnFailed(e -> {
             ocupado(false);
-            tratarFalloFirebase(local, correo, clave, tarea.getException());
+            mostrarError("No se pudo iniciar sesión: " + tarea.getException());
         });
-        Thread hilo = new Thread(tarea, "login-firebase");
+        Thread hilo = new Thread(tarea, "login");
         hilo.setDaemon(true);
         hilo.start();
     }
 
     /**
-     * Pregunta si seguir sin conexión o reintentar, según el motivo del fallo.
-     * @param local: nombre del usuario
-     * @param correo: correo del usuario
-     * @param clave: contraseña del firebase
-     * @param fallo: tipo de fallo en el inicio de sesion
+     * Hace lo que corresponda según cómo haya ido el inicio de sesión
+     * @param resultado: resultado de AuthService.iniciarSesion
+     * @param correo: email escrito
+     * @param clave: contraseña escrita
      */
-    private void tratarFalloFirebase(Usuario local, String correo, String clave, Throwable fallo) {
-        boolean contrasenaIncorrecta = fallo instanceof AuthException a
-                && CREDENCIALES_INCORRECTAS.contains(a.getCodigo());
-
-        String titulo;
-        String mensaje;
-        if (contrasenaIncorrecta) {
-            titulo = "Contraseña incorrecta";
-            mensaje = "Firebase no acepta esa contraseña para este correo.\n\n"
-                    + "Puedes volver a escribirla o continuar sin conexión (tus datos no se sincronizarán).";
-        } else if (fallo instanceof AuthException a) {
-            titulo = "No se pudo verificar la cuenta";
-            mensaje = a.getMessage() + "\n\n"
-                    + "Puedes reintentarlo o continuar sin conexión (tus datos no se sincronizarán).";
-        } else {
-            titulo = "Sin conexión con Firebase";
-            mensaje = "No se ha podido contactar con Firebase.\n\n"
-                    + "Puedes reintentarlo o continuar sin conexión (tus datos no se sincronizarán).";
-        }
-
-        if (preguntarContinuarSinConexion(titulo, mensaje)) {
-            SesionActual.iniciarSinConexion(local);
-            alAcceder.accept(local);
-        } else if (contrasenaIncorrecta) {
-            txtPasswordOculto.clear();
-            txtPasswordOculto.requestFocus();
-        } else {
-            comprobarFirebase(local, correo, clave);
+    private void tratarResultado(ResultadoLogin resultado, String correo, String clave) {
+        switch (resultado.estado()) {
+            case ONLINE -> {
+                SesionActual.iniciar(resultado.usuario(), resultado.sesion());
+                alAcceder.accept(resultado.usuario());
+            }
+            case OFFLINE -> {
+                SesionActual.iniciarSinConexion(resultado.usuario());
+                alAcceder.accept(resultado.usuario());
+            }
+            case SIN_VERIFICAR -> preguntarSinConexion(resultado, correo, clave);
+            case CREDENCIALES_INCORRECTAS -> {
+                Campos.marcarError(cajaEmail, true);
+                Campos.marcarError(cajaPassword, true);
+                mostrarError("Email o contraseña incorrectos.");
+            }
+            case RECHAZADA_POR_FIREBASE -> {
+                Campos.marcarError(cajaPassword, true);
+                mostrarError("Firebase no acepta esa contraseña: puede que la hayas cambiado. Escribe la nueva o, "
+                        + "si quieres usar la guardada en este equipo, marca \"Iniciar sesión sin conexión\".");
+            }
+            case ERROR -> mostrarError(resultado.detalle());
         }
     }
 
     /**
-     * @return true si el usuario elige "Continuar sin conexión"; cerrar el popup equivale a reintentar.
-     * @param titulo: titulo del dialog
+     * La contraseña es correcta en este equipo pero no se ha podido verificar en Firebase: pregunta si
+     * seguir sin conexión o reintentar.
+     * @param resultado: resultado con el usuario y el motivo (null si simplemente no hay conexión)
+     * @param correo: email escrito
+     * @param clave: contraseña escrita
+     */
+    private void preguntarSinConexion(ResultadoLogin resultado, String correo, String clave) {
+        String titulo;
+        String mensaje;
+        if (resultado.detalle() == null) {
+            titulo = "Sin conexión con Firebase";
+            mensaje = "No se ha podido contactar con Firebase.\n\n"
+                    + "Puedes reintentarlo o continuar sin conexión (tus datos no se sincronizarán).";
+        } else {
+            titulo = "No se pudo verificar la cuenta";
+            mensaje = resultado.detalle() + "\n\n"
+                    + "Puedes reintentarlo o continuar sin conexión (tus datos no se sincronizarán).";
+        }
+
+        if (preguntarContinuarSinConexion(titulo, mensaje)) {
+            SesionActual.iniciarSinConexion(resultado.usuario());
+            alAcceder.accept(resultado.usuario());
+        } else {
+            comprobar(correo, clave, false);
+        }
+    }
+
+    /**
+     * Popup con las opciones Reintentar y Continuar sin conexión
+     * @param titulo: título del dialog
      * @param mensaje: mensaje del dialog
-     * @return Devuelve true para continuar o false para reintentar
+     * @return Devuelve true para continuar sin conexión o false para reintentar; cerrar el popup equivale a reintentar
      */
     private boolean preguntarContinuarSinConexion(String titulo, String mensaje) {
         ButtonType reintentar = new ButtonType("Reintentar", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -272,8 +263,8 @@ public class LoginController {
     }
 
     /**
-     * Deshabilita el boton si se esta iniciando sesion
-     * @param si: si se esta comprobando el inicio o no
+     * Deshabilita el botón si se está iniciando sesión
+     * @param si: si se está comprobando el inicio o no
      */
     private void ocupado(boolean si) {
         btnEntrar.setDisable(si);

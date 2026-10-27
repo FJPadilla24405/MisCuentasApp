@@ -66,7 +66,7 @@ public class FirebaseClient {
     /**
      * Hace una peticion a una ruta especificada
      * @param ruta: ruta a la que hacer la peticion
-     * @return Devuelve un httrequest
+     * @return Devuelve un httprequest
      */
     private HttpRequest.Builder peticion(String ruta) {
         String url = baseUrl + "/" + ruta + ".json";
@@ -77,9 +77,9 @@ public class FirebaseClient {
     }
 
     /**
-     * Envia un mensaje a un httpquest
-     * @param req:
-     * @return Devuelve  
+     * Envia una petición http a firebase
+     * @param req: peticion http que se envia
+     * @return Devuelve un texto con la respuesta del servidor
      * @throws IOException
      * @throws InterruptedException
      */
