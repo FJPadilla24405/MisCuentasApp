@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
 
 <!-- Pantalla principal: barra lateral fija a la izquierda y, a la derecha, el hueco donde se muestra el contenido de cada apartado -->
 <BorderPane prefHeight="800.0" prefWidth="1280.0" stylesheets="@styles/application.css" styleClass="main-raiz" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
@@ -9,7 +15,38 @@
       <fx:include fx:id="barraLateral" source="components/BarraLateral.fxml" />
    </left>
    <center>
-      <!-- MainController va metiendo aquí el FXML de cada apartado (screens/sections/) -->
-      <StackPane fx:id="contenido" styleClass="contenido-fondo" />
+      <VBox>
+         <children>
+            <!-- Barra superior: migas de pan, avisos y usuario -->
+            <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="barra-superior">
+               <children>
+                  <Label styleClass="miga-base" text="Espacio personal" />
+                  <Group>
+                     <children>
+                        <SVGPath content="M9 6 L15 12 L9 18" scaleX="0.6" scaleY="0.6" styleClass="icono" />
+                     </children>
+                  </Group>
+                  <Label fx:id="lblMiga" styleClass="miga-actual" text="Vista general" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <StackPane styleClass="boton-icono">
+                     <children>
+                        <Group>
+                           <children>
+                              <SVGPath content="M18 8 A6 6 0 0 0 6 8 C6 15 3 17 3 17 H21 C21 17 18 15 18 8 Z M13.7 21 A2 2 0 0 1 10.3 21" scaleX="0.75" scaleY="0.75" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </children>
+                  </StackPane>
+                  <StackPane styleClass="avatar">
+                     <children>
+                        <Label fx:id="lblInicialesSuperior" styleClass="avatar-texto" text="LM" />
+                     </children>
+                  </StackPane>
+               </children>
+            </HBox>
+            <!-- MainController va metiendo aquí el FXML de cada apartado (screens/sections/) -->
+            <StackPane fx:id="contenido" styleClass="contenido-fondo" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
    </center>
 </BorderPane>

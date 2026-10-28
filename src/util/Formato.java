@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -68,5 +71,66 @@ public final class Formato {
             iniciales = palabras[0].substring(0, Math.min(2, palabras[0].length()));
         }
         return iniciales.toUpperCase(ES);
+    }
+
+    // Nombres de los meses en español y abreviaturas (septiembre se abrevia sept)
+    private static final String[] MESES = { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+            "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
+    private static final String[] MESES_CORTOS = { "ene", "feb", "mar", "abr", "may", "jun", "jul", "ago",
+            "sept", "oct", "nov", "dic" };
+
+    /**
+     * Da formato de moneda a un importe poniéndole siempre el signo: +1.500,00 € o −200,00 €. El cero va sin signo.
+     * @param valor: importe a mostrar
+     * @param moneda: código de moneda de tres letras
+     * @return Devuelve el importe con signo como texto
+     */
+    public static String monedaConSigno(BigDecimal valor, String moneda) {
+        if (valor.signum() == 0) {
+            return moneda(valor, moneda);
+        }
+        return (valor.signum() > 0 ? "+" : "\u2212") + moneda(valor.abs(), moneda);
+    }
+
+    /**
+     * Da formato a un porcentaje con un decimal y coma: 48,4 %
+     * @param porcentaje: valor entre 0 y 100
+     * @return Devuelve el porcentaje como texto
+     */
+    public static String porcentaje(BigDecimal porcentaje) {
+        DecimalFormat formato = new DecimalFormat("0.0", DecimalFormatSymbols.getInstance(ES));
+        formato.setRoundingMode(RoundingMode.HALF_UP);
+        return formato.format(porcentaje) + "\u00A0%";
+    }
+
+    /**
+     * Fecha corta para las tablas: de 2026-09-29 sale "29 sept".
+     * @param iso: fecha en formato yyyy-MM-dd
+     * @return Devuelve la fecha corta, o el texto tal cual si no es una fecha válida
+     */
+    public static String fechaCorta(String iso) {
+        try {
+            LocalDate fecha = LocalDate.parse(iso);
+            return fecha.getDayOfMonth() + " " + MESES_CORTOS[fecha.getMonthValue() - 1];
+        } catch (DateTimeParseException | NullPointerException e) {
+            return iso == null ? "" : iso;
+        }
+    }
+
+    /**
+     * @param mes: mes y año
+     * @return Devuelve el nombre del mes en minúscula: septiembre
+     */
+    public static String nombreMes(YearMonth mes) {
+        return MESES[mes.getMonthValue() - 1];
+    }
+
+    /**
+     * @param mes: mes y año
+     * @return Devuelve el mes con su año y la primera letra en mayúscula: Septiembre 2026
+     */
+    public static String mesConAnio(YearMonth mes) {
+        String nombre = nombreMes(mes);
+        return nombre.substring(0, 1).toUpperCase(ES) + nombre.substring(1) + " " + mes.getYear();
     }
 }

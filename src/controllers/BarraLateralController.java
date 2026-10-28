@@ -1,5 +1,7 @@
 package controllers;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -53,6 +55,8 @@ public class BarraLateralController {
     // Botón marcado ahora mismo (apartado o cuenta) y, si es una cuenta, su id para recuperarlo al repintar la lista
     private Button activo;
     private Integer cuentaActivaId;
+    // Fila de cada cuenta de la lista, por id de cuenta, para poder marcarla desde fuera
+    private final Map<Integer, Button> filasCuentas = new HashMap<>();
 
     /**
      * Rellena el nombre del usuario y pinta sus cuentas
@@ -102,11 +106,23 @@ public class BarraLateralController {
     }
 
     /**
+     * Marca una cuenta en la barra y avisa de que se ha elegido, igual que si se hubiera pulsado su fila.
+     * Lo usan los paneles que enseñan cuentas (por ejemplo las tarjetas de la vista general).
+     * @param cuenta: cuenta a elegir
+     */
+    public void seleccionarCuenta(Cuenta cuenta) {
+        cuentaActivaId = cuenta.getId();
+        activar(filasCuentas.get(cuenta.getId()));
+        alElegirCuenta.accept(cuenta);
+    }
+
+    /**
      * Vuelve a leer las cuentas del usuario (con su saldo actual) y rehace la lista. Si había una
      * cuenta marcada, sigue marcada.
      */
     public void refrescarCuentas() {
         listaCuentas.getChildren().clear();
+        filasCuentas.clear();
         Usuario usuario = SesionActual.getUsuario();
         if (usuario == null) {
             return;
@@ -114,6 +130,7 @@ public class BarraLateralController {
         for (Cuenta cuenta : cuentaDAO.listarPorUsuario(usuario.getId())) {
             Button fila = crearFilaCuenta(cuenta);
             listaCuentas.getChildren().add(fila);
+            filasCuentas.put(cuenta.getId(), fila);
             if (cuentaActivaId != null && cuentaActivaId == cuenta.getId()) {
                 activar(fila);
             }

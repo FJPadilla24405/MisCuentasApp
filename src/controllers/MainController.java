@@ -8,8 +8,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import models.Cuenta;
+import service.auth.SesionActual;
+import util.Formato;
 import util.Seccion;
 
 /**
@@ -24,6 +27,9 @@ import util.Seccion;
 public class MainController {
 
     @FXML private StackPane contenido;
+    // Barra superior: apartado actual (migas de pan) e iniciales del usuario
+    @FXML private Label lblMiga;
+    @FXML private Label lblInicialesSuperior;
     // Controlador de la barra lateral incluida con fx:include fx:id="barraLateral"
     @FXML private BarraLateralController barraLateralController;
 
@@ -34,6 +40,9 @@ public class MainController {
      */
     @FXML
     private void initialize() {
+        if (SesionActual.getUsuario() != null) {
+            lblInicialesSuperior.setText(Formato.iniciales(SesionActual.getUsuario().getNombre()));
+        }
         barraLateralController.setAlElegirSeccion(this::mostrarSeccion);
         barraLateralController.setAlElegirCuenta(this::mostrarCuenta);
         barraLateralController.setAlCerrarSesion(() -> alCerrarSesion.run());
@@ -69,6 +78,11 @@ public class MainController {
      * @param seccion: apartado elegido en la barra lateral
      */
     private void mostrarSeccion(Seccion seccion) {
+        lblMiga.setText(seccion.getTitulo());
+        if (seccion == Seccion.VISTA_GENERAL) {
+            mostrarResumen(null);
+            return;
+        }
         URL fxml = getClass().getResource(seccion.getRutaFxml());
         if (fxml == null) {
             mostrarProvisional(seccion.getTitulo(), "Este apartado todavía no está hecho.");
@@ -83,12 +97,35 @@ public class MainController {
     }
 
     /**
-     * Muestra una cuenta. De momento es un panel provisional con su nombre: cuando exista
-     * screens/sections/Cuenta.fxml se cargará aquí y se le pasará la cuenta.
+     * Muestra una cuenta con la misma pantalla de resumen que la vista general, pero solo con sus datos.
      * @param cuenta: cuenta elegida en la barra lateral
      */
     private void mostrarCuenta(Cuenta cuenta) {
-        mostrarProvisional(cuenta.getNombre(), "Aquí irán los movimientos de esta cuenta.");
+        lblMiga.setText(cuenta.getNombre());
+        mostrarResumen(cuenta);
+    }
+
+    /**
+     * Carga la pantalla de resumen (screens/sections/Resumen.fxml). Es una sola pantalla para la vista
+     * general y para cada cuenta: solo cambian los datos que se le pasan.
+     * @param cuenta: cuenta a resumir, o null para la vista general (todas las cuentas)
+     */
+    private void mostrarResumen(Cuenta cuenta) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/sections/Resumen.fxml"));
+            Parent panel = loader.load();
+            ResumenController resumen = loader.getController();
+            // Pulsar la tarjeta de una cuenta equivale a pulsarla en la barra lateral
+            resumen.setAlElegirCuenta(barraLateralController::seleccionarCuenta);
+            if (cuenta == null) {
+                resumen.mostrarTodas();
+            } else {
+                resumen.mostrarCuenta(cuenta);
+            }
+            mostrarContenido(panel);
+        } catch (IOException e) {
+            throw new UncheckedIOException("No se pudo cargar el resumen", e);
+        }
     }
 
     /**

@@ -464,3 +464,231 @@
     -fx-stroke: -mc-cabecera;
 }
 
+/* ===== Barra superior de la pantalla principal ===== */
+.barra-superior {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent -mc-borde-suave transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 28 0 28;
+    -fx-min-height: 56;
+    -fx-pref-height: 56;
+    -fx-max-height: 56;
+}
+.miga-base {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+.miga-actual {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* ===== Pantalla de resumen (vista general y cuentas) ===== */
+.resumen-scroll,
+.resumen-scroll > .viewport {
+    -fx-background: -mc-fondo;
+    -fx-background-color: -mc-fondo;
+    -fx-padding: 0;
+}
+.resumen-contenido {
+    -fx-padding: 28 32 32 32;
+}
+.resumen-etiqueta {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+}
+.resumen-titulo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+/* Botones blancos con borde: mes, exportar, buscador y filtro */
+.boton-filtro {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 10;
+    -fx-padding: 0 14 0 14;
+    -fx-min-height: 38;
+    -fx-pref-height: 38;
+    -fx-graphic-text-gap: 8;
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+.boton-filtro:hover,
+.boton-filtro:focused,
+.boton-filtro:showing {
+    -fx-background-color: -mc-hover;
+}
+.boton-filtro > .arrow-button {
+    -fx-padding: 0 0 0 2;
+}
+.boton-filtro > .arrow-button > .arrow {
+    -fx-background-color: #7a8a82;
+}
+.buscador,
+.buscador:hover {
+    -fx-background-color: white;
+    -fx-cursor: text;
+    -fx-padding: 0 12 0 14;
+}
+
+/* Tarjetas de resumen */
+.kpi {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: -mc-borde-suave;
+    -fx-border-radius: 14;
+    -fx-padding: 18 20 18 20;
+    -fx-effect: dropshadow(gaussian, rgba(21, 63, 48, 0.05), 10, 0, 0, 2);
+}
+.kpi-principal {
+    -fx-background-color: -mc-cabecera;
+    -fx-border-color: -mc-cabecera;
+}
+.kpi-titulo {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+.kpi-valor {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+.kpi-detalle {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+.kpi-principal .kpi-titulo {
+    -fx-text-fill: #cfe0d6;
+}
+.kpi-principal .kpi-valor {
+    -fx-text-fill: white;
+}
+.kpi-principal .kpi-detalle {
+    -fx-text-fill: #a9c4b5;
+}
+.kpi-principal .icono {
+    -fx-stroke: white;
+}
+.icono-ingreso {
+    -fx-stroke: -mc-verde;
+}
+.icono-gasto {
+    -fx-stroke: #d9732b;
+}
+
+/* Tarjeta de cada cuenta */
+.tarjeta-cuenta {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 14;
+    -fx-border-color: -mc-borde-suave;
+    -fx-border-radius: 14;
+    -fx-padding: 14 16 14 16;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(21, 63, 48, 0.05), 10, 0, 0, 2);
+}
+.tarjeta-cuenta:hover,
+.tarjeta-cuenta:focused {
+    -fx-background-color: white;
+    -fx-border-color: -mc-verde;
+}
+.tarjeta-cuenta-nombre {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.tarjeta-cuenta-tipo {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 11px;
+}
+.tarjeta-cuenta-saldo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.icono-caja {
+    -fx-background-color: #e8f1ec;
+    -fx-background-radius: 10;
+    -fx-min-width: 34;
+    -fx-min-height: 34;
+    -fx-pref-width: 34;
+    -fx-pref-height: 34;
+    -fx-max-width: 34;
+    -fx-max-height: 34;
+}
+.icono-caja .icono {
+    -fx-stroke: -mc-cabecera;
+}
+
+/* Tarjeta de movimientos y tabla */
+.tarjeta {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: -mc-borde-suave;
+    -fx-border-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(21, 63, 48, 0.05), 10, 0, 0, 2);
+}
+.tarjeta-cabecera {
+    -fx-padding: 16 20 16 20;
+}
+.tarjeta-titulo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+.pastilla {
+    -fx-background-color: #e3efe8;
+    -fx-background-radius: 20;
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 11px;
+    -fx-padding: 3 10 3 10;
+}
+.tabla-cabecera {
+    -fx-background-color: #f1f5f2;
+    -fx-padding: 9 20 9 20;
+}
+.tabla-titulo {
+    -fx-text-fill: #8a9a92;
+    -fx-font-size: 10px;
+}
+.tabla-fila {
+    -fx-border-color: -mc-borde-suave transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 10 20 10 20;
+    -fx-alignment: CENTER_LEFT;
+}
+.tabla-fila:hover {
+    -fx-background-color: #fafcfb;
+}
+.tabla-fecha,
+.tabla-texto {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+.tabla-concepto {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 13px;
+}
+.importe-ingreso {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.importe-gasto {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.tabla-vacia {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+    -fx-padding: 14 20 16 20;
+}
+
