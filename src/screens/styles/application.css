@@ -692,3 +692,380 @@
     -fx-padding: 14 20 16 20;
 }
 
+/* ===== Pantalla de perfil ===== */
+.perfil-tarjeta {
+    -fx-padding: 20;
+    -fx-spacing: 16;
+}
+.avatar-grande {
+    -fx-background-color: #d8eadf;
+    -fx-background-radius: 24;
+    -fx-min-width: 48;
+    -fx-min-height: 48;
+    -fx-pref-width: 48;
+    -fx-pref-height: 48;
+    -fx-max-width: 48;
+    -fx-max-height: 48;
+}
+.avatar-grande-texto {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+.linea-fina {
+    -fx-background-color: -mc-borde-suave;
+}
+.campo-etiqueta-fuerte {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.campo-caja.solo-lectura {
+    -fx-background-color: #f5f7f5;
+}
+.campo-caja.solo-lectura .campo-input {
+    -fx-text-fill: -mc-suave;
+}
+.boton-suave {
+    -fx-background-color: #e8f1ec;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+    -fx-text-fill: -mc-cabecera;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-min-height: 38;
+    -fx-pref-height: 38;
+    -fx-graphic-text-gap: 8;
+    -fx-cursor: hand;
+}
+.boton-suave:hover,
+.boton-suave:focused {
+    -fx-background-color: #dcebe2;
+}
+.boton-suave .icono {
+    -fx-stroke: -mc-cabecera;
+}
+
+/* Selector de moneda */
+.combo-campo {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 10;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+.combo-campo:focused,
+.combo-campo:showing {
+    -fx-background-color: white;
+    -fx-border-color: -mc-verde;
+}
+.combo-campo > .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -mc-texto;
+    -fx-padding: 0 0 0 12;
+}
+.combo-campo > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12 0 0;
+}
+.combo-campo > .arrow-button > .arrow {
+    -fx-background-color: #7a8a82;
+}
+
+/* Tarjetas de tema (solo se guarda la elección) */
+.tema-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 10;
+    -fx-padding: 8 8 10 8;
+    -fx-cursor: hand;
+}
+.tema-card:hover {
+    -fx-border-color: #b9c6bf;
+}
+.tema-card.seleccionado {
+    -fx-border-color: -mc-verde;
+    -fx-border-width: 1.5;
+}
+.tema-nombre {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.tema-vista {
+    -fx-background-radius: 6;
+    -fx-padding: 8;
+    -fx-min-height: 62;
+    -fx-pref-height: 62;
+}
+.tv-lateral {
+    -fx-min-width: 16;
+    -fx-pref-width: 16;
+    -fx-max-width: 16;
+    -fx-background-radius: 3;
+}
+.tv-barra {
+    -fx-min-height: 4;
+    -fx-pref-height: 4;
+    -fx-max-height: 4;
+    -fx-max-width: 34;
+    -fx-background-radius: 2;
+}
+.tv-bloque {
+    -fx-background-radius: 3;
+}
+.tema-claro {
+    -fx-background-color: #eef1ee;
+}
+.tema-claro .tv-lateral,
+.tema-claro .tv-bloque {
+    -fx-background-color: white;
+}
+.tema-claro .tv-barra {
+    -fx-background-color: #153f30;
+}
+.tema-oscuro {
+    -fx-background-color: #153f30;
+}
+.tema-oscuro .tv-lateral,
+.tema-oscuro .tv-bloque {
+    -fx-background-color: #1f5a45;
+}
+.tema-oscuro .tv-barra {
+    -fx-background-color: #a9c4b5;
+}
+.tema-sistema {
+    -fx-background-color: #d5dcd7;
+}
+.tema-sistema .tv-lateral,
+.tema-sistema .tv-bloque {
+    -fx-background-color: #e8ece9;
+}
+.tema-sistema .tv-barra {
+    -fx-background-color: #7a8a82;
+}
+
+/* Lista de cuentas del perfil */
+.cuenta-fila {
+    -fx-border-color: -mc-borde-suave transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 14 0 14 0;
+}
+.cuenta-fila.inactiva {
+    -fx-opacity: 0.55;
+}
+.perfil-saldo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.boton-puntos {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 6;
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 14px;
+    -fx-padding: 0 6 0 6;
+    -fx-min-height: 24;
+    -fx-cursor: hand;
+}
+.boton-puntos:hover,
+.boton-puntos:focused {
+    -fx-background-color: -mc-hover;
+}
+
+/* ===== Pantalla de presupuestos ===== */
+.boton-anadir {
+    -fx-background-radius: 10;
+    -fx-min-height: 38;
+    -fx-pref-height: 38;
+    -fx-padding: 0 18 0 14;
+    -fx-graphic-text-gap: 8;
+}
+.boton-primario .icono {
+    -fx-stroke: white;
+}
+
+/* Aviso de presupuestos cerca del límite o superados */
+.aviso-presupuesto {
+    -fx-background-color: #fdf0ed;
+    -fx-background-radius: 10;
+    -fx-border-color: #f3d3cb;
+    -fx-border-radius: 10;
+    -fx-padding: 11 16 11 16;
+}
+.aviso-presupuesto .icono {
+    -fx-stroke: #c0392b;
+}
+.aviso-texto {
+    -fx-text-fill: #b5382a;
+    -fx-font-size: 12px;
+}
+
+/* Tarjeta de cada presupuesto */
+.presupuesto-tarjeta {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: -mc-borde-suave;
+    -fx-border-radius: 14;
+    -fx-padding: 16 18 16 18;
+    -fx-effect: dropshadow(gaussian, rgba(21, 63, 48, 0.05), 10, 0, 0, 2);
+}
+.presupuesto-nombre {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.presupuesto-etiqueta {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 11px;
+}
+.presupuesto-limite {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.presupuesto-importe {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+.restante-dentro {
+    -fx-text-fill: -mc-verde;
+}
+.restante-cerca {
+    -fx-text-fill: #b5533c;
+}
+.restante-superado {
+    -fx-text-fill: #a5281b;
+}
+
+/* Pastilla de estado */
+.estado-pastilla {
+    -fx-background-radius: 20;
+    -fx-font-size: 10px;
+    -fx-padding: 3 10 3 10;
+}
+.estado-dentro {
+    -fx-background-color: #e3efe8;
+    -fx-text-fill: -mc-verde;
+}
+.estado-cerca {
+    -fx-background-color: #fbe9e5;
+    -fx-text-fill: #b5533c;
+}
+.estado-superado {
+    -fx-background-color: #f7d6d1;
+    -fx-text-fill: #a5281b;
+    -fx-font-weight: bold;
+}
+
+/* Barra de progreso: la pista y el relleno (el ancho del relleno lo pone el controlador) */
+.barra-pista {
+    -fx-background-color: #e9eeeb;
+    -fx-background-radius: 4;
+    -fx-min-height: 8;
+    -fx-pref-height: 8;
+    -fx-max-height: 8;
+}
+.barra-relleno {
+    -fx-background-radius: 4;
+    -fx-min-width: 0;
+}
+.barra-dentro {
+    -fx-background-color: -mc-verde;
+}
+.barra-cerca {
+    -fx-background-color: #b5533c;
+}
+.barra-superado {
+    -fx-background-color: #a5281b;
+}
+
+/* ===== Ventana "Añadir presupuesto" ===== */
+.pastilla-borrador {
+    -fx-background-color: #fbe9e5;
+    -fx-background-radius: 20;
+    -fx-text-fill: #b5533c;
+    -fx-font-size: 10px;
+    -fx-padding: 3 10 3 10;
+}
+.campo-importe {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: -mc-borde -mc-borde -mc-verde -mc-borde;
+    -fx-border-width: 1 1 2 1;
+    -fx-border-radius: 10;
+    -fx-padding: 0 16 0 16;
+    -fx-min-height: 58;
+    -fx-pref-height: 58;
+}
+.campo-importe.error {
+    -fx-border-color: -mc-borde -mc-borde -mc-error -mc-borde;
+}
+.campo-importe-input,
+.campo-importe-input:focused {
+    -fx-font-size: 26px;
+    -fx-text-fill: -mc-titulo;
+}
+.campo-importe-moneda {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 14px;
+}
+.combo-campo.error,
+.combo-campo.error:focused {
+    -fx-border-color: -mc-error;
+}
+
+/* Selector de alcance de cuentas: tres opciones con punto de radio */
+.opcion-alcance {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 10;
+    -fx-min-height: 46;
+    -fx-pref-height: 46;
+    -fx-padding: 0 14 0 14;
+    -fx-alignment: CENTER_LEFT;
+    -fx-graphic-text-gap: 10;
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+.opcion-alcance:hover {
+    -fx-background-color: -mc-hover;
+}
+.opcion-alcance:selected {
+    -fx-background-color: -mc-activo;
+    -fx-border-color: -mc-verde;
+    -fx-text-fill: -mc-cabecera;
+}
+.opcion-alcance:selected .icono {
+    -fx-stroke: -mc-cabecera;
+}
+.opcion-alcance:disabled {
+    -fx-opacity: 0.45;
+    -fx-cursor: default;
+}
+.radio-punto {
+    -fx-background-color: #b9c6bf, white;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 8, 7;
+    -fx-min-width: 16;
+    -fx-min-height: 16;
+    -fx-pref-width: 16;
+    -fx-pref-height: 16;
+    -fx-max-width: 16;
+    -fx-max-height: 16;
+}
+.opcion-alcance:selected .radio-punto {
+    -fx-background-color: -mc-verde, white, -mc-verde;
+    -fx-background-insets: 0, 2, 5;
+    -fx-background-radius: 8, 6, 3;
+}

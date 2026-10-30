@@ -197,6 +197,46 @@ public class AuthService {
     }
 
     /**
+     * Cambia la contraseña de un usuario que ya ha entrado. Primero se comprueba la contraseña actual con la
+     * huella local. En una cuenta online se vuelve a iniciar sesión en Firebase con ella (para tener un token
+     * reciente) y se cambia allí; solo si eso sale bien se guarda la huella nueva en local, para que las dos
+     * contraseñas no se descuadren. En una cuenta offline solo cambia la huella local.
+     * Tarda (huella y red): llamarlo fuera de la hebra de JavaFX.
+     * @param usuario: usuario de la sesión
+     * @param actual: contraseña actual
+     * @param nueva: contraseña nueva
+     * @throws AuthException con código PASSWORD_ACTUAL_INCORRECTA si la actual no es correcta, o con el error de Firebase
+     * @throws IOException si no hay conexión (cuentas online)
+     * @throws InterruptedException
+     */
+    public void cambiarContrasena(Usuario usuario, String actual, String nueva) throws IOException, InterruptedException {
+        if (!ContrasenaLocal.verificar(actual, usuario.getPasswordHash())) {
+            throw new AuthException("PASSWORD_ACTUAL_INCORRECTA", "La contraseña actual no es correcta.");
+        }
+        Sesion sesionNueva = null;
+        if (!usuario.isSoloLocal()) {
+            FirebaseAuthClient cliente = firebase();
+            Sesion reciente;
+            try {
+                reciente = cliente.iniciarSesion(usuario.getEmail(), actual);
+            } catch (AuthException a) {
+                if (CREDENCIALES_INCORRECTAS.contains(a.getCodigo())) {
+                    throw new AuthException("PASSWORD_ACTUAL_INCORRECTA", "La contraseña actual no coincide con la de tu cuenta online. "
+                            + "Si la cambiaste en otro sitio, cierra sesión e inicia sesión con la nueva.");
+                }
+                throw a;
+            }
+            sesionNueva = cliente.cambiarContrasena(reciente.idToken(), nueva);
+        }
+        String huella = ContrasenaLocal.hashear(nueva);
+        usuarioDAO.actualizarPasswordHash(usuario.getId(), huella);
+        usuario.setPasswordHash(huella);
+        if (sesionNueva != null) {
+            SesionActual.iniciar(usuario, sesionNueva);
+        }
+    }
+
+    /**
      * Comprueba que no haya ya un usuario local con ese email
      * @param correo: email normalizado
      * @throws AuthException si ya existe

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Pantalla de editar perfil: datos personales, preferencias y cuentas. Los temas oscuro y sistema solo se guardan: todavía no cambian el aspecto -->
+<ScrollPane fx:id="raiz" fitToWidth="true" hbarPolicy="NEVER" styleClass="resumen-scroll" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PerfilController">
+   <content>
+      <VBox spacing="20.0" styleClass="resumen-contenido">
+         <children>
+            <Label styleClass="resumen-titulo" text="Un espacio a tu medida." />
+
+            <GridPane hgap="20.0">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="ALWAYS" percentWidth="63.0" />
+                  <ColumnConstraints hgrow="ALWAYS" percentWidth="37.0" />
+               </columnConstraints>
+               <children>
+
+                  <!-- Columna izquierda: datos, preferencias y botones -->
+                  <VBox spacing="18.0" GridPane.columnIndex="0">
+                     <children>
+
+                        <VBox styleClass="tarjeta, perfil-tarjeta">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" spacing="14.0">
+                                 <children>
+                                    <StackPane styleClass="avatar-grande">
+                                       <children>
+                                          <Label fx:id="lblAvatar" styleClass="avatar-grande-texto" text="LM" />
+                                       </children>
+                                    </StackPane>
+                                    <VBox spacing="2.0">
+                                       <children>
+                                          <Label styleClass="tarjeta-titulo" text="Datos personales" />
+                                          <Label styleClass="texto-suave" text="Tu información de acceso a MisCuentas." />
+                                       </children>
+                                    </VBox>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lblTipoCuenta" styleClass="pastilla" text="Cuenta online" />
+                                 </children>
+                              </HBox>
+                              <Region maxHeight="1.0" minHeight="1.0" prefHeight="1.0" styleClass="linea-fina" />
+                              <HBox spacing="16.0">
+                                 <children>
+                                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="campo-etiqueta" text="Nombre completo" />
+                                          <HBox fx:id="cajaNombre" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+                                             <children>
+                                                <TextField fx:id="txtNombre" promptText="Tu nombre" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="campo-etiqueta" text="Email" />
+                                          <HBox fx:id="cajaEmail" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+                                             <children>
+                                                <TextField fx:id="txtEmail" promptText="tucorreo@email.com" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+                                                <Group>
+                                                   <children>
+                                                      <SVGPath content="M4 4 H20 A2 2 0 0 1 22 6 V18 A2 2 0 0 1 20 20 H4 A2 2 0 0 1 2 18 V6 A2 2 0 0 1 4 4 Z M22 6 L12 13 L2 6" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                                                   </children>
+                                                </Group>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <Label fx:id="lblEmailNota" managed="false" styleClass="texto-suave-pequeno" text="El email de una cuenta online no se puede cambiar desde aquí." visible="false" wrapText="true" />
+                              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                 <children>
+                                    <VBox spacing="3.0">
+                                       <children>
+                                          <Label styleClass="campo-etiqueta-fuerte" text="Contraseña" />
+                                          <Label fx:id="lblPasswordNota" styleClass="texto-suave-pequeno" text="Se cambia en este equipo y en la nube." />
+                                       </children>
+                                    </VBox>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" onAction="#cambiarContrasena" styleClass="boton-filtro" text="Cambiar contraseña">
+                                       <graphic>
+                                          <Group>
+                                             <children>
+                                                <SVGPath content="M5 11 H19 A1 1 0 0 1 20 12 V20 A1 1 0 0 1 19 21 H5 A1 1 0 0 1 4 20 V12 A1 1 0 0 1 5 11 Z M8 11 V7 A4 4 0 0 1 16 7 V11" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                                             </children>
+                                          </Group>
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+
+                        <VBox styleClass="tarjeta, perfil-tarjeta">
+                           <children>
+                              <Label styleClass="tarjeta-titulo" text="Preferencias de la aplicación" />
+                              <VBox spacing="6.0">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Moneda de visualización" />
+                                    <ComboBox fx:id="cmbMoneda" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                    <Label styleClass="texto-suave-pequeno" text="Los saldos y resúmenes se muestran en esta moneda. Los importes no se convierten." wrapText="true" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="8.0">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Tema de la aplicación" />
+                                    <HBox spacing="12.0">
+                                       <children>
+                        <VBox fx:id="cardClaro" maxWidth="1.7976931348623157E308" onMouseClicked="#elegirClaro" prefWidth="100.0" spacing="8.0" styleClass="tema-card" HBox.hgrow="ALWAYS">
+                           <children>
+                              <HBox spacing="6.0" styleClass="tema-vista, tema-claro">
+                                 <children>
+                                    <Region styleClass="tv-lateral" />
+                                    <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Region styleClass="tv-barra" />
+                                          <Region styleClass="tv-bloque" VBox.vgrow="ALWAYS" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label styleClass="tema-nombre" text="Claro" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Group fx:id="checkClaro">
+                                       <children>
+                                          <SVGPath content="M12 3 A9 9 0 1 0 12 21 A9 9 0 1 0 12 3 Z M8 12 L11 15 L16 9" scaleX="0.75" scaleY="0.75" styleClass="icono, icono-ingreso" />
+                                       </children>
+                                    </Group>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox fx:id="cardOscuro" maxWidth="1.7976931348623157E308" onMouseClicked="#elegirOscuro" prefWidth="100.0" spacing="8.0" styleClass="tema-card" HBox.hgrow="ALWAYS">
+                           <children>
+                              <HBox spacing="6.0" styleClass="tema-vista, tema-oscuro">
+                                 <children>
+                                    <Region styleClass="tv-lateral" />
+                                    <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Region styleClass="tv-barra" />
+                                          <Region styleClass="tv-bloque" VBox.vgrow="ALWAYS" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label styleClass="tema-nombre" text="Oscuro" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Group fx:id="checkOscuro">
+                                       <children>
+                                          <SVGPath content="M12 3 A9 9 0 1 0 12 21 A9 9 0 1 0 12 3 Z M8 12 L11 15 L16 9" scaleX="0.75" scaleY="0.75" styleClass="icono, icono-ingreso" />
+                                       </children>
+                                    </Group>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox fx:id="cardSistema" maxWidth="1.7976931348623157E308" onMouseClicked="#elegirSistema" prefWidth="100.0" spacing="8.0" styleClass="tema-card" HBox.hgrow="ALWAYS">
+                           <children>
+                              <HBox spacing="6.0" styleClass="tema-vista, tema-sistema">
+                                 <children>
+                                    <Region styleClass="tv-lateral" />
+                                    <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Region styleClass="tv-barra" />
+                                          <Region styleClass="tv-bloque" VBox.vgrow="ALWAYS" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label styleClass="tema-nombre" text="Sistema" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Group fx:id="checkSistema">
+                                       <children>
+                                          <SVGPath content="M12 3 A9 9 0 1 0 12 21 A9 9 0 1 0 12 3 Z M8 12 L11 15 L16 9" scaleX="0.75" scaleY="0.75" styleClass="icono, icono-ingreso" />
+                                       </children>
+                                    </Group>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </VBox>
+
+                        <Label fx:id="lblError" managed="false" styleClass="mensaje-error" visible="false" wrapText="true" />
+                        <Label fx:id="lblOk" managed="false" styleClass="mensaje-ok" visible="false" wrapText="true" />
+                        <HBox alignment="CENTER" spacing="10.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#cancelar" prefWidth="100.0" styleClass="boton-secundario" text="Cancelar" />
+                              <Button mnemonicParsing="false" onAction="#guardar" prefWidth="150.0" styleClass="boton-primario" text="Guardar cambios" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+
+                  <!-- Columna derecha: cuentas (las filas las crea PerfilController) -->
+                  <VBox styleClass="tarjeta, perfil-tarjeta" GridPane.columnIndex="1" GridPane.fillHeight="false" GridPane.valignment="TOP">
+                     <children>
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label styleClass="tarjeta-titulo" text="Tus cuentas" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Label fx:id="lblActivas" styleClass="pastilla" text="0 activas" />
+                           </children>
+                        </HBox>
+                        <Label styleClass="texto-suave" text="Todas las activas participan en tu vista general." wrapText="true" />
+                        <VBox fx:id="listaCuentas" />
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#anadirCuenta" styleClass="boton-suave" text="Añadir cuenta">
+                           <graphic>
+                              <Group>
+                                 <children>
+                                    <SVGPath content="M12 5 V19 M5 12 H19" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                                 </children>
+                              </Group>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </VBox>
+               </children>
+            </GridPane>
+         </children>
+      </VBox>
+   </content>
+</ScrollPane>

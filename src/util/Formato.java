@@ -118,6 +118,22 @@ public final class Formato {
     }
 
     /**
+     * Junta varios textos con comas y una "y" antes del último: "Vivienda", "Vivienda y Ocio", "BBVA, Santander y Efectivo".
+     * @param elementos: textos a juntar
+     * @return Devuelve la enumeración (vacía si no hay elementos)
+     */
+    public static String enumerar(java.util.List<String> elementos) {
+        if (elementos.isEmpty()) {
+            return "";
+        }
+        if (elementos.size() == 1) {
+            return elementos.get(0);
+        }
+        String inicio = String.join(", ", elementos.subList(0, elementos.size() - 1));
+        return inicio + " y " + elementos.get(elementos.size() - 1);
+    }
+
+    /**
      * @param mes: mes y año
      * @return Devuelve el nombre del mes en minúscula: septiembre
      */

@@ -93,6 +93,28 @@ public class CuentaDAO {
     }
 
     /**
+     * Lista todas las cuentas de un usuario, también las desactivadas (las activas primero).
+     * @param usuarioId: id del usuario del que queremos sus cuentas
+     * @return Devuelve una lista con todas las cuentas del usuario
+     */
+    public List<Cuenta> listarTodasPorUsuario(int usuarioId) {
+        String sql = "SELECT * FROM cuentas WHERE usuario_id = ? ORDER BY activa DESC, id";
+        List<Cuenta> lista = new ArrayList<>();
+        Connection conn = DatabaseManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, usuarioId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapear(rs));
+                }
+            }
+            return lista;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error listando todas las cuentas", e);
+        }
+    }
+
+    /**
      * Calcula el saldo actual de una cuenta a partir de su saldo inicial
      * más la suma de ingresos y menos la suma de gastos registrados.
      * @param cuentaId: Id de la cuenta para el cálculo

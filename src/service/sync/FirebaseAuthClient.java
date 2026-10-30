@@ -116,6 +116,39 @@ public class FirebaseAuthClient {
     }
 
     /**
+     * Cambia la contraseña de la cuenta con la que se ha iniciado sesión. El idToken tiene que ser reciente
+     * (por eso AuthService vuelve a iniciar sesión justo antes con la contraseña actual).
+     * @param idToken: token de una sesión recién iniciada
+     * @param nueva: contraseña nueva
+     * @return Devuelve la sesión nueva (Firebase renueva los tokens al cambiar la contraseña)
+     * @throws IOException si no hay conexión o Firebase rechaza la petición (AuthException)
+     * @throws InterruptedException
+     */
+    @SuppressWarnings("unchecked")
+    public Sesion cambiarContrasena(String idToken, String nueva) throws IOException, InterruptedException {
+        if (nueva == null || nueva.isEmpty()) {
+            throw new AuthException("MISSING_PASSWORD", "Escribe la contraseña nueva.");
+        }
+        Map<String, Object> cuerpo = new LinkedHashMap<>();
+        cuerpo.put("idToken", idToken);
+        cuerpo.put("password", nueva);
+        cuerpo.put("returnSecureToken", Boolean.TRUE);
+
+        HttpRequest req = HttpRequest.newBuilder(URI.create(URL + "/accounts:update?key=" + apiKey))
+                .timeout(Duration.ofSeconds(30))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(Json.escribir(cuerpo), StandardCharsets.UTF_8))
+                .build();
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        if (resp.statusCode() != 200) {
+            throw traducirError(resp.body());
+        }
+        Map<String, Object> json = (Map<String, Object>) Json.leer(resp.body());
+        return new Sesion((String) json.get("localId"), (String) json.get("idToken"), (String) json.get("refreshToken"));
+    }
+
+    /**
      * Registro y login son la misma petición; solo cambia la operación de la URL.
      * @param operacion: operación que hacer en la url
      * @param email: email de la cuenta
@@ -176,6 +209,7 @@ public class FirebaseAuthClient {
             case "USER_DISABLED" -> "Esta cuenta está deshabilitada.";
             case "TOO_MANY_ATTEMPTS_TRY_LATER" -> "Demasiados intentos. Inténtalo de nuevo más tarde.";
             case "RESET_PASSWORD_EXCEED_LIMIT" -> "Has pedido demasiados correos de recuperación. Inténtalo de nuevo más tarde.";
+            case "CREDENTIAL_TOO_OLD_LOGIN_AGAIN", "INVALID_ID_TOKEN", "TOKEN_EXPIRED" -> "Por seguridad, vuelve a iniciar sesión para hacer este cambio.";
             case "OPERATION_NOT_ALLOWED" -> "El acceso con correo y contraseña no está activado en el proyecto de Firebase.";
             case "API_KEY_INVALID" -> "La clave de API de Firebase no es válida.";
             default -> "No se pudo completar la operación (" + codigo + ").";

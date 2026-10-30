@@ -83,6 +83,11 @@ public class MainController {
             mostrarResumen(null);
             return;
         }
+        if (seccion == Seccion.PERFIL) {
+            lblMiga.setText("Mi perfil");
+            mostrarPerfil();
+            return;
+        }
         URL fxml = getClass().getResource(seccion.getRutaFxml());
         if (fxml == null) {
             mostrarProvisional(seccion.getTitulo(), "Este apartado todavía no está hecho.");
@@ -93,6 +98,33 @@ public class MainController {
             mostrarContenido(panel);
         } catch (IOException e) {
             throw new UncheckedIOException("No se pudo cargar " + seccion.getRutaFxml(), e);
+        }
+    }
+
+    /**
+     * Carga la pantalla de editar perfil. Cuando se guarda algo que se ve en la barra lateral o en la barra
+     * superior (nombre, moneda, cuentas), se actualizan.
+     */
+    private void mostrarPerfil() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/sections/Perfil.fxml"));
+            Parent panel = loader.load();
+            PerfilController perfil = loader.getController();
+            perfil.setAlCambiar(this::alCambiarPerfil);
+            mostrarContenido(panel);
+        } catch (IOException e) {
+            throw new UncheckedIOException("No se pudo cargar el perfil", e);
+        }
+    }
+
+    /**
+     * Actualiza lo que se ve fuera de la pantalla de perfil: nombre e iniciales, y las cuentas con sus saldos
+     */
+    private void alCambiarPerfil() {
+        barraLateralController.refrescarUsuario();
+        barraLateralController.refrescarCuentas();
+        if (SesionActual.getUsuario() != null) {
+            lblInicialesSuperior.setText(Formato.iniciales(SesionActual.getUsuario().getNombre()));
         }
     }
 

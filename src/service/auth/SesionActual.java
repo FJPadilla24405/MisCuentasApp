@@ -42,6 +42,14 @@ public final class SesionActual {
      * Devuelve el usuario de la sesión actual
      * @return Devuelve el usuario
      */
+    /**
+     * Cambia los datos del usuario de la sesión (por ejemplo, tras editar el perfil) sin tocar la sesión de Firebase.
+     * @param u: usuario con los datos nuevos
+     */
+    public static void actualizarUsuario(Usuario u) {
+        usuario = u;
+    }
+
     public static Usuario getUsuario() {
         return usuario;
     }

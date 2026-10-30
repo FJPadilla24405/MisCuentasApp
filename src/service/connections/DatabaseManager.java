@@ -72,22 +72,36 @@ public class DatabaseManager {
     /**
      * Pone al día una base de datos creada con una versión anterior del esquema. CREATE TABLE IF NOT EXISTS
      * no añade columnas a una tabla que ya existe, así que aquí se añaden las que falten.
-     * Por ahora: usuarios.password_hash (huella de la contraseña local).
+     * Por ahora: usuarios.password_hash (huella de la contraseña local) y presupuestos.nombre y
+     * presupuestos.alcance (nombre del presupuesto y tipo de cuentas que cuentan para él).
      * @throws SQLException
      */
     private static void migrar() throws SQLException {
-        boolean tieneHuella = false;
+        anadirColumnaSiFalta("usuarios", "password_hash", "VARCHAR(255)");
+        anadirColumnaSiFalta("presupuestos", "nombre", "VARCHAR(50)");
+        anadirColumnaSiFalta("presupuestos", "alcance", "VARCHAR(10) DEFAULT 'todas'");
+    }
+
+    /**
+     * Añade una columna a una tabla solo si todavía no existe.
+     * @param tabla: nombre de la tabla
+     * @param columna: nombre de la columna
+     * @param definicion: tipo y valor por defecto de la columna (lo que va tras su nombre en el ALTER TABLE)
+     * @throws SQLException
+     */
+    private static void anadirColumnaSiFalta(String tabla, String columna, String definicion) throws SQLException {
+        boolean existe = false;
         try (Statement st = connection.createStatement();
-                ResultSet rs = st.executeQuery("PRAGMA table_info(usuarios)")) {
+                ResultSet rs = st.executeQuery("PRAGMA table_info(" + tabla + ")")) {
             while (rs.next()) {
-                if ("password_hash".equalsIgnoreCase(rs.getString("name"))) {
-                    tieneHuella = true;
+                if (columna.equalsIgnoreCase(rs.getString("name"))) {
+                    existe = true;
                 }
             }
         }
-        if (!tieneHuella) {
+        if (!existe) {
             try (Statement st = connection.createStatement()) {
-                st.execute("ALTER TABLE usuarios ADD COLUMN password_hash VARCHAR(255)");
+                st.execute("ALTER TABLE " + tabla + " ADD COLUMN " + columna + " " + definicion);
             }
         }
     }

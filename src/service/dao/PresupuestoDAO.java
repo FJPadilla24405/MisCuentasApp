@@ -26,14 +26,16 @@ public class PresupuestoDAO {
 	 * @return Devuelve el presupuesto insertado
 	 */
     public Presupuesto insertar(Presupuesto p) {
-        String sql = "INSERT INTO presupuestos (usuario_id, categoria_id, limite, periodo, mes_referencia) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO presupuestos (usuario_id, categoria_id, nombre, limite, periodo, mes_referencia, alcance) VALUES (?, ?, ?, ?, ?, ?, ?)";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, p.getUsuarioId());
             ps.setInt(2, p.getCategoriaId());
-            Dinero.escribir(ps, 3, p.getLimite());
-            ps.setString(4, p.getPeriodo());
-            ps.setString(5, p.getMesReferencia());
+            ps.setString(3, p.getNombre());
+            Dinero.escribir(ps, 4, p.getLimite());
+            ps.setString(5, p.getPeriodo());
+            ps.setString(6, p.getMesReferencia());
+            ps.setString(7, p.getAlcance());
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -72,6 +74,28 @@ public class PresupuestoDAO {
     }
 
     /**
+     * Lista los meses en los que un usuario tiene algún presupuesto
+     * @param usuarioId: id del usuario
+     * @return Devuelve los meses con formato "yyyy-MM", del más reciente al más antiguo
+     */
+    public List<String> listarMesesPorUsuario(int usuarioId) {
+        String sql = "SELECT DISTINCT mes_referencia FROM presupuestos WHERE usuario_id = ? ORDER BY mes_referencia DESC";
+        List<String> meses = new ArrayList<>();
+        Connection conn = DatabaseManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, usuarioId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    meses.add(rs.getString("mes_referencia"));
+                }
+            }
+            return meses;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error listando los meses con presupuesto", e);
+        }
+    }
+
+    /**
      * Método que puede o no devolver un presupuesto de un usuario concreto en una categoría y mes específico
      * @param usuarioId: id del usuario
      * @param categoriaId: id de la categoría
@@ -101,12 +125,14 @@ public class PresupuestoDAO {
      * @param p: Presupuesto con datos nuevos
      */
     public void actualizar(Presupuesto p) {
-        String sql = "UPDATE presupuestos SET limite = ?, periodo = ? WHERE id = ?";
+        String sql = "UPDATE presupuestos SET nombre = ?, limite = ?, periodo = ?, alcance = ? WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            Dinero.escribir(ps, 1, p.getLimite());
-            ps.setString(2, p.getPeriodo());
-            ps.setInt(3, p.getId());
+            ps.setString(1, p.getNombre());
+            Dinero.escribir(ps, 2, p.getLimite());
+            ps.setString(3, p.getPeriodo());
+            ps.setString(4, p.getAlcance());
+            ps.setInt(5, p.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error actualizando presupuesto", e);
@@ -139,9 +165,11 @@ public class PresupuestoDAO {
                 rs.getInt("id"),
                 rs.getInt("usuario_id"),
                 rs.getInt("categoria_id"),
+                rs.getString("nombre"),
                 Dinero.leer(rs, "limite"),
                 rs.getString("periodo"),
-                rs.getString("mes_referencia")
+                rs.getString("mes_referencia"),
+                rs.getString("alcance")
         );
     }
 }

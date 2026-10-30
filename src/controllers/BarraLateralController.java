@@ -63,12 +63,19 @@ public class BarraLateralController {
      */
     @FXML
     private void initialize() {
+        refrescarUsuario();
+        refrescarCuentas();
+    }
+
+    /**
+     * Vuelve a poner el nombre y las iniciales del usuario de la sesión (por ejemplo, tras editar el perfil)
+     */
+    public void refrescarUsuario() {
         Usuario usuario = SesionActual.getUsuario();
         if (usuario != null) {
             lblNombre.setText(usuario.getNombre());
             lblIniciales.setText(Formato.iniciales(usuario.getNombre()));
         }
-        refrescarCuentas();
     }
 
     /**

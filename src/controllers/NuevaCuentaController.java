@@ -24,6 +24,7 @@ import service.dao.CuentaDAO;
 import util.Campos;
 import util.Dinero;
 import util.Formato;
+import util.Importes;
 
 /**
  * Controlador de NuevaCuentaDialog.fxml: ventana para crear una cuenta (nombre, tipo y saldo inicial).
@@ -140,23 +141,13 @@ public class NuevaCuentaController {
     }
 
     /**
-     * Convierte el texto del saldo en número. Acepta 1250.5, 1250,5 y 1.250,50; un solo punto seguido
-     * de tres cifras (1.250) se entiende como separador de miles. Un campo vacío es 0.
+     * Convierte el texto del saldo en número (ver Importes.leer). Un campo vacío es 0.
      * @param texto: lo escrito en el campo
      * @return Devuelve el importe
      * @throws NumberFormatException si no es un número
      */
     private BigDecimal leerImporte(String texto) {
-        String t = texto.trim().replace(" ", "").replace("\u00A0", "").replace("€", "");
-        if (t.isEmpty()) {
-            return Dinero.CERO;
-        }
-        if (t.contains(",")) {
-            t = t.replace(".", "").replace(",", ".");
-        } else if (t.matches("-?\\d{1,3}(\\.\\d{3})+")) {
-            t = t.replace(".", "");
-        }
-        return new BigDecimal(t);
+        return Importes.leer(texto);
     }
 
     /**
