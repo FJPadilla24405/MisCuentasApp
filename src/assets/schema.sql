@@ -52,10 +52,10 @@ CREATE TABLE IF NOT EXISTS presupuestos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     usuario_id INTEGER NOT NULL,
     categoria_id INTEGER NOT NULL,
-    nombre VARCHAR(50),
     limite DECIMAL(12,2) NOT NULL,
     periodo VARCHAR(20) DEFAULT 'mensual',
     mes_referencia VARCHAR(20) NOT NULL,
+    nombre VARCHAR(50),
     alcance VARCHAR(10) DEFAULT 'todas',
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (categoria_id) REFERENCES categorias(id)

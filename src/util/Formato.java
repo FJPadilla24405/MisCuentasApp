@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.Currency;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -118,22 +119,6 @@ public final class Formato {
     }
 
     /**
-     * Junta varios textos con comas y una "y" antes del último: "Vivienda", "Vivienda y Ocio", "BBVA, Santander y Efectivo".
-     * @param elementos: textos a juntar
-     * @return Devuelve la enumeración (vacía si no hay elementos)
-     */
-    public static String enumerar(java.util.List<String> elementos) {
-        if (elementos.isEmpty()) {
-            return "";
-        }
-        if (elementos.size() == 1) {
-            return elementos.get(0);
-        }
-        String inicio = String.join(", ", elementos.subList(0, elementos.size() - 1));
-        return inicio + " y " + elementos.get(elementos.size() - 1);
-    }
-
-    /**
      * @param mes: mes y año
      * @return Devuelve el nombre del mes en minúscula: septiembre
      */
@@ -148,5 +133,30 @@ public final class Formato {
     public static String mesConAnio(YearMonth mes) {
         String nombre = nombreMes(mes);
         return nombre.substring(0, 1).toUpperCase(ES) + nombre.substring(1) + " " + mes.getYear();
+    }
+
+    /**
+     * Porcentaje sin el ",0" cuando es exacto: 90 % o 75,7 %
+     * @param porcentaje: valor entre 0 y 100 o más
+     * @return Devuelve el porcentaje como texto
+     */
+    public static String porcentajeCorto(BigDecimal porcentaje) {
+        String texto = porcentaje(porcentaje);
+        return texto.replace(",0\u00A0%", "\u00A0%");
+    }
+
+    /**
+     * Une nombres en una frase: "A", "A y B" o "A, B y C"
+     * @param nombres: nombres a unir
+     * @return Devuelve el texto
+     */
+    public static String lista(List<String> nombres) {
+        if (nombres.isEmpty()) {
+            return "";
+        }
+        if (nombres.size() == 1) {
+            return nombres.get(0);
+        }
+        return String.join(", ", nombres.subList(0, nombres.size() - 1)) + " y " + nombres.get(nombres.size() - 1);
     }
 }

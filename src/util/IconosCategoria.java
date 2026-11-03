@@ -4,58 +4,72 @@ import java.text.Normalizer;
 import java.util.Locale;
 
 /**
- * Icono de cada categoría de gasto (trazos SVG de una cuadrícula de 24x24). Se elige por el nombre de la
- * categoría; las que no tienen uno propio usan una etiqueta.
+ * Elige el icono de una categoría según su nombre (las categorías no guardan icono). Los trazos están
+ * en una cuadrícula de 24x24.
  *
  * @author Fco Padilla
  */
 public final class IconosCategoria {
 
-    private static final String VIVIENDA = "M3 11 L12 3 L21 11 M5 9.5 V20 H19 V9.5 M10 20 V14 H14 V20";
-    private static final String ALIMENTACION = "M3 9 H21 L19 20 H5 Z M8 9 L11 4 M16 9 L13 4 M9 13 V16 M12 13 V16 M15 13 V16";
-    private static final String COMPRAS = "M5 8 H19 L20 20 H4 Z M9 8 V6 A3 3 0 0 1 15 6 V8";
-    private static final String SERVICIOS = "M13 2 L4 14 H12 L11 22 L20 10 H12 Z";
-    private static final String TRANSPORTE = "M5 13 L7 7 H17 L19 13 M3 13 H21 V18 H3 Z M7 18 V20 M17 18 V20 M7 15.5 L7.01 15.5 M17 15.5 L17.01 15.5";
-    private static final String OCIO = "M4 6 H20 V18 H4 Z M8 6 V18 M16 6 V18 M4 10 H8 M4 14 H8 M16 10 H20 M16 14 H20";
-    private static final String SALUD = "M12 20 C12 20 4 15 4 9.5 A4 4 0 0 1 12 8 A4 4 0 0 1 20 9.5 C20 15 12 20 12 20 Z";
-    private static final String EDUCACION = "M4 5 H11 A1 1 0 0 1 12 6 V19 A3 3 0 0 0 9 17 H4 Z M20 5 H13 A1 1 0 0 0 12 6 V19 A3 3 0 0 1 15 17 H20 Z";
-    private static final String OTRA = "M3 12 V4 H11 L21 14 L14 21 Z M7.5 8 L7.51 8";
+    private static final String CASA = "M3 11 L12 3 L21 11 M5 10 V21 H19 V10 M10 21 V14 H14 V21";
+    private static final String CESTA = "M3 9 H21 L19 20 H5 Z M8 9 L12 3 L16 9";
+    private static final String BOLSA = "M5 7 H19 L20 20 H4 Z M9 7 V6 A3 3 0 0 1 15 6 V7";
+    private static final String RAYO = "M13 3 L5 14 H12 L11 21 L19 10 H12 Z";
+    private static final String COCHE = "M5 17 V10 L7 5 H17 L19 10 V17 M3 17 H21 M7 17 V19 M17 17 V19 M5 11 H19";
+    private static final String ENTRADA = "M4 7 H20 V17 H4 Z M8 7 V17 M16 7 V17 M4 12 H20";
+    private static final String CORAZON = "M12 20 C5 15 3 11 3 8 A4.5 4.5 0 0 1 12 6 A4.5 4.5 0 0 1 21 8 C21 11 19 15 12 20 Z";
+    private static final String LIBRO = "M4 5 H11 A2 2 0 0 1 12 7 V20 A2 2 0 0 0 10 18 H4 Z M20 5 H13 A2 2 0 0 0 12 7 V20 A2 2 0 0 1 14 18 H20 Z";
+    private static final String ETIQUETA = "M3 12 L12 3 H21 V12 L12 21 Z M16 8 L16.01 8";
 
-    // No se instancia
+    // Constructor base vacío
     private IconosCategoria() {
     }
 
     /**
-     * @param nombreCategoria: nombre de la categoría
-     * @return Devuelve el trazo SVG de su icono
+     * @param nombre: nombre de la categoría
+     * @return Devuelve el trazo SVG del icono que le corresponde (una etiqueta si no se reconoce)
      */
-    public static String trazo(String nombreCategoria) {
-        String n = Normalizer.normalize(nombreCategoria == null ? "" : nombreCategoria, Normalizer.Form.NFD)
+    public static String para(String nombre) {
+        String n = Normalizer.normalize(nombre == null ? "" : nombre, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
-        if (n.contains("viviend") || n.contains("hogar") || n.contains("alquiler")) {
-            return VIVIENDA;
+        if (contiene(n, "vivienda", "hogar", "alquiler", "hipoteca", "casa")) {
+            return CASA;
         }
-        if (n.contains("aliment") || n.contains("supermercado") || n.contains("comida")) {
-            return ALIMENTACION;
+        if (contiene(n, "aliment", "comida", "supermercado", "restaurante")) {
+            return CESTA;
         }
-        if (n.contains("compra") || n.contains("ropa")) {
-            return COMPRAS;
+        if (contiene(n, "compra", "ropa", "tienda")) {
+            return BOLSA;
         }
-        if (n.contains("servicio") || n.contains("suministro") || n.contains("factura")) {
-            return SERVICIOS;
+        if (contiene(n, "servicio", "suministro", "luz", "agua", "internet", "factura")) {
+            return RAYO;
         }
-        if (n.contains("transporte") || n.contains("coche") || n.contains("gasolina")) {
-            return TRANSPORTE;
+        if (contiene(n, "transporte", "coche", "gasolina", "bus", "taxi")) {
+            return COCHE;
         }
-        if (n.contains("ocio") || n.contains("entretenimiento") || n.contains("cine")) {
-            return OCIO;
+        if (contiene(n, "ocio", "entretenimiento", "cine", "juego", "viaje")) {
+            return ENTRADA;
         }
-        if (n.contains("salud") || n.contains("farmacia") || n.contains("medic")) {
-            return SALUD;
+        if (contiene(n, "salud", "medic", "farmacia")) {
+            return CORAZON;
         }
-        if (n.contains("educacion") || n.contains("estudio") || n.contains("formacion")) {
-            return EDUCACION;
+        if (contiene(n, "educacion", "estudio", "curso", "libro")) {
+            return LIBRO;
         }
-        return OTRA;
+        return ETIQUETA;
+    }
+
+    /**
+     * @param texto: texto en minúscula y sin tildes
+     * @param palabras: palabras a buscar
+     * @return Devuelve true si el texto contiene alguna de las palabras
+     */
+    private static boolean contiene(String texto, String... palabras) {
+        for (String p : palabras) {
+            if (texto.contains(p)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

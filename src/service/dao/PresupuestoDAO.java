@@ -26,15 +26,15 @@ public class PresupuestoDAO {
 	 * @return Devuelve el presupuesto insertado
 	 */
     public Presupuesto insertar(Presupuesto p) {
-        String sql = "INSERT INTO presupuestos (usuario_id, categoria_id, nombre, limite, periodo, mes_referencia, alcance) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO presupuestos (usuario_id, categoria_id, limite, periodo, mes_referencia, nombre, alcance) VALUES (?, ?, ?, ?, ?, ?, ?)";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, p.getUsuarioId());
             ps.setInt(2, p.getCategoriaId());
-            ps.setString(3, p.getNombre());
-            Dinero.escribir(ps, 4, p.getLimite());
-            ps.setString(5, p.getPeriodo());
-            ps.setString(6, p.getMesReferencia());
+            Dinero.escribir(ps, 3, p.getLimite());
+            ps.setString(4, p.getPeriodo());
+            ps.setString(5, p.getMesReferencia());
+            ps.setString(6, p.getNombre());
             ps.setString(7, p.getAlcance());
             ps.executeUpdate();
 
@@ -74,7 +74,7 @@ public class PresupuestoDAO {
     }
 
     /**
-     * Lista los meses en los que un usuario tiene algún presupuesto
+     * Meses en los que el usuario tiene algún presupuesto
      * @param usuarioId: id del usuario
      * @return Devuelve los meses con formato "yyyy-MM", del más reciente al más antiguo
      */
@@ -86,7 +86,7 @@ public class PresupuestoDAO {
             ps.setInt(1, usuarioId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    meses.add(rs.getString("mes_referencia"));
+                    meses.add(rs.getString(1));
                 }
             }
             return meses;
@@ -121,18 +121,20 @@ public class PresupuestoDAO {
     }
 
     /**
-     * Actualiza los datos de un presupuesto en la base de datos
+     * Actualiza los datos de un presupuesto en la base de datos (categoría, límite, periodo, mes, nombre y alcance)
      * @param p: Presupuesto con datos nuevos
      */
     public void actualizar(Presupuesto p) {
-        String sql = "UPDATE presupuestos SET nombre = ?, limite = ?, periodo = ?, alcance = ? WHERE id = ?";
+        String sql = "UPDATE presupuestos SET categoria_id = ?, limite = ?, periodo = ?, mes_referencia = ?, nombre = ?, alcance = ? WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, p.getNombre());
+            ps.setInt(1, p.getCategoriaId());
             Dinero.escribir(ps, 2, p.getLimite());
             ps.setString(3, p.getPeriodo());
-            ps.setString(4, p.getAlcance());
-            ps.setInt(5, p.getId());
+            ps.setString(4, p.getMesReferencia());
+            ps.setString(5, p.getNombre());
+            ps.setString(6, p.getAlcance());
+            ps.setInt(7, p.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error actualizando presupuesto", e);
@@ -161,15 +163,16 @@ public class PresupuestoDAO {
      * @throws SQLException
      */
     private Presupuesto mapear(ResultSet rs) throws SQLException {
-        return new Presupuesto(
+        Presupuesto p = new Presupuesto(
                 rs.getInt("id"),
                 rs.getInt("usuario_id"),
                 rs.getInt("categoria_id"),
-                rs.getString("nombre"),
                 Dinero.leer(rs, "limite"),
                 rs.getString("periodo"),
-                rs.getString("mes_referencia"),
-                rs.getString("alcance")
+                rs.getString("mes_referencia")
         );
+        p.setNombre(rs.getString("nombre"));
+        p.setAlcance(rs.getString("alcance"));
+        return p;
     }
 }

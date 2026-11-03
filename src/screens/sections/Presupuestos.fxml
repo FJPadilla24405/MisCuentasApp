@@ -12,19 +12,19 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
-<!-- Pantalla de presupuestos del mes: límite total, gastado, restante y una tarjeta por categoría. Las tarjetas las crea PresupuestosController -->
+<!-- Pantalla de presupuestos: límite de gasto por categoría y mes. Las tarjetas de cada presupuesto las crea PresupuestosController -->
 <ScrollPane fx:id="raiz" fitToWidth="true" hbarPolicy="NEVER" styleClass="resumen-scroll" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PresupuestosController">
    <content>
       <VBox spacing="20.0" styleClass="resumen-contenido">
          <children>
 
-            <!-- Cabecera: título, selector de mes y botón de añadir -->
+            <!-- Cabecera -->
             <HBox alignment="TOP_LEFT" spacing="12.0">
                <children>
                   <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label styleClass="resumen-etiqueta" text="PRESUPUESTOS" />
-                        <Label styleClass="resumen-titulo" text="Ver presupuestos" wrapText="true" />
+                        <Label styleClass="resumen-titulo" text="Ver presupuestos" />
                         <Label styleClass="texto-suave" text="Pon límites a tus gastos y haz espacio para lo que importa." wrapText="true" />
                      </children>
                   </VBox>
@@ -39,7 +39,7 @@
                               </Group>
                            </graphic>
                         </MenuButton>
-                        <Button mnemonicParsing="false" onAction="#anadirPresupuesto" styleClass="boton-primario, boton-anadir" text="Añadir presupuesto">
+                        <Button mnemonicParsing="false" onAction="#anadirPresupuesto" styleClass="boton-primario, boton-primario-icono" text="Añadir presupuesto">
                            <graphic>
                               <Group>
                                  <children>
@@ -53,7 +53,7 @@
                </children>
             </HBox>
 
-            <!-- Tarjetas de resumen: límite total, gastado y restante -->
+            <!-- Tarjetas de resumen -->
             <GridPane hgap="16.0">
                <columnConstraints>
                   <ColumnConstraints hgrow="ALWAYS" percentWidth="33.333" />
@@ -64,7 +64,7 @@
                   <VBox spacing="8.0" styleClass="kpi, kpi-principal" GridPane.columnIndex="0">
                      <children>
                         <Label styleClass="kpi-titulo" text="Límite total del mes" />
-                        <Label fx:id="lblLimiteTotal" styleClass="kpi-valor" text="0,00 €" />
+                        <Label fx:id="lblLimite" styleClass="kpi-valor" text="0,00 €" />
                         <Label fx:id="lblLimiteDetalle" styleClass="kpi-detalle" wrapText="true" />
                      </children>
                   </VBox>
@@ -85,28 +85,26 @@
                </children>
             </GridPane>
 
-            <!-- Aviso: presupuestos cerca del límite o superados (se oculta si no hay ninguno) -->
-            <HBox fx:id="cajaAviso" alignment="CENTER_LEFT" managed="false" spacing="10.0" styleClass="aviso-presupuesto" visible="false">
+            <!-- Aviso: presupuestos cerca del límite o superados -->
+            <HBox fx:id="avisoBox" alignment="CENTER_LEFT" managed="false" spacing="10.0" styleClass="aviso" visible="false">
                <children>
                   <Group>
                      <children>
                         <SVGPath content="M12 3 A9 9 0 1 0 12 21 A9 9 0 1 0 12 3 Z M12 8 V13 M12 16 L12.01 16" scaleX="0.67" scaleY="0.67" styleClass="icono" />
                      </children>
                   </Group>
-                  <Label fx:id="lblAviso" styleClass="aviso-texto" wrapText="true" HBox.hgrow="ALWAYS" />
+                  <Label fx:id="lblAviso" styleClass="aviso-texto" wrapText="true" />
                </children>
             </HBox>
 
-            <!-- Título de la lista de categorías -->
+            <!-- Presupuestos por categoría -->
             <HBox alignment="CENTER_LEFT">
                <children>
                   <Label styleClass="tarjeta-titulo" text="Tus presupuestos por categoría" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblPeriodo" styleClass="texto-suave" text="Mensuales" />
+                  <Label fx:id="lblPeriodo" styleClass="texto-suave-pequeno" />
                </children>
             </HBox>
-
-            <!-- Una tarjeta por presupuesto. Las crea PresupuestosController -->
             <GridPane fx:id="gridPresupuestos" hgap="16.0" vgap="16.0">
                <columnConstraints>
                   <ColumnConstraints hgrow="ALWAYS" percentWidth="33.333" />
@@ -114,14 +112,14 @@
                   <ColumnConstraints hgrow="ALWAYS" percentWidth="33.334" />
                </columnConstraints>
             </GridPane>
-            <Label fx:id="lblVacio" managed="false" styleClass="texto-suave" visible="false" wrapText="true" />
+            <Label fx:id="lblVacio" managed="false" styleClass="tarjeta, tabla-vacia" visible="false" wrapText="true" />
 
             <!-- Pie -->
             <HBox alignment="CENTER_LEFT">
                <children>
-                  <Label styleClass="texto-suave-pequeno" text="Los límites te ayudan a planificar; no modifican tus movimientos ni tus saldos." />
+                  <Label styleClass="texto-suave-pequeno" text="Los límites te ayudan a planificar; no modifican tus movimientos ni tus saldos." wrapText="true" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblDatosHasta" styleClass="texto-suave-pequeno" />
+                  <Label fx:id="lblDatos" styleClass="texto-suave-pequeno" />
                </children>
             </HBox>
          </children>

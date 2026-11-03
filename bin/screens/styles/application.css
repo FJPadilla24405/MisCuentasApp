@@ -879,161 +879,142 @@
     -fx-background-color: -mc-hover;
 }
 
-/* ===== Pantalla de presupuestos ===== */
-.boton-anadir {
-    -fx-background-radius: 10;
-    -fx-min-height: 38;
-    -fx-pref-height: 38;
-    -fx-padding: 0 18 0 14;
+/* ===== Presupuestos ===== */
+.boton-primario-icono {
+    -fx-padding: 0 18 0 16;
     -fx-graphic-text-gap: 8;
 }
 .boton-primario .icono {
     -fx-stroke: white;
 }
+.pastilla-alerta {
+    -fx-background-color: #fbe6e2;
+    -fx-background-radius: 20;
+    -fx-text-fill: #b0392f;
+    -fx-font-size: 11px;
+    -fx-padding: 3 10 3 10;
+}
 
 /* Aviso de presupuestos cerca del límite o superados */
-.aviso-presupuesto {
-    -fx-background-color: #fdf0ed;
+.aviso {
     -fx-background-radius: 10;
-    -fx-border-color: #f3d3cb;
     -fx-border-radius: 10;
-    -fx-padding: 11 16 11 16;
+    -fx-padding: 12 16 12 16;
 }
-.aviso-presupuesto .icono {
-    -fx-stroke: #c0392b;
+.aviso-alerta {
+    -fx-background-color: #fdeeea;
+    -fx-border-color: #f3cfc8;
 }
-.aviso-texto {
-    -fx-text-fill: #b5382a;
+.aviso-alerta .icono {
+    -fx-stroke: #b0392f;
+}
+.aviso-alerta .aviso-texto {
+    -fx-text-fill: #b0392f;
+    -fx-font-size: 12px;
+}
+.aviso-ok {
+    -fx-background-color: #e8f1ec;
+    -fx-border-color: #cfe3d7;
+}
+.aviso-ok .icono {
+    -fx-stroke: -mc-verde;
+}
+.aviso-ok .aviso-texto {
+    -fx-text-fill: -mc-cabecera;
     -fx-font-size: 12px;
 }
 
 /* Tarjeta de cada presupuesto */
-.presupuesto-tarjeta {
+.presupuesto-card {
     -fx-background-color: white;
     -fx-background-radius: 14;
     -fx-border-color: -mc-borde-suave;
     -fx-border-radius: 14;
     -fx-padding: 16 18 16 18;
+    -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(21, 63, 48, 0.05), 10, 0, 0, 2);
 }
-.presupuesto-nombre {
-    -fx-text-fill: -mc-titulo;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
-.presupuesto-etiqueta {
-    -fx-text-fill: -mc-suave;
-    -fx-font-size: 11px;
+.presupuesto-card:hover {
+    -fx-border-color: -mc-verde;
 }
 .presupuesto-limite {
     -fx-text-fill: -mc-titulo;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
-.presupuesto-importe {
+.presupuesto-valor {
     -fx-text-fill: -mc-titulo;
-    -fx-font-size: 15px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
-.restante-dentro {
+.presupuesto-valor-ok {
     -fx-text-fill: -mc-verde;
-}
-.restante-cerca {
-    -fx-text-fill: #b5533c;
-}
-.restante-superado {
-    -fx-text-fill: #a5281b;
-}
-
-/* Pastilla de estado */
-.estado-pastilla {
-    -fx-background-radius: 20;
-    -fx-font-size: 10px;
-    -fx-padding: 3 10 3 10;
-}
-.estado-dentro {
-    -fx-background-color: #e3efe8;
-    -fx-text-fill: -mc-verde;
-}
-.estado-cerca {
-    -fx-background-color: #fbe9e5;
-    -fx-text-fill: #b5533c;
-}
-.estado-superado {
-    -fx-background-color: #f7d6d1;
-    -fx-text-fill: #a5281b;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
-
-/* Barra de progreso: la pista y el relleno (el ancho del relleno lo pone el controlador) */
-.barra-pista {
-    -fx-background-color: #e9eeeb;
-    -fx-background-radius: 4;
-    -fx-min-height: 8;
+.presupuesto-valor-alerta {
+    -fx-text-fill: #b0392f;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+.barra-presupuesto {
     -fx-pref-height: 8;
+    -fx-min-height: 8;
     -fx-max-height: 8;
 }
-.barra-relleno {
+.barra-presupuesto > .track {
+    -fx-background-color: #e8ece9;
+    -fx-background-insets: 0;
     -fx-background-radius: 4;
-    -fx-min-width: 0;
 }
-.barra-dentro {
+.barra-presupuesto > .bar {
     -fx-background-color: -mc-verde;
+    -fx-background-insets: 0;
+    -fx-background-radius: 4;
+    -fx-padding: 0;
 }
-.barra-cerca {
-    -fx-background-color: #b5533c;
-}
-.barra-superado {
-    -fx-background-color: #a5281b;
+.barra-presupuesto.alerta > .bar {
+    -fx-background-color: #b8443a;
 }
 
-/* ===== Ventana "Añadir presupuesto" ===== */
-.pastilla-borrador {
-    -fx-background-color: #fbe9e5;
-    -fx-background-radius: 20;
-    -fx-text-fill: #b5533c;
-    -fx-font-size: 10px;
-    -fx-padding: 3 10 3 10;
+/* Ventana del presupuesto */
+.importe-caja {
+    -fx-border-color: transparent transparent -mc-borde transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 4 0;
 }
-.campo-importe {
-    -fx-background-color: white;
-    -fx-background-radius: 10;
-    -fx-border-color: -mc-borde -mc-borde -mc-verde -mc-borde;
-    -fx-border-width: 1 1 2 1;
-    -fx-border-radius: 10;
-    -fx-padding: 0 16 0 16;
-    -fx-min-height: 58;
-    -fx-pref-height: 58;
+.importe-caja.enfocado {
+    -fx-border-color: transparent transparent -mc-verde transparent;
 }
-.campo-importe.error {
-    -fx-border-color: -mc-borde -mc-borde -mc-error -mc-borde;
+.importe-caja.error {
+    -fx-border-color: transparent transparent -mc-error transparent;
 }
-.campo-importe-input,
-.campo-importe-input:focused {
-    -fx-font-size: 26px;
+.importe-input,
+.importe-input:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
     -fx-text-fill: -mc-titulo;
+    -fx-font-size: 30px;
+    -fx-prompt-text-fill: #b9c6bf;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
-.campo-importe-moneda {
+.importe-moneda {
     -fx-text-fill: -mc-suave;
     -fx-font-size: 14px;
+    -fx-padding: 0 0 6 0;
 }
-.combo-campo.error,
-.combo-campo.error:focused {
+.combo-campo.error {
     -fx-border-color: -mc-error;
 }
-
-/* Selector de alcance de cuentas: tres opciones con punto de radio */
 .opcion-alcance {
     -fx-background-color: white;
-    -fx-background-insets: 0;
     -fx-background-radius: 10;
     -fx-border-color: -mc-borde;
     -fx-border-radius: 10;
-    -fx-min-height: 46;
-    -fx-pref-height: 46;
-    -fx-padding: 0 14 0 14;
-    -fx-alignment: CENTER_LEFT;
-    -fx-graphic-text-gap: 10;
+    -fx-padding: 14 14 14 14;
+    -fx-graphic-text-gap: 8;
     -fx-text-fill: -mc-texto;
     -fx-font-size: 13px;
     -fx-cursor: hand;
@@ -1042,30 +1023,41 @@
     -fx-background-color: -mc-hover;
 }
 .opcion-alcance:selected {
-    -fx-background-color: -mc-activo;
+    -fx-background-color: #e8f1ec;
     -fx-border-color: -mc-verde;
-    -fx-text-fill: -mc-cabecera;
+}
+.opcion-alcance .radio {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-border-color: #b9c6bf;
+    -fx-border-radius: 8;
+}
+.opcion-alcance:selected .radio {
+    -fx-border-color: -mc-verde;
+}
+.opcion-alcance .radio > .dot {
+    -fx-background-color: transparent;
+}
+.opcion-alcance:selected .radio > .dot {
+    -fx-background-color: -mc-verde;
 }
 .opcion-alcance:selected .icono {
     -fx-stroke: -mc-cabecera;
 }
-.opcion-alcance:disabled {
-    -fx-opacity: 0.45;
-    -fx-cursor: default;
+.boton-peligro {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #f3cfc8;
+    -fx-border-radius: 8;
+    -fx-text-fill: #b0392f;
+    -fx-font-size: 13px;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-padding: 0 16 0 16;
+    -fx-cursor: hand;
 }
-.radio-punto {
-    -fx-background-color: #b9c6bf, white;
-    -fx-background-insets: 0, 1;
-    -fx-background-radius: 8, 7;
-    -fx-min-width: 16;
-    -fx-min-height: 16;
-    -fx-pref-width: 16;
-    -fx-pref-height: 16;
-    -fx-max-width: 16;
-    -fx-max-height: 16;
+.boton-peligro:hover {
+    -fx-background-color: #fdeeea;
 }
-.opcion-alcance:selected .radio-punto {
-    -fx-background-color: -mc-verde, white, -mc-verde;
-    -fx-background-insets: 0, 2, 5;
-    -fx-background-radius: 8, 6, 3;
-}
+

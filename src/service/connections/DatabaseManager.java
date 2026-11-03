@@ -72,8 +72,7 @@ public class DatabaseManager {
     /**
      * Pone al día una base de datos creada con una versión anterior del esquema. CREATE TABLE IF NOT EXISTS
      * no añade columnas a una tabla que ya existe, así que aquí se añaden las que falten.
-     * Por ahora: usuarios.password_hash (huella de la contraseña local) y presupuestos.nombre y
-     * presupuestos.alcance (nombre del presupuesto y tipo de cuentas que cuentan para él).
+     * Por ahora: usuarios.password_hash (huella de la contraseña local) y presupuestos.nombre y presupuestos.alcance.
      * @throws SQLException
      */
     private static void migrar() throws SQLException {
@@ -83,10 +82,10 @@ public class DatabaseManager {
     }
 
     /**
-     * Añade una columna a una tabla solo si todavía no existe.
+     * Añade una columna a una tabla si todavía no la tiene
      * @param tabla: nombre de la tabla
      * @param columna: nombre de la columna
-     * @param definicion: tipo y valor por defecto de la columna (lo que va tras su nombre en el ALTER TABLE)
+     * @param definicion: tipo y valor por defecto de la columna
      * @throws SQLException
      */
     private static void anadirColumnaSiFalta(String tabla, String columna, String definicion) throws SQLException {

@@ -5,16 +5,15 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
@@ -24,53 +23,51 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
-import models.Presupuesto;
 import models.Usuario;
 import service.auth.SesionActual;
-import service.presupuestos.PresupuestoService;
-import service.presupuestos.PresupuestoService.Estado;
-import service.presupuestos.PresupuestoService.FilaPresupuesto;
-import service.presupuestos.PresupuestoService.Vista;
+import service.presupuesto.PresupuestoService;
+import service.presupuesto.PresupuestoService.Estado;
+import service.presupuesto.PresupuestoService.FilaPresupuesto;
+import service.presupuesto.PresupuestoService.ResumenPresupuestos;
 import util.Formato;
 import util.IconosCategoria;
 
 /**
- * Controlador de Presupuestos.fxml: los presupuestos de un mes con lo que se ha gastado en cada uno. Arriba
- * se ve el límite total, lo gastado y lo que queda; debajo, una tarjeta por categoría con su barra de
- * progreso. El botón "Añadir presupuesto" abre NuevoPresupuestoController. Los datos los calcula PresupuestoService.
+ * Controlador de Presupuestos.fxml: tarjetas de resumen del mes, aviso de presupuestos cerca del límite
+ * o superados y una tarjeta por presupuesto (lo gastado, lo que queda y una barra de progreso).
+ * Al pulsar una tarjeta se edita ese presupuesto y "Añadir presupuesto" abre la misma ventana vacía.
+ * Los datos los calcula PresupuestoService.
  *
  * @author Fco Padilla
  */
 public class PresupuestosController {
 
-    // Tarjetas por fila
-    private static final int COLUMNAS = 3;
-    // 24 de la cuadrícula del icono escalados a 16 píxeles
+    // Trazo del icono de las tarjetas (cuadrícula de 24x24) y su escala a 16 píxeles
     private static final double ESCALA_ICONO = 0.67;
 
     @FXML private ScrollPane raiz;
     @FXML private MenuButton menuMes;
-    @FXML private Label lblLimiteTotal;
+    @FXML private Label lblLimite;
     @FXML private Label lblLimiteDetalle;
     @FXML private Label lblGastadoTitulo;
     @FXML private Label lblGastado;
     @FXML private Label lblGastadoDetalle;
     @FXML private Label lblRestante;
     @FXML private Label lblRestanteDetalle;
-    @FXML private HBox cajaAviso;
+    @FXML private HBox avisoBox;
     @FXML private Label lblAviso;
     @FXML private Label lblPeriodo;
     @FXML private GridPane gridPresupuestos;
     @FXML private Label lblVacio;
-    @FXML private Label lblDatosHasta;
+    @FXML private Label lblDatos;
 
     private final PresupuestoService servicio = new PresupuestoService();
     private YearMonth mes = YearMonth.now();
-    private Vista vista;
+    private Usuario usuario;
     private String moneda = "EUR";
 
     /**
-     * Pinta los presupuestos del mes actual al abrir la pantalla
+     * Pinta los presupuestos del mes actual
      */
     @FXML
     private void initialize() {
@@ -78,46 +75,52 @@ public class PresupuestosController {
     }
 
     /**
-     * Abre la ventana para crear un presupuesto. Si se crea, se pasa al mes del nuevo presupuesto para verlo.
+     * Abre la ventana para crear un presupuesto. Si se guarda, se muestra el mes de ese presupuesto.
      */
     @FXML
     private void anadirPresupuesto() {
-        Usuario usuario = SesionActual.getUsuario();
-        if (usuario == null) {
-            return;
-        }
-        Optional<Presupuesto> creado = NuevoPresupuestoController.mostrar(raiz.getScene().getWindow(), usuario, mes);
-        creado.ifPresent(p -> {
-            mes = YearMonth.parse(p.getMesReferencia());
-            refrescar();
-        });
+        abrirDialogo(null);
     }
 
     /**
-     * Vuelve a calcular los datos del mes y pinta toda la pantalla
+     * Abre la ventana de un presupuesto (nuevo si es null, o para editar el que se pasa)
+     * @param fila: presupuesto a editar, o null para uno nuevo
+     */
+    private void abrirDialogo(FilaPresupuesto fila) {
+        Optional<YearMonth> resultado = PresupuestoController.mostrar(raiz.getScene().getWindow(), usuario, mes,
+                fila == null ? null : fila.presupuesto());
+        if (resultado.isPresent()) {
+            mes = resultado.get();
+            refrescar();
+        }
+    }
+
+    /**
+     * Vuelve a calcular los presupuestos del mes y pinta toda la pantalla
      */
     private void refrescar() {
-        Usuario usuario = SesionActual.getUsuario();
+        usuario = SesionActual.getUsuario();
         if (usuario == null) {
             return;
         }
         moneda = usuario.getMoneda();
-        vista = servicio.calcular(usuario, mes);
-        pintarMeses();
-        pintarResumen();
-        pintarAviso();
-        pintarTarjetas();
-        pintarPie();
+        ResumenPresupuestos datos = servicio.calcular(usuario, mes);
+        pintarMeses(datos.meses());
+        pintarTarjetas(datos);
+        pintarAviso(datos);
+        pintarPresupuestos(datos);
+        lblPeriodo.setText("Mensuales · " + Formato.mesConAnio(mes));
+        lblDatos.setText(textoDatos());
     }
 
     /**
-     * Rellena el selector de mes y el texto "Mensuales · Septiembre 2026"
+     * Rellena el selector de mes
+     * @param meses: meses que se pueden elegir
      */
-    private void pintarMeses() {
+    private void pintarMeses(List<YearMonth> meses) {
         menuMes.setText(Formato.mesConAnio(mes));
-        lblPeriodo.setText("Mensuales · " + Formato.mesConAnio(mes));
         menuMes.getItems().clear();
-        for (YearMonth m : vista.meses()) {
+        for (YearMonth m : meses) {
             MenuItem item = new MenuItem(Formato.mesConAnio(m));
             item.setOnAction(e -> {
                 mes = m;
@@ -129,250 +132,227 @@ public class PresupuestosController {
 
     /**
      * Rellena las tres tarjetas de arriba: límite total, gastado y restante
+     * @param datos: presupuestos del mes
      */
-    private void pintarResumen() {
-        int n = vista.filas().size();
-        lblLimiteTotal.setText(Formato.moneda(vista.limiteTotal(), moneda));
-        lblLimiteDetalle.setText(n == 0 ? "Sin presupuestos este mes" : contar(n, "presupuesto", "presupuestos") + " · " + textoAlcanceGeneral());
+    private void pintarTarjetas(ResumenPresupuestos datos) {
+        int n = datos.filas().size();
+        lblLimite.setText(Formato.moneda(datos.limiteTotal(), moneda));
+        lblLimiteDetalle.setText(n == 0 ? "Aún no hay presupuestos este mes"
+                : n + (n == 1 ? " presupuesto" : " presupuestos") + " · " + textoAlcanceComun(datos));
 
         lblGastadoTitulo.setText("Gastado en " + Formato.nombreMes(mes));
-        lblGastado.setText(Formato.moneda(vista.gastadoTotal(), moneda));
-        BigDecimal usado = vista.porcentajeUsado();
-        lblGastadoDetalle.setText(usado == null ? "Aún no hay límites con los que comparar"
-                : Formato.porcentaje(usado) + " del límite total utilizado");
+        lblGastado.setText(Formato.moneda(datos.gastadoTotal(), moneda));
+        BigDecimal gastado = datos.porcentajeGastado();
+        lblGastadoDetalle.setText(gastado == null ? "Sin límite que comparar"
+                : Formato.porcentajeCorto(gastado) + " del límite total utilizado");
 
-        BigDecimal restante = vista.restanteTotal();
-        lblRestante.setText(restante.signum() < 0 ? Formato.monedaConSigno(restante, moneda) : Formato.moneda(restante, moneda));
-        BigDecimal disponible = vista.porcentajeDisponible();
-        if (disponible == null) {
-            lblRestanteDetalle.setText("Añade un presupuesto para empezar");
-        } else if (restante.signum() < 0) {
-            lblRestanteDetalle.setText("Has superado el límite total");
-        } else {
-            lblRestanteDetalle.setText(Formato.porcentaje(disponible) + " del límite total disponible");
-        }
+        lblRestante.setText(Formato.moneda(datos.restanteTotal(), moneda));
+        BigDecimal restante = datos.porcentajeRestante();
+        lblRestanteDetalle.setText(restante == null ? "Sin límite que comparar"
+                : Formato.porcentajeCorto(restante) + " del límite total disponible");
     }
 
     /**
-     * Muestra el aviso con las categorías superadas o cerca de su límite; si no hay ninguna, lo oculta
+     * @param datos: presupuestos del mes
+     * @return Devuelve el alcance si todos los presupuestos tienen el mismo, o "Alcances distintos"
      */
-    private void pintarAviso() {
+    private String textoAlcanceComun(ResumenPresupuestos datos) {
+        String primero = datos.filas().get(0).presupuesto().getAlcance();
+        boolean iguales = datos.filas().stream().allMatch(f -> f.presupuesto().getAlcance().equals(primero));
+        return iguales ? textoAlcance(primero) : "Alcances distintos";
+    }
+
+    /**
+     * @param alcance: "todas", "banco" o "efectivo"
+     * @return Devuelve el texto del alcance
+     */
+    private String textoAlcance(String alcance) {
+        return switch (alcance) {
+            case "banco" -> "Solo bancos";
+            case "efectivo" -> "Solo efectivo";
+            default -> "Todas las cuentas";
+        };
+    }
+
+    /**
+     * Muestra el aviso: rojo si hay presupuestos cerca del límite o superados, verde si todos van bien y
+     * nada si no hay presupuestos.
+     * @param datos: presupuestos del mes
+     */
+    private void pintarAviso(ResumenPresupuestos datos) {
         List<String> superados = new ArrayList<>();
-        List<String> cerca = new ArrayList<>();
-        for (FilaPresupuesto f : vista.filas()) {
+        List<String> cercanos = new ArrayList<>();
+        for (FilaPresupuesto f : datos.filas()) {
             if (f.estado() == Estado.SUPERADO) {
-                superados.add(f.categoria());
+                superados.add(f.categoria().getNombre());
             } else if (f.estado() == Estado.CERCA) {
-                cerca.add(f.categoria());
+                cercanos.add(f.categoria().getNombre());
             }
         }
-        boolean hayAviso = !superados.isEmpty() || !cerca.isEmpty();
-        cajaAviso.setVisible(hayAviso);
-        cajaAviso.setManaged(hayAviso);
-        if (!hayAviso) {
+        avisoBox.getStyleClass().removeAll("aviso-ok", "aviso-alerta");
+        if (datos.filas().isEmpty()) {
+            avisoBox.setVisible(false);
+            avisoBox.setManaged(false);
             return;
         }
-        StringBuilder texto = new StringBuilder();
+        List<String> frases = new ArrayList<>();
         if (!superados.isEmpty()) {
-            texto.append(Formato.enumerar(superados)).append(superados.size() == 1 ? " ha superado su límite. " : " han superado su límite. ");
+            frases.add(Formato.lista(superados) + (superados.size() == 1 ? " ha superado su límite." : " han superado su límite."));
         }
-        if (!cerca.isEmpty()) {
-            texto.append(Formato.enumerar(cerca)).append(cerca.size() == 1 ? " está cerca de su límite. " : " están cerca de su límite. ");
+        if (!cercanos.isEmpty()) {
+            frases.add(Formato.lista(cercanos) + (cercanos.size() == 1 ? " está cerca de su límite." : " están cerca de su límite."));
         }
-        if (superados.isEmpty()) {
-            texto.append("Ningún presupuesto se ha superado este mes.");
+        if (superados.isEmpty() && !cercanos.isEmpty()) {
+            String cuando = mes.equals(YearMonth.now()) ? "este mes" : "en " + Formato.nombreMes(mes);
+            frases.add("Ningún presupuesto se ha superado " + cuando + ".");
         }
-        lblAviso.setText(texto.toString().trim());
+        boolean alerta = !frases.isEmpty();
+        lblAviso.setText(alerta ? String.join(" ", frases) : "Todos tus presupuestos van dentro del límite.");
+        avisoBox.getStyleClass().add(alerta ? "aviso-alerta" : "aviso-ok");
+        avisoBox.setVisible(true);
+        avisoBox.setManaged(true);
     }
 
     /**
-     * Pinta una tarjeta por presupuesto, tres por fila, o un mensaje si el mes no tiene presupuestos
+     * Pinta una tarjeta por presupuesto, en tres columnas, o el mensaje de que no hay ninguno
+     * @param datos: presupuestos del mes
      */
-    private void pintarTarjetas() {
+    private void pintarPresupuestos(ResumenPresupuestos datos) {
         gridPresupuestos.getChildren().clear();
-        boolean vacia = vista.filas().isEmpty();
-        gridPresupuestos.setVisible(!vacia);
-        gridPresupuestos.setManaged(!vacia);
-        lblVacio.setVisible(vacia);
-        lblVacio.setManaged(vacia);
-        if (vacia) {
-            lblVacio.setText("Todavía no tienes presupuestos para " + Formato.nombreMes(mes) + " de " + mes.getYear()
-                    + ". Pulsa \"Añadir presupuesto\" para crear el primero.");
+        boolean vacio = datos.filas().isEmpty();
+        lblVacio.setVisible(vacio);
+        lblVacio.setManaged(vacio);
+        gridPresupuestos.setVisible(!vacio);
+        gridPresupuestos.setManaged(!vacio);
+        if (vacio) {
+            lblVacio.setText("No tienes presupuestos en " + Formato.nombreMes(mes) + ". Crea el primero con \"Añadir presupuesto\".");
             return;
         }
         int i = 0;
-        for (FilaPresupuesto fila : vista.filas()) {
-            gridPresupuestos.add(crearTarjeta(fila), i % COLUMNAS, i / COLUMNAS);
+        for (FilaPresupuesto fila : datos.filas()) {
+            gridPresupuestos.add(crearTarjeta(fila), i % 3, i / 3);
             i++;
         }
     }
 
     /**
-     * Pone hasta qué día llegan los datos: hoy si es el mes actual, el último día si ya pasó
-     */
-    private void pintarPie() {
-        LocalDate hoy = LocalDate.now();
-        if (mes.isAfter(YearMonth.from(hoy))) {
-            lblDatosHasta.setText("Este mes todavía no ha empezado");
-            return;
-        }
-        LocalDate hasta = mes.equals(YearMonth.from(hoy)) ? hoy : mes.atEndOfMonth();
-        lblDatosHasta.setText("Datos hasta el " + Formato.fechaCorta(hasta.toString()) + " " + hasta.getYear());
-    }
-
-    /**
-     * Crea la tarjeta de un presupuesto: icono y nombre de la categoría, estado, límite, gastado, restante,
-     * barra de progreso y alcance de cuentas
+     * Crea la tarjeta de un presupuesto: categoría y estado, límite, gastado, restante y barra de progreso
      * @param fila: presupuesto con lo gastado
      * @return Devuelve la tarjeta
      */
     private VBox crearTarjeta(FilaPresupuesto fila) {
-        String estado = fila.estado().name().toLowerCase(Locale.ROOT);
+        Estado estado = fila.estado();
+        boolean alerta = estado != Estado.DENTRO;
 
-        Label nombre = new Label(fila.categoria());
-        nombre.getStyleClass().add("presupuesto-nombre");
-        nombre.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(nombre, Priority.ALWAYS);
-        Label pastilla = new Label(textoEstado(fila.estado()));
-        pastilla.getStyleClass().addAll("estado-pastilla", "estado-" + estado);
+        Label categoria = new Label(fila.nombreCategoria());
+        categoria.getStyleClass().add("tarjeta-cuenta-nombre");
+        categoria.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(categoria, Priority.ALWAYS);
+        Label pastilla = new Label(switch (estado) {
+            case DENTRO -> "Dentro del límite";
+            case CERCA -> "Cerca del límite";
+            case SUPERADO -> "Superado";
+        });
+        pastilla.getStyleClass().add(alerta ? "pastilla-alerta" : "pastilla");
         pastilla.setMinWidth(Region.USE_PREF_SIZE);
-        HBox cabecera = new HBox(10, cajaIcono(IconosCategoria.trazo(fila.categoria())), nombre, pastilla);
+        HBox cabecera = new HBox(10, cajaIcono(IconosCategoria.para(fila.categoria().getNombre())), categoria, pastilla);
         cabecera.setAlignment(Pos.CENTER_LEFT);
 
-        Label etiquetaLimite = new Label("Límite mensual");
-        etiquetaLimite.getStyleClass().add("presupuesto-etiqueta");
-        Label limite = new Label(Formato.moneda(fila.limite(), moneda));
-        limite.getStyleClass().add("presupuesto-limite");
-        Region hueco = new Region();
-        HBox.setHgrow(hueco, Priority.ALWAYS);
-        HBox filaLimite = new HBox(etiquetaLimite, hueco, limite);
-        filaLimite.setAlignment(Pos.CENTER_LEFT);
+        HBox limite = new HBox(new Label("Límite mensual"), espacio(), valor(Formato.moneda(fila.limite(), moneda), "presupuesto-limite"));
+        limite.getChildren().get(0).getStyleClass().add("texto-suave-pequeno");
+        limite.setAlignment(Pos.CENTER_LEFT);
 
-        Label gastado = new Label(Formato.moneda(fila.gastado(), moneda));
-        gastado.getStyleClass().add("presupuesto-importe");
-        Label restante = new Label(fila.restante().signum() < 0 ? Formato.monedaConSigno(fila.restante(), moneda)
-                : Formato.moneda(fila.restante(), moneda));
-        restante.getStyleClass().addAll("presupuesto-importe", "restante-" + estado);
-        HBox cifras = new HBox(36, columna("Gastado", gastado), columna("Restante", restante));
+        VBox gastado = columna("Gastado", Formato.moneda(fila.gastado(), moneda), "presupuesto-valor");
+        VBox restante = columna("Restante", Formato.moneda(fila.restante(), moneda), alerta ? "presupuesto-valor-alerta" : "presupuesto-valor-ok");
+        HBox cifras = new HBox(16, gastado, restante);
+        HBox.setHgrow(gastado, Priority.ALWAYS);
+        HBox.setHgrow(restante, Priority.ALWAYS);
 
-        Label usado = new Label(Formato.porcentaje(fila.porcentaje()) + " utilizado");
-        usado.getStyleClass().add("presupuesto-etiqueta");
-        Label alcance = new Label(textoAlcance(fila.presupuesto().getAlcance()));
-        alcance.getStyleClass().add("presupuesto-etiqueta");
-        Region hueco2 = new Region();
-        HBox.setHgrow(hueco2, Priority.ALWAYS);
-        HBox filaPie = new HBox(usado, hueco2, alcance);
-        filaPie.setAlignment(Pos.CENTER_LEFT);
-
-        VBox tarjeta = new VBox(12, cabecera, filaLimite, cifras, crearBarra(fila, estado), filaPie);
-        tarjeta.getStyleClass().add("presupuesto-tarjeta");
-        tarjeta.setMaxWidth(Double.MAX_VALUE);
-        tarjeta.setMaxHeight(Double.MAX_VALUE);
-        String nombrePresupuesto = fila.presupuesto().getNombre();
-        if (nombrePresupuesto != null && !nombrePresupuesto.isBlank()) {
-            Tooltip.install(tarjeta, new Tooltip(nombrePresupuesto));
+        double fraccion = fila.limite().signum() > 0 ? fila.gastado().doubleValue() / fila.limite().doubleValue() : 0;
+        ProgressBar barra = new ProgressBar(Math.min(1.0, fraccion));
+        barra.getStyleClass().add("barra-presupuesto");
+        if (alerta) {
+            barra.getStyleClass().add("alerta");
         }
+        barra.setMaxWidth(Double.MAX_VALUE);
+
+        Label utilizado = new Label(Formato.porcentajeCorto(fila.porcentaje()) + " utilizado");
+        utilizado.getStyleClass().add("texto-suave-pequeno");
+        Label alcance = new Label(textoAlcance(fila.presupuesto().getAlcance()));
+        alcance.getStyleClass().add("texto-suave-pequeno");
+        HBox pie = new HBox(utilizado, espacio(), alcance);
+        pie.setAlignment(Pos.CENTER_LEFT);
+
+        VBox tarjeta = new VBox(12, cabecera, limite, cifras, barra, pie);
+        tarjeta.getStyleClass().add("presupuesto-card");
+        tarjeta.setOnMouseClicked(e -> abrirDialogo(fila));
+        String nombre = fila.presupuesto().getNombre();
+        Tooltip.install(tarjeta, new Tooltip((nombre == null || nombre.isBlank() ? fila.nombreCategoria() : nombre) + "\nPulsa para editarlo"));
         return tarjeta;
     }
 
     /**
-     * Crea la barra de progreso: una pista gris con un relleno cuyo ancho es el porcentaje gastado (como máximo todo)
-     * @param fila: presupuesto con lo gastado
-     * @param estado: dentro, cerca o superado, para el color
-     * @return Devuelve la barra
-     */
-    private StackPane crearBarra(FilaPresupuesto fila, String estado) {
-        double proporcion = Math.max(0, Math.min(1, fila.porcentaje().doubleValue() / 100.0));
-        Region relleno = new Region();
-        relleno.getStyleClass().addAll("barra-relleno", "barra-" + estado);
-        StackPane pista = new StackPane(relleno);
-        pista.getStyleClass().add("barra-pista");
-        StackPane.setAlignment(relleno, Pos.CENTER_LEFT);
-        relleno.maxWidthProperty().bind(Bindings.multiply(pista.widthProperty(), proporcion));
-        relleno.setVisible(proporcion > 0);
-        return pista;
-    }
-
-    /**
-     * Una columna de cifras: una etiqueta pequeña encima del importe
-     * @param titulo: etiqueta
-     * @param importe: importe ya formateado
+     * Crea una columna con un título pequeño y un valor
+     * @param titulo: título
+     * @param valor: valor
+     * @param clase: clase CSS del valor
      * @return Devuelve la columna
      */
-    private VBox columna(String titulo, Label importe) {
-        Label etiqueta = new Label(titulo);
-        etiqueta.getStyleClass().add("presupuesto-etiqueta");
-        VBox caja = new VBox(2, etiqueta, importe);
-        caja.setAlignment(Pos.CENTER_LEFT);
-        return caja;
+    private VBox columna(String titulo, String valor, String clase) {
+        Label t = new Label(titulo);
+        t.getStyleClass().add("texto-suave-pequeno");
+        return new VBox(3, t, valor(valor, clase));
     }
 
     /**
-     * Icono dentro de un cuadrado redondeado de color suave, como en las tarjetas de cuenta
+     * @param texto: contenido
+     * @param clase: clase CSS
+     * @return Devuelve una etiqueta con ese texto y esa clase
+     */
+    private Label valor(String texto, String clase) {
+        Label l = new Label(texto);
+        l.getStyleClass().add(clase);
+        return l;
+    }
+
+    /**
+     * @return Devuelve un hueco que empuja lo que va después hacia la derecha
+     */
+    private Region espacio() {
+        Region r = new Region();
+        HBox.setHgrow(r, Priority.ALWAYS);
+        return r;
+    }
+
+    /**
+     * Icono dentro de un cuadrado redondeado de color suave
      * @param trazo: trazo SVG del icono
      * @return Devuelve el cuadrado con el icono
      */
     private StackPane cajaIcono(String trazo) {
-        SVGPath icono = new SVGPath();
-        icono.setContent(trazo);
-        icono.getStyleClass().add("icono");
-        icono.setScaleX(ESCALA_ICONO);
-        icono.setScaleY(ESCALA_ICONO);
-        StackPane caja = new StackPane(new Group(icono));
+        SVGPath path = new SVGPath();
+        path.setContent(trazo);
+        path.getStyleClass().add("icono");
+        path.setScaleX(ESCALA_ICONO);
+        path.setScaleY(ESCALA_ICONO);
+        StackPane caja = new StackPane(new Group(path));
         caja.getStyleClass().add("icono-caja");
         return caja;
     }
 
     /**
-     * @param estado: estado de un presupuesto
-     * @return Devuelve el texto de su pastilla
+     * @return Devuelve "Datos hasta el 30 sept 2026": hoy si es el mes actual, el último día si es un mes pasado
      */
-    private String textoEstado(Estado estado) {
-        return switch (estado) {
-            case DENTRO -> "Dentro del límite";
-            case CERCA -> "Cerca del límite";
-            case SUPERADO -> "Límite superado";
-        };
-    }
-
-    /**
-     * @param alcance: "todas", "banco" o "efectivo"
-     * @return Devuelve el texto que se ve en la tarjeta
-     */
-    private String textoAlcance(String alcance) {
-        if (Presupuesto.ALCANCE_BANCO.equals(alcance)) {
-            return "Solo bancos";
+    private String textoDatos() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate hasta;
+        if (mes.equals(YearMonth.from(hoy))) {
+            hasta = hoy;
+        } else if (mes.isBefore(YearMonth.from(hoy))) {
+            hasta = mes.atEndOfMonth();
+        } else {
+            return "Mes futuro: todavía sin datos";
         }
-        if (Presupuesto.ALCANCE_EFECTIVO.equals(alcance)) {
-            return "Solo efectivo";
-        }
-        return "Todas las cuentas";
-    }
-
-    /**
-     * @return Devuelve el alcance común a todos los presupuestos del mes, o "Varios alcances" si no es el mismo
-     */
-    private String textoAlcanceGeneral() {
-        String primero = null;
-        for (FilaPresupuesto f : vista.filas()) {
-            String actual = f.presupuesto().getAlcance();
-            if (primero == null) {
-                primero = actual;
-            } else if (!primero.equals(actual)) {
-                return "Varios alcances";
-            }
-        }
-        return textoAlcance(primero);
-    }
-
-    /**
-     * Escribe una cantidad con su palabra en singular o plural
-     * @param n: cantidad
-     * @param singular: palabra si es 1
-     * @param plural: palabra si no es 1
-     * @return Devuelve el texto, por ejemplo "1 presupuesto" o "6 presupuestos"
-     */
-    private String contar(int n, String singular, String plural) {
-        return n + " " + (n == 1 ? singular : plural);
+        return "Datos hasta el " + Formato.fechaCorta(hasta.toString()) + " " + hasta.getYear();
     }
 }

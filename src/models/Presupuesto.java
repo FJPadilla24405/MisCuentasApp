@@ -10,13 +10,6 @@ import java.math.BigDecimal;
  */
 public class Presupuesto {
 
-    /** Alcance: cuentan los gastos de todas las cuentas activas */
-    public static final String ALCANCE_TODAS = "todas";
-    /** Alcance: solo cuentan los gastos de las cuentas de tipo banco */
-    public static final String ALCANCE_BANCO = "banco";
-    /** Alcance: solo cuentan los gastos de las cuentas de tipo efectivo */
-    public static final String ALCANCE_EFECTIVO = "efectivo";
-
     // Identificador local (clave primaria autoincremental de SQLite)
     private int id;
     // Id del usuario dueño del presupuesto
@@ -27,9 +20,9 @@ public class Presupuesto {
     private BigDecimal limite;
     private String periodo; // "mensual"
     private String mesReferencia; // formato "yyyy-MM"
-    // Nombre que le pone el usuario al presupuesto (máximo 50 caracteres; puede ser null en datos antiguos)
+    // Nombre que le pone el usuario (por ejemplo "Alimentación del mes"); puede ser null en presupuestos antiguos
     private String nombre;
-    // Qué cuentas cuentan para el límite: "todas", "banco" o "efectivo" (null en datos antiguos se entiende como "todas")
+    // Cuentas que cuentan para el gasto: "todas", "banco" o "efectivo". null se entiende como "todas"
     private String alcance;
 
     /**
@@ -54,25 +47,6 @@ public class Presupuesto {
         this.limite = limite;
         this.periodo = periodo;
         this.mesReferencia = mesReferencia;
-        this.alcance = ALCANCE_TODAS;
-    }
-
-    /**
-     * Crea un presupuesto con todos sus datos, incluidos el nombre y el alcance de cuentas.
-     * @param id: identificador local del presupuesto
-     * @param usuarioId: id del usuario dueño del presupuesto
-     * @param categoriaId: id de la categoría
-     * @param nombre: nombre del presupuesto
-     * @param limite: cantidad máxima de gasto
-     * @param periodo: periodo del presupuesto ("mensual")
-     * @param mesReferencia: mes al que se aplica, con formato "yyyy-MM"
-     * @param alcance: cuentas que cuentan ("todas", "banco" o "efectivo")
-     */
-    public Presupuesto(int id, int usuarioId, int categoriaId, String nombre, BigDecimal limite, String periodo,
-            String mesReferencia, String alcance) {
-        this(id, usuarioId, categoriaId, limite, periodo, mesReferencia);
-        this.nombre = nombre;
-        this.alcance = alcance == null || alcance.isBlank() ? ALCANCE_TODAS : alcance;
     }
 
     /** @return Devuelve el identificador local del presupuesto */
@@ -135,7 +109,15 @@ public class Presupuesto {
         this.mesReferencia = mesReferencia;
     }
 
-    /** @return Devuelve el nombre del presupuesto (puede ser null en presupuestos antiguos) */
+    /**
+     * @return Devuelve un texto corto con el id, el límite y el mes del presupuesto
+     */
+    @Override
+    public String toString() {
+        return "Presupuesto{id=" + id + ", limite=" + limite + ", mesReferencia='" + mesReferencia + "'}";
+    }
+
+    /** @return Devuelve el nombre del presupuesto (puede ser null) */
     public String getNombre() {
         return nombre;
     }
@@ -145,21 +127,13 @@ public class Presupuesto {
         this.nombre = nombre;
     }
 
-    /** @return Devuelve el alcance de cuentas: "todas", "banco" o "efectivo" (nunca null) */
+    /** @return Devuelve el alcance de cuentas: "todas", "banco" o "efectivo" ("todas" si no tiene) */
     public String getAlcance() {
-        return alcance == null || alcance.isBlank() ? ALCANCE_TODAS : alcance;
+        return alcance == null ? "todas" : alcance;
     }
 
     /** @param alcance: "todas", "banco" o "efectivo" */
     public void setAlcance(String alcance) {
         this.alcance = alcance;
-    }
-
-    /**
-     * @return Devuelve un texto corto con el id, el límite y el mes del presupuesto
-     */
-    @Override
-    public String toString() {
-        return "Presupuesto{id=" + id + ", limite=" + limite + ", mesReferencia='" + mesReferencia + "'}";
     }
 }
