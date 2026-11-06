@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
@@ -23,17 +24,22 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.util.StringConverter;
+import models.Categoria;
 import models.Cuenta;
 import models.Usuario;
 import service.auth.SesionActual;
+import service.categoria.CategoriaService;
+import service.categoria.CategoriaService.Usos;
 import service.perfil.PerfilService;
 import service.perfil.PerfilService.DatoInvalido;
 import service.resumen.ResumenService.FilaCuenta;
 import util.Campos;
 import util.Formato;
+import util.IconosCategoria;
 
 /**
  * Controlador de Perfil.fxml: datos personales, cambio de contraseña, preferencias (moneda y tema) y
@@ -49,6 +55,8 @@ public class PerfilController {
     private static final String ICONO_EFECTIVO = "M4 7 H19 A1 1 0 0 1 20 8 V19 A1 1 0 0 1 19 20 H5 A2 2 0 0 1 3 18 V6 A2 2 0 0 1 5 4 H17 M16 14 L16.01 14";
     // 24 de la cuadrícula del icono escalados a 16 píxeles
     private static final double ESCALA_ICONO = 0.67;
+    // Alto máximo de las listas de cuentas y de categorías: a partir de ahí tienen scroll
+    private static final double ALTO_MAXIMO_LISTA = 300;
     // Monedas que se pueden elegir
     private static final List<String> MONEDAS = List.of("EUR", "USD", "GBP", "CHF", "MXN", "ARS", "COP", "CLP", "PEN", "BRL", "JPY");
 
@@ -71,9 +79,14 @@ public class PerfilController {
     @FXML private Label lblError;
     @FXML private Label lblOk;
     @FXML private Label lblActivas;
+    @FXML private ScrollPane scrollCuentas;
     @FXML private VBox listaCuentas;
+    @FXML private Label lblNumCategorias;
+    @FXML private ScrollPane scrollCategorias;
+    @FXML private VBox listaCategorias;
 
     private final PerfilService servicio = new PerfilService();
+    private final CategoriaService categoriaService = new CategoriaService();
     private Runnable alCambiar = () -> { };
     private Usuario usuario;
     // Tema elegido en pantalla (todavía sin guardar)
@@ -95,6 +108,8 @@ public class PerfilController {
                 return texto;
             }
         });
+        limitarAlto(scrollCuentas, listaCuentas);
+        limitarAlto(scrollCategorias, listaCategorias);
         Campos.configurar(cajaNombre, txtNombre);
         Campos.configurar(cajaEmail, txtEmail);
         cargar();
@@ -177,15 +192,13 @@ public class PerfilController {
     }
 
     /**
-     * Abre la ventana para crear una cuenta; si se crea, aparece en la lista y en la barra lateral
+     * Abre la ventana para crear una categoría
      */
     @FXML
-    private void anadirCuenta() {
+    private void anadirCategoria() {
         ocultarMensajes();
-        Optional<Cuenta> creada = NuevaCuentaController.mostrar(raiz.getScene().getWindow(), usuario);
-        if (creada.isPresent()) {
-            pintarCuentas();
-            alCambiar.run();
+        if (CategoriaController.mostrar(raiz.getScene().getWindow(), usuario, null)) {
+            pintarCategorias();
         }
     }
 
@@ -225,6 +238,7 @@ public class PerfilController {
 
         elegirTema(usuario.getTema() == null ? "claro" : usuario.getTema());
         pintarCuentas();
+        pintarCategorias();
     }
 
     /**
@@ -373,6 +387,101 @@ public class PerfilController {
         if (confirmacion.showAndWait().filter(b -> b == desactivar).isPresent()) {
             servicio.cambiarEstadoCuenta(c, false);
             cuentaCambiada();
+        }
+    }
+
+    /**
+     * Hace que una lista tenga el alto de su contenido hasta un máximo (ALTO_MAXIMO_LISTA); a partir de ahí
+     * la lista se queda de ese alto y aparece el scroll en vez de estirar la tarjeta hacia abajo.
+     * @param scroll: ScrollPane que contiene la lista
+     * @param contenido: lista que hay dentro
+     */
+    private void limitarAlto(ScrollPane scroll, Region contenido) {
+        scroll.prefHeightProperty().bind(Bindings.min(ALTO_MAXIMO_LISTA, contenido.heightProperty()));
+    }
+
+    /**
+     * Rellena la lista de categorías (primero las de gasto, luego las de ingreso) y su contador
+     */
+    private void pintarCategorias() {
+        listaCategorias.getChildren().clear();
+        List<Categoria> categorias = categoriaService.listar(usuario);
+        lblNumCategorias.setText(categorias.size() + (categorias.size() == 1 ? " categoría" : " categorías"));
+        for (Categoria c : categorias) {
+            listaCategorias.getChildren().add(crearFilaCategoria(c));
+        }
+    }
+
+    /**
+     * Crea la fila de una categoría: icono, nombre, tipo y menú con las acciones
+     * @param c: categoría
+     * @return Devuelve la fila
+     */
+    private HBox crearFilaCategoria(Categoria c) {
+        String sub = c.getSubcategoria();
+        Label nombre = new Label(sub == null || sub.isBlank() ? c.getNombre() : c.getNombre() + " · " + sub);
+        nombre.getStyleClass().add("tarjeta-cuenta-nombre");
+        nombre.setMaxWidth(Double.MAX_VALUE);
+        Label tipo = new Label("gasto".equals(c.getTipo()) ? "Gasto" : "Ingreso");
+        tipo.getStyleClass().add("tarjeta-cuenta-tipo");
+        VBox textos = new VBox(2, nombre, tipo);
+        textos.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(textos, Priority.ALWAYS);
+
+        Button puntos = new Button("···");
+        puntos.getStyleClass().add("boton-puntos");
+        MenuItem editar = new MenuItem("Editar");
+        editar.setOnAction(e -> {
+            if (CategoriaController.mostrar(raiz.getScene().getWindow(), usuario, c)) {
+                pintarCategorias();
+            }
+        });
+        MenuItem eliminar = new MenuItem("Eliminar");
+        eliminar.setOnAction(e -> eliminarCategoria(c));
+        ContextMenu menu = new ContextMenu(editar, eliminar);
+        puntos.setOnAction(e -> menu.show(puntos, Side.BOTTOM, 0, 0));
+
+        HBox fila = new HBox(10, icono(IconosCategoria.para(c.getNombre())), textos, puntos);
+        fila.setAlignment(Pos.CENTER_LEFT);
+        fila.getStyleClass().add("categoria-fila");
+        return fila;
+    }
+
+    /**
+     * Elimina una categoría después de confirmarlo. Si tiene movimientos no se puede; si tiene
+     * presupuestos, se eliminan con ella.
+     * @param c: categoría a eliminar
+     */
+    private void eliminarCategoria(Categoria c) {
+        ocultarMensajes();
+        Usos usos = categoriaService.usos(c);
+        if (usos.movimientos() > 0) {
+            Alert aviso = new Alert(Alert.AlertType.WARNING, "Se usa en " + usos.movimientos()
+                    + (usos.movimientos() == 1 ? " movimiento" : " movimientos")
+                    + ". Una categoría con movimientos no se puede eliminar para no perder sus datos.");
+            aviso.setTitle("MisCuentas");
+            aviso.setHeaderText("No se puede eliminar " + c.getNombre());
+            prepararDialogo(aviso);
+            aviso.showAndWait();
+            return;
+        }
+        String detalle = usos.presupuestos() > 0
+                ? "También se eliminará su presupuesto" + (usos.presupuestos() == 1 ? "" : "s") + " (" + usos.presupuestos() + "). Tus movimientos no cambian."
+                : "No tiene movimientos ni presupuestos.";
+        ButtonType eliminar = new ButtonType("Eliminar", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelar = new ButtonType("Cancelar", javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE);
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION, detalle, eliminar, cancelar);
+        confirmacion.setTitle("MisCuentas");
+        confirmacion.setHeaderText("¿Eliminar " + c.getNombre() + "?");
+        confirmacion.setGraphic(null);
+        prepararDialogo(confirmacion);
+        if (confirmacion.showAndWait().filter(b -> b == eliminar).isPresent()) {
+            try {
+                categoriaService.eliminar(c);
+            } catch (service.DatoInvalido e) {
+                mostrarError(e.getMessage());
+            }
+            pintarCategorias();
         }
     }
 

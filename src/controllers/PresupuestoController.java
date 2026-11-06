@@ -35,7 +35,7 @@ import service.presupuesto.PresupuestoService;
 import service.presupuesto.PresupuestoService.DatoInvalido;
 import util.Campos;
 import util.Formato;
-import util.Importe;
+import util.Importes;
 
 /**
  * Controlador de PresupuestoDialog.fxml: ventana para crear o editar un presupuesto (nombre, categoría,
@@ -276,7 +276,7 @@ public class PresupuestoController {
 
         java.math.BigDecimal limite;
         try {
-            limite = Importe.leer(txtImporte.getText());
+            limite = Importes.leer(txtImporte.getText());
         } catch (NumberFormatException e) {
             Campos.marcarError(cajaImporte, true);
             mostrarError("Escribe el importe límite como un número. Ejemplo: 350,00");

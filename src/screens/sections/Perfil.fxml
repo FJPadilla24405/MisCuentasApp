@@ -217,26 +217,55 @@
                   </VBox>
 
                   <!-- Columna derecha: cuentas (las filas las crea PerfilController) -->
-                  <VBox styleClass="tarjeta, perfil-tarjeta" GridPane.columnIndex="1" GridPane.fillHeight="false" GridPane.valignment="TOP">
+                  <VBox spacing="18.0" GridPane.columnIndex="1" GridPane.fillHeight="false" GridPane.valignment="TOP">
                      <children>
-                        <HBox alignment="CENTER_LEFT">
+
+                        <!-- Cuentas: la lista tiene scroll si hay muchas. Las filas las crea PerfilController -->
+                        <VBox styleClass="tarjeta, perfil-tarjeta">
                            <children>
-                              <Label styleClass="tarjeta-titulo" text="Tus cuentas" />
-                              <Region HBox.hgrow="ALWAYS" />
-                              <Label fx:id="lblActivas" styleClass="pastilla" text="0 activas" />
-                           </children>
-                        </HBox>
-                        <Label styleClass="texto-suave" text="Todas las activas participan en tu vista general." wrapText="true" />
-                        <VBox fx:id="listaCuentas" />
-                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#anadirCuenta" styleClass="boton-suave" text="Añadir cuenta">
-                           <graphic>
-                              <Group>
+                              <HBox alignment="CENTER_LEFT">
                                  <children>
-                                    <SVGPath content="M12 5 V19 M5 12 H19" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                                    <Label styleClass="tarjeta-titulo" text="Tus cuentas" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lblActivas" styleClass="pastilla" text="0 activas" />
                                  </children>
-                              </Group>
-                           </graphic>
-                        </Button>
+                              </HBox>
+                              <Label styleClass="texto-suave" text="Todas las activas participan en tu vista general." wrapText="true" />
+                              <ScrollPane fx:id="scrollCuentas" fitToWidth="true" hbarPolicy="NEVER" styleClass="lista-scroll">
+                                 <content>
+                                    <VBox fx:id="listaCuentas" />
+                                 </content>
+                              </ScrollPane>
+                           </children>
+                        </VBox>
+
+                        <!-- Categorías: crear, editar y eliminar. La lista tiene scroll si hay muchas -->
+                        <VBox styleClass="tarjeta, perfil-tarjeta">
+                           <children>
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label styleClass="tarjeta-titulo" text="Tus categorías" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label fx:id="lblNumCategorias" styleClass="pastilla" text="0 categorías" />
+                                 </children>
+                              </HBox>
+                              <Label styleClass="texto-suave" text="Las usas en tus movimientos y en tus presupuestos." wrapText="true" />
+                              <ScrollPane fx:id="scrollCategorias" fitToWidth="true" hbarPolicy="NEVER" styleClass="lista-scroll">
+                                 <content>
+                                    <VBox fx:id="listaCategorias" />
+                                 </content>
+                              </ScrollPane>
+                              <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#anadirCategoria" styleClass="boton-suave" text="Añadir categoría">
+                                 <graphic>
+                                    <Group>
+                                       <children>
+                                          <SVGPath content="M12 5 V19 M5 12 H19" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                                       </children>
+                                    </Group>
+                                 </graphic>
+                              </Button>
+                           </children>
+                        </VBox>
                      </children>
                   </VBox>
                </children>

@@ -72,13 +72,14 @@ public class DatabaseManager {
     /**
      * Pone al día una base de datos creada con una versión anterior del esquema. CREATE TABLE IF NOT EXISTS
      * no añade columnas a una tabla que ya existe, así que aquí se añaden las que falten.
-     * Por ahora: usuarios.password_hash (huella de la contraseña local) y presupuestos.nombre y presupuestos.alcance.
+     * Por ahora: usuarios.password_hash (huella de la contraseña local) presupuestos.nombre, presupuestos.alcance y movimientos.nota.
      * @throws SQLException
      */
     private static void migrar() throws SQLException {
         anadirColumnaSiFalta("usuarios", "password_hash", "VARCHAR(255)");
         anadirColumnaSiFalta("presupuestos", "nombre", "VARCHAR(50)");
         anadirColumnaSiFalta("presupuestos", "alcance", "VARCHAR(10) DEFAULT 'todas'");
+        anadirColumnaSiFalta("movimientos", "nota", "VARCHAR(255)");
     }
 
     /**

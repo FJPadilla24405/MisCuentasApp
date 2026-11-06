@@ -1061,3 +1061,255 @@
     -fx-background-color: #fdeeea;
 }
 
+/* ===== Listas con scroll en el perfil (cuentas y categorías) ===== */
+.lista-scroll,
+.lista-scroll > .viewport {
+    -fx-background: white;
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+.lista-scroll > .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+    -fx-padding: 0;
+}
+.lista-scroll > .scroll-bar > .track,
+.lista-scroll > .scroll-bar > .track-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+.lista-scroll > .scroll-bar > .thumb {
+    -fx-background-color: #cdd8d1;
+    -fx-background-radius: 4;
+    -fx-background-insets: 0;
+}
+.lista-scroll > .scroll-bar > .increment-button,
+.lista-scroll > .scroll-bar > .decrement-button {
+    -fx-padding: 0;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+    -fx-max-height: 0;
+}
+.lista-scroll > .scroll-bar > .increment-button > .increment-arrow,
+.lista-scroll > .scroll-bar > .decrement-button > .decrement-arrow {
+    -fx-padding: 0;
+    -fx-shape: "";
+}
+.lista-scroll > .corner {
+    -fx-background-color: transparent;
+}
+.categoria-fila {
+    -fx-border-color: -mc-borde-suave transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 10 8 10 0;
+}
+
+/* ===== Añadir movimiento ===== */
+.segmentado {
+    -fx-background-color: #eef1ee;
+    -fx-background-radius: 10;
+    -fx-padding: 3;
+}
+.segmento-opcion {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+    -fx-padding: 6 18 6 18;
+    -fx-cursor: hand;
+}
+.segmento-opcion:selected {
+    -fx-background-color: white;
+    -fx-text-fill: -mc-verde;
+    -fx-font-weight: bold;
+}
+.importe-signo {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 30px;
+}
+.date-campo {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 10;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 10;
+    -fx-min-height: 40;
+    -fx-pref-height: 40;
+    -fx-font-size: 13px;
+}
+.date-campo:focused,
+.date-campo:showing {
+    -fx-border-color: -mc-verde;
+}
+.date-campo.error {
+    -fx-border-color: -mc-error;
+}
+.date-campo > .text-field,
+.date-campo > .text-field:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0 0 0 12;
+    -fx-text-fill: -mc-texto;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.date-campo > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 12 0 0;
+}
+.date-campo > .arrow-button > .arrow {
+    -fx-background-color: #7a8a82;
+}
+.opcion-movimiento {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 12;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 12;
+    -fx-padding: 14 16 14 16;
+    -fx-alignment: CENTER_LEFT;
+    -fx-content-display: GRAPHIC_ONLY;
+    -fx-cursor: hand;
+}
+.opcion-movimiento:hover,
+.opcion-movimiento:focused {
+    -fx-background-color: #f5f9f6;
+    -fx-border-color: -mc-verde;
+}
+.opcion-movimiento:disabled {
+    -fx-opacity: 0.6;
+    -fx-cursor: default;
+}
+
+
+/* ===== Gráficas y resúmenes ===== */
+
+/* Interruptor Mes / Año */
+.vista-segmentada {
+    -fx-background-color: #e9efeb;
+    -fx-background-radius: 10;
+    -fx-padding: 3;
+    -fx-spacing: 2;
+}
+.vista-opcion,
+.vista-opcion:focused,
+.vista-opcion:armed {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 13px;
+    -fx-padding: 6 20 6 20;
+    -fx-cursor: hand;
+}
+.vista-opcion:hover {
+    -fx-text-fill: -mc-titulo;
+}
+.vista-opcion:selected,
+.vista-opcion:selected:focused,
+.vista-opcion:selected:armed {
+    -fx-background-color: white;
+    -fx-text-fill: -mc-titulo;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(21, 63, 48, 0.14), 4, 0, 0, 1);
+}
+
+/* Flechas para cambiar de mes o de año */
+.boton-flecha {
+    -fx-padding: 0;
+    -fx-min-width: 38;
+    -fx-pref-width: 38;
+    -fx-max-width: 38;
+}
+.boton-flecha:disabled,
+.boton-filtro:disabled {
+    -fx-opacity: 0.45;
+}
+
+/* Tarjetas con gráfica */
+.grafico-tarjeta {
+    -fx-padding: 18 20 18 20;
+}
+.leyenda-nombre {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 12px;
+}
+.leyenda-importe {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.nota-insight {
+    -fx-background-color: #f1f6f3;
+    -fx-background-radius: 10;
+    -fx-padding: 9 12 9 12;
+}
+.nota-insight .icono {
+    -fx-stroke: -mc-verde;
+}
+.pastilla-destacada {
+    -fx-background-color: #e3efe8;
+    -fx-background-radius: 20;
+    -fx-padding: 5 12 5 10;
+}
+.pastilla-destacada .icono {
+    -fx-stroke: -mc-verde;
+}
+.pastilla-destacada .label {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Aviso que sale al pasar el ratón por una gráfica (se escribe con colores fijos porque la ventana del aviso no ve las variables de .root) */
+.grafico-aviso {
+    -fx-background-color: #153f30;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 8 12 8 12;
+}
+
+/* Tablas de resumen */
+.tabla-numero {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+}
+.tabla-numero-fuerte {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.tabla-cuenta {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.balance-positivo {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.balance-negativo {
+    -fx-text-fill: #b8443a;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.balance-cero {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.tabla-total,
+.tabla-total:hover {
+    -fx-background-color: #e8f1ec;
+}
+
+/* Barra superior: moneda y tema (solo en la vista anual) */
+.info-superior {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}

@@ -110,6 +110,42 @@ public class CategoriaDAO {
     }
 
     /**
+     * Cuenta los movimientos que usan una categoría
+     * @param categoriaId: id de la categoría
+     * @return Devuelve el número de movimientos
+     */
+    public int contarMovimientos(int categoriaId) {
+        return contar("SELECT COUNT(*) FROM movimientos WHERE categoria_id = ?", categoriaId);
+    }
+
+    /**
+     * Cuenta los presupuestos que usan una categoría
+     * @param categoriaId: id de la categoría
+     * @return Devuelve el número de presupuestos
+     */
+    public int contarPresupuestos(int categoriaId) {
+        return contar("SELECT COUNT(*) FROM presupuestos WHERE categoria_id = ?", categoriaId);
+    }
+
+    /**
+     * Ejecuta una consulta COUNT(*) con un solo parámetro
+     * @param sql: consulta
+     * @param id: valor del parámetro
+     * @return Devuelve el resultado de la cuenta
+     */
+    private int contar(String sql, int id) {
+        Connection conn = DatabaseManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error contando usos de la categoria", e);
+        }
+    }
+
+    /**
      * Elimina una categoría por su id.
      * @param id: Id de la categoría para eliminar
      */

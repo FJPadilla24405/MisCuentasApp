@@ -175,4 +175,19 @@ public class PresupuestoDAO {
         p.setAlcance(rs.getString("alcance"));
         return p;
     }
+
+    /**
+     * Elimina todos los presupuestos de una categoría (hace falta antes de borrar la categoría)
+     * @param categoriaId: id de la categoría
+     */
+    public void eliminarPorCategoria(int categoriaId) {
+        String sql = "DELETE FROM presupuestos WHERE categoria_id = ?";
+        Connection conn = DatabaseManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, categoriaId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error eliminando los presupuestos de la categoria", e);
+        }
+    }
 }

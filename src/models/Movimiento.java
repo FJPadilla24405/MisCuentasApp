@@ -28,6 +28,8 @@ public class Movimiento {
     private boolean sincronizado;
     // Id de la regla recurrente de la que nace; 0 si es un movimiento puntual (en la base de datos se guarda NULL)
     private int recurrenteId;
+    // Detalle opcional que añade el usuario (el concepto va en descripcion)
+    private String nota;
 
     /**
      * Constructor vacío
@@ -193,5 +195,19 @@ public class Movimiento {
 	@Override
     public String toString() {
         return "Movimiento{id=" + id + ", importe=" + importe + ", tipo='" + tipo + "', fecha='" + fecha + "'}";
+    }
+
+    /**
+     * @return Devuelve la nota del movimiento (puede ser null)
+     */
+    public String getNota() {
+        return nota;
+    }
+
+    /**
+     * @param nota: detalle opcional del movimiento
+     */
+    public void setNota(String nota) {
+        this.nota = nota;
     }
 }

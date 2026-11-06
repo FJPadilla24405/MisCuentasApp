@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- Ventana para añadir un movimiento a mano (la abre la pantalla de una cuenta) -->
+<VBox prefWidth="520.0" spacing="16.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MovimientoController">
+   <padding>
+      <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+   </padding>
+   <fx:define>
+      <ToggleGroup fx:id="grupoTipo" />
+   </fx:define>
+   <children>
+      <HBox alignment="CENTER_LEFT">
+         <children>
+            <HBox spacing="2.0" styleClass="segmentado">
+               <children>
+                  <ToggleButton fx:id="tglGasto" mnemonicParsing="false" selected="true" styleClass="segmento-opcion" text="Gasto" toggleGroup="$grupoTipo" />
+                  <ToggleButton fx:id="tglIngreso" mnemonicParsing="false" styleClass="segmento-opcion" text="Ingreso" toggleGroup="$grupoTipo" />
+               </children>
+            </HBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <Label styleClass="pastilla-alerta" text="Borrador sin guardar" />
+         </children>
+      </HBox>
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Importe *" />
+            <HBox fx:id="cajaImporte" alignment="BOTTOM_LEFT" spacing="10.0" styleClass="importe-caja">
+               <children>
+                  <Label fx:id="lblSigno" styleClass="importe-signo" text="−" />
+                  <TextField fx:id="txtImporte" onAction="#guardar" promptText="0,00" styleClass="importe-input" HBox.hgrow="ALWAYS" />
+                  <Label fx:id="lblMoneda" styleClass="importe-moneda" text="EUR €" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Concepto *" />
+            <HBox fx:id="cajaConcepto" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <TextField fx:id="txtConcepto" onAction="#guardar" promptText="Por ejemplo: Compra en el supermercado" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <HBox spacing="14.0">
+         <children>
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label styleClass="campo-etiqueta" text="Cuenta *" />
+                  <ComboBox fx:id="cmbCuenta" maxWidth="1.7976931348623157E308" promptText="Elige una cuenta" styleClass="combo-campo" />
+               </children>
+            </VBox>
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label styleClass="campo-etiqueta" text="Fecha *" />
+                  <DatePicker fx:id="dpFecha" maxWidth="1.7976931348623157E308" promptText="dd/mm/aaaa" styleClass="date-campo" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Categoría *" />
+            <ComboBox fx:id="cmbCategoria" maxWidth="1.7976931348623157E308" promptText="Elige una categoría" styleClass="combo-campo" />
+         </children>
+      </VBox>
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Nota (opcional)" />
+            <HBox fx:id="cajaNota" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <TextField fx:id="txtNota" onAction="#guardar" promptText="Por ejemplo: Compra de la semana" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <Label styleClass="texto-suave-pequeno" text="Añade un detalle para encontrarlo fácilmente después." wrapText="true" />
+         </children>
+      </VBox>
+
+      <CheckBox fx:id="chkRecurrente" mnemonicParsing="false" text="Marcar como movimiento recurrente" />
+
+      <Region maxHeight="1.0" minHeight="1.0" prefHeight="1.0" styleClass="linea-fina" />
+
+      <Label fx:id="lblError" managed="false" styleClass="mensaje-error" visible="false" wrapText="true" />
+
+      <HBox alignment="CENTER_LEFT" spacing="10.0">
+         <children>
+            <Label styleClass="texto-suave-pequeno" text="Tus datos se guardan de forma segura." />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#cancelar" prefWidth="110.0" styleClass="boton-secundario" text="Cancelar" />
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#guardar" prefWidth="170.0" styleClass="boton-primario" text="Guardar movimiento" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

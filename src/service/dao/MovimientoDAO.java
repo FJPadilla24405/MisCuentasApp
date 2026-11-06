@@ -26,8 +26,8 @@ public class MovimientoDAO {
 	 * @return Devuelve el movimiento insertado
 	 */
     public Movimiento insertar(Movimiento m) {
-        String sql = "INSERT INTO movimientos (usuario_id, cuenta_id, categoria_id, importe, tipo, fecha, descripcion, sincronizado, recurrente_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)";
+        String sql = "INSERT INTO movimientos (usuario_id, cuenta_id, categoria_id, importe, tipo, fecha, descripcion, sincronizado, recurrente_id, nota) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, m.getUsuarioId());
@@ -42,6 +42,7 @@ public class MovimientoDAO {
             } else {
                 ps.setNull(8, java.sql.Types.INTEGER);
             }
+            ps.setString(9, m.getNota());
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -129,7 +130,7 @@ public class MovimientoDAO {
      * @param m: movimiento a actualizar
      */
     public void actualizar(Movimiento m) {
-        String sql = "UPDATE movimientos SET cuenta_id = ?, categoria_id = ?, importe = ?, tipo = ?, fecha = ?, descripcion = ?, sincronizado = 0 WHERE id = ?";
+        String sql = "UPDATE movimientos SET cuenta_id = ?, categoria_id = ?, importe = ?, tipo = ?, fecha = ?, descripcion = ?, nota = ?, sincronizado = 0 WHERE id = ?";
         Connection conn = DatabaseManager.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, m.getCuentaId());
@@ -138,7 +139,8 @@ public class MovimientoDAO {
             ps.setString(4, m.getTipo());
             ps.setString(5, m.getFecha());
             ps.setString(6, m.getDescripcion());
-            ps.setInt(7, m.getId());
+            ps.setString(7, m.getNota());
+            ps.setInt(8, m.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error actualizando movimiento", e);
@@ -189,7 +191,7 @@ public class MovimientoDAO {
      * @throws SQLException
      */
     private Movimiento mapear(ResultSet rs) throws SQLException {
-        return new Movimiento(
+        Movimiento m = new Movimiento(
                 rs.getInt("id"),
                 rs.getInt("usuario_id"),
                 rs.getInt("cuenta_id"),
@@ -201,5 +203,7 @@ public class MovimientoDAO {
                 rs.getInt("sincronizado") == 1,
                 rs.getInt("recurrente_id")
         );
+        m.setNota(rs.getString("nota"));
+        return m;
     }
 }

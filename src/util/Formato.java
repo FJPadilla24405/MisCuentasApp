@@ -128,6 +128,49 @@ public final class Formato {
 
     /**
      * @param mes: mes y año
+     * @return Devuelve la abreviatura del mes en minúscula: sept
+     */
+    public static String mesCorto(YearMonth mes) {
+        return MESES_CORTOS[mes.getMonthValue() - 1];
+    }
+
+    /**
+     * @param mes: número de mes (1 a 12)
+     * @return Devuelve la abreviatura del mes con la primera letra en mayúscula: Ene, Feb... Sept
+     */
+    public static String mesCortoMayuscula(int mes) {
+        String corto = MESES_CORTOS[mes - 1];
+        return corto.substring(0, 1).toUpperCase(ES) + corto.substring(1);
+    }
+
+    /**
+     * @param mes: mes y año
+     * @return Devuelve el nombre del mes con la primera letra en mayúscula: Septiembre
+     */
+    public static String nombreMesMayuscula(YearMonth mes) {
+        String nombre = nombreMes(mes);
+        return nombre.substring(0, 1).toUpperCase(ES) + nombre.substring(1);
+    }
+
+    /**
+     * Importe con moneda sin los decimales cuando son cero: 3.000 € o 1.250,50 €. Sirve para los ejes de
+     * las gráficas y para los textos en los que los céntimos estorban.
+     * @param valor: importe a mostrar
+     * @param moneda: código de moneda de tres letras
+     * @return Devuelve el importe como texto
+     */
+    public static String monedaCorta(BigDecimal valor, String moneda) {
+        BigDecimal redondeado = valor.setScale(2, RoundingMode.HALF_UP);
+        if (redondeado.remainder(BigDecimal.ONE).signum() != 0) {
+            return moneda(redondeado, moneda);
+        }
+        DecimalFormat formato = new DecimalFormat("#,##0", DecimalFormatSymbols.getInstance(ES));
+        formato.setRoundingMode(RoundingMode.HALF_UP);
+        return formato.format(redondeado) + "\u00A0" + simbolo(moneda);
+    }
+
+    /**
+     * @param mes: mes y año
      * @return Devuelve el mes con su año y la primera letra en mayúscula: Septiembre 2026
      */
     public static String mesConAnio(YearMonth mes) {

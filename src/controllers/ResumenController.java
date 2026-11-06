@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import javafx.fxml.FXML;
@@ -34,6 +36,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.FileChooser;
 import models.Cuenta;
+import models.Movimiento;
 import models.Usuario;
 import service.auth.SesionActual;
 import service.resumen.ExportadorCsv;
@@ -70,6 +73,7 @@ public class ResumenController {
     private static final String BOM = "\uFEFF";
 
     @FXML private ScrollPane raiz;
+    @FXML private Button btnAnadirMovimiento;
     @FXML private Label lblEtiqueta;
     @FXML private Label lblTitulo;
     @FXML private Label lblSubtitulo;
@@ -93,6 +97,7 @@ public class ResumenController {
 
     private final ResumenService servicio = new ResumenService();
     private Consumer<Cuenta> alElegirCuenta = c -> { };
+    private Runnable alCambiar = () -> { };
     // Cuenta que se muestra, o null para la vista general
     private Cuenta cuenta;
     private YearMonth mes = YearMonth.now();
@@ -118,6 +123,15 @@ public class ResumenController {
     }
 
     /**
+     * Qué hacer cuando se añade un movimiento, para que se actualice lo que se ve fuera de esta pantalla
+     * (los saldos de la barra lateral). Lo llama quien carga esta pantalla.
+     * @param accion: refresco de la barra lateral
+     */
+    public void setAlCambiar(Runnable accion) {
+        this.alCambiar = accion;
+    }
+
+    /**
      * Muestra la vista general: la suma de todas las cuentas
      */
     public void mostrarTodas() {
@@ -132,6 +146,25 @@ public class ResumenController {
     public void mostrarCuenta(Cuenta cuenta) {
         this.cuenta = cuenta;
         refrescar();
+    }
+
+    /**
+     * Añade un movimiento a la cuenta que se está viendo. Primero se pregunta si se quiere añadir a mano o
+     * importar un archivo (importar todavía no está hecho) y después se abre el formulario. Al guardar, se
+     * muestra el mes del movimiento y se actualizan los saldos.
+     */
+    @FXML
+    private void anadirMovimiento() {
+        Usuario usuario = SesionActual.getUsuario();
+        if (cuenta == null || usuario == null || !ElegirMovimientoController.preguntar(raiz.getScene().getWindow())) {
+            return;
+        }
+        Optional<Movimiento> guardado = MovimientoController.mostrar(raiz.getScene().getWindow(), usuario, cuenta);
+        if (guardado.isPresent()) {
+            mes = YearMonth.from(LocalDate.parse(guardado.get().getFecha()));
+            refrescar();
+            alCambiar.run();
+        }
     }
 
     /**
@@ -199,6 +232,9 @@ public class ResumenController {
         moneda = usuario.getMoneda();
         datos = servicio.calcular(usuario, cuenta, mes);
         pintarCabecera(usuario);
+        // El botón de añadir movimiento solo tiene sentido en una cuenta (un movimiento va en una cuenta)
+        btnAnadirMovimiento.setVisible(cuenta != null);
+        btnAnadirMovimiento.setManaged(cuenta != null);
         pintarMeses();
         pintarTarjetas();
         pintarCuentas();

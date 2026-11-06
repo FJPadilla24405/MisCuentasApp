@@ -30,6 +30,8 @@ public class MainController {
     // Barra superior: apartado actual (migas de pan) e iniciales del usuario
     @FXML private Label lblMiga;
     @FXML private Label lblInicialesSuperior;
+    // Moneda y tema (solo se enseña en la vista anual de Gráficas y resúmenes)
+    @FXML private Label lblInfoSuperior;
     // Controlador de la barra lateral incluida con fx:include fx:id="barraLateral"
     @FXML private BarraLateralController barraLateralController;
 
@@ -79,8 +81,13 @@ public class MainController {
      */
     private void mostrarSeccion(Seccion seccion) {
         lblMiga.setText(seccion.getTitulo());
+        ponerInfoSuperior("");
         if (seccion == Seccion.VISTA_GENERAL) {
             mostrarResumen(null);
+            return;
+        }
+        if (seccion == Seccion.GRAFICAS) {
+            mostrarGraficas();
             return;
         }
         if (seccion == Seccion.PERFIL) {
@@ -134,6 +141,7 @@ public class MainController {
      */
     private void mostrarCuenta(Cuenta cuenta) {
         lblMiga.setText(cuenta.getNombre());
+        ponerInfoSuperior("");
         mostrarResumen(cuenta);
     }
 
@@ -149,6 +157,7 @@ public class MainController {
             ResumenController resumen = loader.getController();
             // Pulsar la tarjeta de una cuenta equivale a pulsarla en la barra lateral
             resumen.setAlElegirCuenta(barraLateralController::seleccionarCuenta);
+            resumen.setAlCambiar(this::refrescarCuentas);
             if (cuenta == null) {
                 resumen.mostrarTodas();
             } else {
@@ -158,6 +167,35 @@ public class MainController {
         } catch (IOException e) {
             throw new UncheckedIOException("No se pudo cargar el resumen", e);
         }
+    }
+
+    /**
+     * Carga el apartado Gráficas y resúmenes (screens/sections/Graficas.fxml). Su vista mensual y su vista anual
+     * escriben en la barra superior de dónde estamos, y la anual también la moneda y el tema.
+     */
+    private void mostrarGraficas() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/sections/Graficas.fxml"));
+            Parent panel = loader.load();
+            GraficasController graficas = loader.getController();
+            graficas.setAlCambiarMiga(lblMiga::setText);
+            graficas.setAlCambiarInfo(this::ponerInfoSuperior);
+            graficas.iniciar();
+            mostrarContenido(panel);
+        } catch (IOException e) {
+            throw new UncheckedIOException("No se pudo cargar las gráficas", e);
+        }
+    }
+
+    /**
+     * Escribe el texto pequeño que va junto a la campana de la barra superior, o lo esconde si está vacío
+     * @param texto: por ejemplo "EUR · Tema claro"
+     */
+    private void ponerInfoSuperior(String texto) {
+        boolean hayTexto = texto != null && !texto.isBlank();
+        lblInfoSuperior.setText(hayTexto ? texto : "");
+        lblInfoSuperior.setVisible(hayTexto);
+        lblInfoSuperior.setManaged(hayTexto);
     }
 
     /**

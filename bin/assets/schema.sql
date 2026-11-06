@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS movimientos (
     tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('ingreso', 'gasto')),
     fecha DATE NOT NULL,
     descripcion VARCHAR(100),
+    nota VARCHAR(255),
     sincronizado TINYINT DEFAULT 0,
     recurrente_id INTEGER,  -- NULL = puntual
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,

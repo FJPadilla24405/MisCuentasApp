@@ -28,6 +28,8 @@
                   </Group>
                   <Label fx:id="lblMiga" styleClass="miga-actual" text="Vista general" />
                   <Region HBox.hgrow="ALWAYS" />
+                  <!-- Moneda y tema: solo se ve en la vista anual de Gráficas y resúmenes -->
+                  <Label fx:id="lblInfoSuperior" managed="false" styleClass="info-superior" visible="false" />
                   <StackPane styleClass="boton-icono">
                      <children>
                         <Group>

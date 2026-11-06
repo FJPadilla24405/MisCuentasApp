@@ -50,6 +50,15 @@
                               </Group>
                            </graphic>
                         </Button>
+                        <Button fx:id="btnAnadirMovimiento" managed="false" mnemonicParsing="false" onAction="#anadirMovimiento" styleClass="boton-primario, boton-primario-icono" text="Añadir movimiento" visible="false">
+                           <graphic>
+                              <Group>
+                                 <children>
+                                    <SVGPath content="M12 5 V19 M5 12 H19" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                                 </children>
+                              </Group>
+                           </graphic>
+                        </Button>
                      </children>
                   </HBox>
                </children>

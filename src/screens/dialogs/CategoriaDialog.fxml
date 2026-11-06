@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Ventana para crear o editar una categoría (la abre la pantalla de perfil) -->
+<VBox prefWidth="440.0" spacing="16.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CategoriaController">
+   <padding>
+      <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+   </padding>
+   <fx:define>
+      <ToggleGroup fx:id="grupoTipo" />
+   </fx:define>
+   <children>
+      <Label fx:id="lblTitulo" styleClass="panel-titulo" text="Añadir categoría" />
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Nombre *" />
+            <HBox fx:id="cajaNombre" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <TextField fx:id="txtNombre" onAction="#guardar" promptText="Por ejemplo: Alimentación" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Tipo *" />
+            <HBox spacing="8.0">
+               <children>
+                  <ToggleButton fx:id="tglGasto" maxWidth="1.7976931348623157E308" mnemonicParsing="false" selected="true" styleClass="opcion-tipo" text="Gasto" toggleGroup="$grupoTipo" HBox.hgrow="ALWAYS">
+                     <graphic>
+                        <Group>
+                           <children>
+                              <SVGPath content="M7 17 L17 7 M7 7 H17 V17" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </graphic>
+                  </ToggleButton>
+                  <ToggleButton fx:id="tglIngreso" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="opcion-tipo" text="Ingreso" toggleGroup="$grupoTipo" HBox.hgrow="ALWAYS">
+                     <graphic>
+                        <Group>
+                           <children>
+                              <SVGPath content="M17 7 L7 17 M17 17 H7 V7" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </graphic>
+                  </ToggleButton>
+               </children>
+            </HBox>
+            <Label fx:id="lblTipoNota" managed="false" styleClass="texto-suave-pequeno" text="El tipo no se puede cambiar porque la categoría ya tiene movimientos o presupuestos." visible="false" wrapText="true" />
+         </children>
+      </VBox>
+
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Subcategoría (opcional)" />
+            <HBox fx:id="cajaSubcategoria" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <TextField fx:id="txtSubcategoria" onAction="#guardar" promptText="Por ejemplo: Supermercado" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+            <Label styleClass="texto-suave-pequeno" text="Sirve para distinguir categorías con el mismo nombre." wrapText="true" />
+         </children>
+      </VBox>
+
+      <Label fx:id="lblError" managed="false" styleClass="mensaje-error" visible="false" wrapText="true" />
+
+      <HBox alignment="CENTER_RIGHT" spacing="10.0">
+         <children>
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#cancelar" prefWidth="110.0" styleClass="boton-secundario" text="Cancelar" />
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#guardar" prefWidth="160.0" styleClass="boton-primario" text="Guardar categoría" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

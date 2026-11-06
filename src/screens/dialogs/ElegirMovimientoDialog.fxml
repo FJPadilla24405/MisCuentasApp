@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Primera ventana de "Añadir movimiento": añadirlo a mano o importar un archivo (importar todavía no está hecho) -->
+<VBox prefWidth="460.0" spacing="14.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ElegirMovimientoController">
+   <padding>
+      <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+   </padding>
+   <children>
+      <Label styleClass="panel-titulo" text="Añadir movimiento" />
+      <Label styleClass="texto-suave" text="¿Cómo quieres añadirlo?" />
+
+      <Button fx:id="btnManual" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#elegirManual" styleClass="opcion-movimiento">
+         <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="14.0">
+               <children>
+                  <StackPane styleClass="icono-caja">
+                     <children>
+                        <Group>
+                           <children>
+                              <SVGPath content="M4 20 L8 19 L19 8 L16 5 L5 16 Z M14 7 L17 10" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </children>
+                  </StackPane>
+                  <VBox spacing="3.0">
+                     <children>
+                        <Label styleClass="tarjeta-cuenta-nombre" text="Añadir manualmente" />
+                        <Label styleClass="tarjeta-cuenta-tipo" text="Escribe el importe, el concepto y la categoría." />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </graphic>
+      </Button>
+
+      <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="opcion-movimiento">
+         <graphic>
+            <HBox alignment="CENTER_LEFT" spacing="14.0">
+               <children>
+                  <StackPane styleClass="icono-caja">
+                     <children>
+                        <Group>
+                           <children>
+                              <SVGPath content="M12 16 V4 M7 9 L12 4 L17 9 M5 20 H19" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </children>
+                  </StackPane>
+                  <VBox spacing="3.0">
+                     <children>
+                        <Label styleClass="tarjeta-cuenta-nombre" text="Importar un archivo" />
+                        <Label styleClass="tarjeta-cuenta-tipo" text="Próximamente: carga varios movimientos de una vez." />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </graphic>
+      </Button>
+
+      <HBox alignment="CENTER_RIGHT">
+         <children>
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#cancelar" prefWidth="110.0" styleClass="boton-secundario" text="Cancelar" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

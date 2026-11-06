@@ -1,6 +1,7 @@
 package service.auth;
 
 import models.Usuario;
+import service.categoria.CategoriaService;
 import service.dao.UsuarioDAO;
 import service.sync.FirebaseAuthClient;
 import service.sync.FirebaseAuthClient.AuthException;
@@ -248,7 +249,7 @@ public class AuthService {
     }
 
     /**
-     * Inserta un usuario nuevo en la base de datos local
+     * Inserta un usuario nuevo en la base de datos local y le crea sus categorías predefinidas
      * @param uid: uid de Firebase, o el identificador local de las cuentas offline
      * @param nombre: nombre de usuario
      * @param correo: email normalizado
@@ -258,7 +259,9 @@ public class AuthService {
     private Usuario nuevoUsuario(String uid, String nombre, String correo, String huella) {
         Usuario usuario = new Usuario(0, uid, nombre.trim(), correo, "EUR", "claro");
         usuario.setPasswordHash(huella);
-        return usuarioDAO.insertar(usuario);
+        usuarioDAO.insertar(usuario);
+        new CategoriaService().crearPredefinidas(usuario);
+        return usuario;
     }
 
     /**
