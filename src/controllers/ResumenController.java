@@ -85,6 +85,7 @@ public class ResumenController {
     @FXML private Label lblIngresosDetalle;
     @FXML private Label lblGastos;
     @FXML private Label lblGastosDetalle;
+    @FXML private VBox tarjetaBalance;
     @FXML private Label lblBalance;
     @FXML private Label lblBalanceDetalle;
     @FXML private GridPane gridCuentas;
@@ -292,6 +293,13 @@ public class ResumenController {
                 : contar(datos.numGastos(), "gasto registrado", "gastos registrados"));
 
         lblBalance.setText(Formato.monedaConSigno(datos.balance(), moneda));
+        // La tarjeta se tiñe de -resumen-balanceok si el balance es positivo y de -resumen-balancemal si es negativo (con 0 se queda blanca)
+        tarjetaBalance.getStyleClass().removeAll("kpi-balance-ok", "kpi-balance-mal");
+        if (datos.balance().signum() > 0) {
+            tarjetaBalance.getStyleClass().add("kpi-balance-ok");
+        } else if (datos.balance().signum() < 0) {
+            tarjetaBalance.getStyleClass().add("kpi-balance-mal");
+        }
         BigDecimal conservado = datos.porcentajeConservado();
         if (conservado != null) {
             lblBalanceDetalle.setText("Has conservado el " + Formato.porcentaje(conservado) + " de tus ingresos");

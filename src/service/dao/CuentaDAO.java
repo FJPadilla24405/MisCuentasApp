@@ -159,21 +159,6 @@ public class CuentaDAO {
     }
 
     /**
-     * Baja lógica: marca la cuenta como inactiva en lugar de borrarla, para no perder el histórico de movimientos.
-     * @param id: Id de la cuenta para desactivarla
-     */
-    public void desactivar(int id) {
-        String sql = "UPDATE cuentas SET activa = 0 WHERE id = ?";
-        Connection conn = DatabaseManager.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error desactivando cuenta", e);
-        }
-    }
-
-    /**
      * Método que crea una cuenta con los resultados de la consulta
      * @param rs: Resultado de la consulta
      * @return Devuelve la cuenta de la consulta

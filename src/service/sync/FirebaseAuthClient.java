@@ -149,6 +149,32 @@ public class FirebaseAuthClient {
     }
 
     /**
+     * Pide a Firebase un idToken nuevo con el refreshToken de la sesión, sin necesitar la contraseña. El idToken
+     * caduca a la hora de crearse, así que hay que renovarlo antes de subir o descargar datos si la sesión es antigua.
+     * @param actual: sesión con el refreshToken
+     * @return Devuelve la sesión con los tokens renovados
+     * @throws IOException si no hay conexión o Firebase rechaza el token (AuthException)
+     * @throws InterruptedException
+     */
+    @SuppressWarnings("unchecked")
+    public Sesion renovar(Sesion actual) throws IOException, InterruptedException {
+        String cuerpo = "grant_type=refresh_token&refresh_token="
+                + java.net.URLEncoder.encode(actual.refreshToken(), StandardCharsets.UTF_8);
+        HttpRequest req = HttpRequest.newBuilder(URI.create("https://securetoken.googleapis.com/v1/token?key=" + apiKey))
+                .timeout(Duration.ofSeconds(30))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(cuerpo, StandardCharsets.UTF_8))
+                .build();
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        if (resp.statusCode() != 200) {
+            throw traducirError(resp.body());
+        }
+        Map<String, Object> json = (Map<String, Object>) Json.leer(resp.body());
+        return new Sesion((String) json.get("user_id"), (String) json.get("id_token"), (String) json.get("refresh_token"));
+    }
+
+    /**
      * Registro y login son la misma petición; solo cambia la operación de la URL.
      * @param operacion: operación que hacer en la url
      * @param email: email de la cuenta

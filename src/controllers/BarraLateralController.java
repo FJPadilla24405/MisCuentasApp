@@ -45,6 +45,8 @@ public class BarraLateralController {
     @FXML private Button btnGraficas;
     @FXML private Button btnPresupuestos;
     @FXML private Button btnPerfil;
+    @FXML private Button btnConectar;
+    @FXML private HBox cajaConectado;
     @FXML private Label lblIniciales;
     @FXML private Label lblNombre;
 
@@ -52,6 +54,9 @@ public class BarraLateralController {
     private Consumer<Seccion> alElegirSeccion = s -> { };
     private Consumer<Cuenta> alElegirCuenta = c -> { };
     private Runnable alCerrarSesion = () -> { };
+    // Se ejecuta cuando una descarga de Firebase cambia los datos locales, para que se vuelva a pintar lo que se ve
+    private Runnable alDescargar = () -> { };
+    private Seccion seccionActiva;
     // Botón marcado ahora mismo (apartado o cuenta) y, si es una cuenta, su id para recuperarlo al repintar la lista
     private Button activo;
     private Integer cuentaActivaId;
@@ -65,6 +70,7 @@ public class BarraLateralController {
     private void initialize() {
         refrescarUsuario();
         refrescarCuentas();
+        refrescarSync();
     }
 
     /**
@@ -103,11 +109,51 @@ public class BarraLateralController {
     }
 
     /**
+     * Qué hacer cuando se descargan datos de Firebase (cambian las cuentas, los movimientos y quizá el perfil)
+     * @param accion: se ejecuta después de la descarga
+     */
+    public void setAlDescargar(Runnable accion) {
+        this.alDescargar = accion;
+    }
+
+    /**
+     * Enseña el botón de conectar o el estado con las flechas de subir y descargar, según haya conexión con Firebase
+     */
+    public void refrescarSync() {
+        boolean conectado = SesionActual.isConectado();
+        btnConectar.setVisible(!conectado);
+        btnConectar.setManaged(!conectado);
+        cajaConectado.setVisible(conectado);
+        cajaConectado.setManaged(conectado);
+        btnConectar.setText(SesionActual.isSoloLocal() ? "Cuenta solo local" : "Conectar con Firebase");
+    }
+
+    /**
+     * Vuelve a abrir lo que se estaba viendo (apartado o cuenta) con los datos actuales, y rehace el nombre y las cuentas
+     */
+    public void recargarActivo() {
+        refrescarUsuario();
+        refrescarCuentas();
+        Usuario usuario = SesionActual.getUsuario();
+        if (cuentaActivaId != null && usuario != null) {
+            Optional<Cuenta> cuenta = cuentaDAO.listarPorUsuario(usuario.getId()).stream()
+                    .filter(c -> c.getId() == cuentaActivaId).findFirst();
+            if (cuenta.isPresent()) {
+                alElegirCuenta.accept(cuenta.get());
+                return;
+            }
+        }
+        // La cuenta ya no existe (o se estaba en un apartado): se vuelve a abrir el apartado
+        seleccionarSeccion(cuentaActivaId == null && seccionActiva != null ? seccionActiva : Seccion.VISTA_GENERAL);
+    }
+
+    /**
      * Marca un apartado en la barra y avisa de que se ha elegido
      * @param seccion: apartado a elegir
      */
     public void seleccionarSeccion(Seccion seccion) {
         cuentaActivaId = null;
+        seccionActiva = seccion;
         activar(botonDe(seccion));
         alElegirSeccion.accept(seccion);
     }
@@ -190,6 +236,33 @@ public class BarraLateralController {
             cuentaActivaId = cuenta.getId();
             refrescarCuentas();
             alElegirCuenta.accept(cuenta);
+        });
+    }
+
+    /**
+     * Conecta con Firebase (pide la contraseña) una sesión que entró sin conexión
+     */
+    @FXML
+    private void conectarFirebase() {
+        SincronizacionDialogos.conectar(btnConectar.getScene().getWindow(), this::refrescarSync);
+    }
+
+    /**
+     * Sube los datos locales a Firebase (con confirmación)
+     */
+    @FXML
+    private void subirDatos() {
+        SincronizacionDialogos.subir(btnConectar.getScene().getWindow(), this::refrescarSync);
+    }
+
+    /**
+     * Descarga los datos de Firebase (con confirmación) y vuelve a pintar lo que se estaba viendo
+     */
+    @FXML
+    private void descargarDatos() {
+        SincronizacionDialogos.descargar(btnConectar.getScene().getWindow(), () -> {
+            refrescarSync();
+            alDescargar.run();
         });
     }
 

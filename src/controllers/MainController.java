@@ -48,6 +48,13 @@ public class MainController {
         barraLateralController.setAlElegirSeccion(this::mostrarSeccion);
         barraLateralController.setAlElegirCuenta(this::mostrarCuenta);
         barraLateralController.setAlCerrarSesion(() -> alCerrarSesion.run());
+        // Tras descargar datos de Firebase se vuelve a abrir lo que se estaba viendo y se rehacen nombre, iniciales y cuentas
+        barraLateralController.setAlDescargar(() -> {
+            barraLateralController.recargarActivo();
+            if (SesionActual.getUsuario() != null) {
+                lblInicialesSuperior.setText(Formato.iniciales(SesionActual.getUsuario().getNombre()));
+            }
+        });
         barraLateralController.seleccionarSeccion(Seccion.VISTA_GENERAL);
     }
 

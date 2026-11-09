@@ -2,6 +2,7 @@ package main;
 
 import controllers.AuthController;
 import controllers.MainController;
+import controllers.SincronizacionDialogos;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -26,6 +27,11 @@ public class Main extends Application {
 		try {
 			ventana = primaryStage;
 			ventana.setTitle("MisCuentas");
+			// Al cerrar con datos sin subir a Firebase se avisa; el cierre real lo hace cerrarVentana() cuando se confirma
+			ventana.setOnCloseRequest(e -> {
+				e.consume();
+				SincronizacionDialogos.confirmarSalida(ventana, this::cerrarVentana);
+			});
 			mostrarAcceso();
 			ventana.show();
 		} catch (Exception e) {
@@ -59,6 +65,13 @@ public class Main extends Application {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Cierra la ventana (y con ella la aplicación). Close() no vuelve a lanzar el evento de petición de cierre.
+	 */
+	private void cerrarVentana() {
+		ventana.close();
 	}
 
 	/**

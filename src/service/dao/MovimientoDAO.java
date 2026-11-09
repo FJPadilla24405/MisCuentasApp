@@ -4,7 +4,6 @@ import models.Movimiento;
 import service.connections.DatabaseManager;
 import util.Dinero;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -99,29 +98,6 @@ public class MovimientoDAO {
             return lista;
         } catch (SQLException e) {
             throw new RuntimeException("Error listando movimientos por rango", e);
-        }
-    }
-
-    /**
-     * Método que suma los gastos de un usuario por su categoría y mes
-     * @param usuarioId: id del usuario
-     * @param categoriaId: id de la categoría
-     * @param mesReferencia: mes del gasto
-     * @return Devuelve la suma de los gastos
-     */
-    public BigDecimal sumarGastosPorCategoriaYMes(int usuarioId, int categoriaId, String mesReferencia) {
-        String sql = "SELECT COALESCE(SUM(importe), 0) AS total FROM movimientos " +
-                "WHERE usuario_id = ? AND categoria_id = ? AND tipo = 'gasto' AND fecha LIKE ?";
-        Connection conn = DatabaseManager.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, usuarioId);
-            ps.setInt(2, categoriaId);
-            ps.setString(3, mesReferencia + "%"); // mesReferencia con formato "yyyy-MM"
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? Dinero.leer(rs, "total") : Dinero.CERO;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error sumando gastos por categoria", e);
         }
     }
 

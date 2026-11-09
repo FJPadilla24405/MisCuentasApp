@@ -135,7 +135,7 @@
                         <String fx:value="kpi-gastos" />
                      </styleClass>
                   </VBox>
-                  <VBox spacing="8.0" GridPane.columnIndex="3">
+                  <VBox fx:id="tarjetaBalance" spacing="8.0" GridPane.columnIndex="3">
                      <children>
                         <HBox alignment="CENTER_LEFT">
                            <children>

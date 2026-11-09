@@ -42,6 +42,27 @@ public class SyncService {
         Connection conn = DatabaseManager.getConnection();
         comprobarEsquema(conn);
 
+        Map<String, Object> raiz = leerLocal(conn, usuario);
+        String huella = huella(raiz);
+        String ahora = Instant.now().toString();
+        raiz.put("ultimaSync", ahora);
+
+        // Una sola petición: o se sube todo o no se sube nada
+        firebase.escribir(RAIZ + "/" + usuario.getFirebaseUid(), raiz);
+
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE movimientos SET sincronizado = 1 WHERE usuario_id = ?")) {
+            ps.setInt(1, usuario.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error marcando movimientos como sincronizados", e);
+        }
+        MarcaSync.guardar(usuario.getFirebaseUid(), huella, ahora);
+    }
+
+    /**
+     * Lee todos los datos locales del usuario con la forma en la que se guardan en Firebase, salvo ultimaSync.
+     */
+    private Map<String, Object> leerLocal(Connection conn, Usuario usuario) {
         Map<String, Object> raiz = new LinkedHashMap<>();
         try {
             // Perfil, directamente bajo Users/{uid}
@@ -89,20 +110,10 @@ public class SyncService {
             }
             colocar(raiz, "presupuestos", presupuestos);
 
-            raiz.put("ultimaSync", Instant.now().toString());
         } catch (SQLException e) {
             throw new RuntimeException("Error leyendo la base de datos local", e);
         }
-
-        // Una sola petición: o se sube todo o no se sube nada
-        firebase.escribir(RAIZ + "/" + usuario.getFirebaseUid(), raiz);
-
-        try (PreparedStatement ps = conn.prepareStatement("UPDATE movimientos SET sincronizado = 1 WHERE usuario_id = ?")) {
-            ps.setInt(1, usuario.getId());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Error marcando movimientos como sincronizados", e);
-        }
+        return raiz;
     }
 
     /**
@@ -187,6 +198,13 @@ public class SyncService {
             }
 
             conn.commit();
+            try {
+                Object ultima = raiz.get("ultimaSync");
+                MarcaSync.guardar(usuario.getFirebaseUid(), huella(leerLocal(conn, usuario)),
+                        ultima == null ? "" : String.valueOf(ultima));
+            } catch (RuntimeException e) {
+                // Sin marca, la aplicación considerará que hay cambios sin subir: es el lado seguro
+            }
             return true;
         } catch (SQLException | RuntimeException e) {
             try {
@@ -203,6 +221,65 @@ public class SyncService {
                 // nada que hacer
             }
         }
+    }
+
+    /**
+     * Dice si en este equipo hay cambios que todavía no se han subido a Firebase, es decir, si lo que hay en la
+     * nube está desactualizado respecto a lo local. Compara una huella de los datos locales con la que se guardó
+     * en la última subida o descarga. Si nunca se ha sincronizado en este equipo, hay cambios si el usuario ya
+     * tiene cuentas, movimientos o presupuestos. No usa la red.
+     * @param usuario: usuario de la sesión
+     * @return Devuelve true si hay cambios locales sin subir
+     */
+    public boolean hayCambiosSinSubir(Usuario usuario) {
+        exigirUid(usuario);
+        Connection conn = DatabaseManager.getConnection();
+        comprobarEsquema(conn);
+        Map<String, Object> local = leerLocal(conn, usuario);
+        java.util.Optional<MarcaSync.Marca> marca = MarcaSync.leer(usuario.getFirebaseUid());
+        if (marca.isEmpty()) {
+            return local.containsKey("cuentas") || local.containsKey("movimientos") || local.containsKey("presupuestos");
+        }
+        return !marca.get().huella().equals(huella(local));
+    }
+
+    /**
+     * Huella (SHA-256) de unos datos: no depende del orden de las claves, así que dos lecturas de los mismos
+     * datos dan siempre la misma.
+     * @param datos: datos con la forma de Firebase
+     * @return Devuelve la huella en hexadecimal
+     */
+    private String huella(Map<String, Object> datos) {
+        try {
+            byte[] hash = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(canonico(datos).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 no está disponible", e);
+        }
+    }
+
+    /** Texto único para unos datos: las claves de cada mapa van ordenadas. */
+    private String canonico(Object valor) {
+        if (valor instanceof Map<?, ?> m) {
+            StringBuilder sb = new StringBuilder("{");
+            new java.util.TreeMap<String, Object>(m.entrySet().stream()
+                    .collect(java.util.stream.Collectors.toMap(e -> String.valueOf(e.getKey()), Map.Entry::getValue)))
+                    .forEach((k, v) -> sb.append(k).append(':').append(canonico(v)).append(','));
+            return sb.append('}').toString();
+        }
+        if (valor instanceof List<?> l) {
+            StringBuilder sb = new StringBuilder("[");
+            for (Object o : l) {
+                sb.append(canonico(o)).append(',');
+            }
+            return sb.append(']').toString();
+        }
+        return String.valueOf(valor);
     }
 
     /** Inserta una fila remota: solo columnas que existan en local, con usuario_id e id fijados por nosotros. */

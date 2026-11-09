@@ -83,6 +83,50 @@
       <!-- Pie: perfil y usuario -->
       <VBox spacing="6.0" styleClass="barra-pie">
          <children>
+            <!-- Sincronización con Firebase. Sin conexión se ve solo el botón de conectar; conectado, el estado y las flechas de subir y descargar. BarraLateralController decide cuál se ve -->
+            <Button fx:id="btnConectar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#conectarFirebase" styleClass="nav-item" text="Conectar con Firebase">
+               <graphic>
+                  <Group>
+                     <children>
+                        <SVGPath content="M17.5 19 H9 A7 7 0 1 1 15.71 10 H17.5 A4.5 4.5 0 1 1 17.5 19 Z M3 3 L21 21" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                     </children>
+                  </Group>
+               </graphic>
+            </Button>
+            <HBox fx:id="cajaConectado" alignment="CENTER_LEFT" managed="false" spacing="4.0" styleClass="sync-caja" visible="false">
+               <children>
+                  <Group>
+                     <children>
+                        <SVGPath content="M17.5 19 H9 A7 7 0 1 1 15.71 10 H17.5 A4.5 4.5 0 1 1 17.5 19 Z" scaleX="0.67" scaleY="0.67" styleClass="icono, icono-sync" />
+                     </children>
+                  </Group>
+                  <Label maxWidth="1.7976931348623157E308" styleClass="sync-estado" text="Conectado a Firebase" HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#subirDatos" styleClass="boton-icono">
+                     <graphic>
+                        <Group>
+                           <children>
+                              <SVGPath content="M12 16 V4 M7 9 L12 4 L17 9 M5 20 H19" scaleX="0.75" scaleY="0.75" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Subir mis datos a Firebase" />
+                     </tooltip>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#descargarDatos" styleClass="boton-icono">
+                     <graphic>
+                        <Group>
+                           <children>
+                              <SVGPath content="M12 4 V16 M7 11 L12 16 L17 11 M5 20 H19" scaleX="0.75" scaleY="0.75" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Descargar mis datos de Firebase" />
+                     </tooltip>
+                  </Button>
+               </children>
+            </HBox>
             <Button fx:id="btnPerfil" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#irAPerfil" styleClass="nav-item" text="Editar perfil">
                <graphic>
                   <Group>

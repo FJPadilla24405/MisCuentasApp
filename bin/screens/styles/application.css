@@ -568,6 +568,12 @@
 	-fx-background-color: white;
     -fx-border-color: -mc-borde-suave;
 }
+.kpi-balance-ok {
+    -fx-background-color: -resumen-balanceok;
+}
+.kpi-balance-mal {
+    -fx-background-color: -resumen-balancemal;
+}
 .kpi-titulo {
     -fx-text-fill: -mc-cabecera;
     -fx-font-size: 12px;
@@ -1329,4 +1335,16 @@
 .info-superior {
     -fx-text-fill: -mc-suave;
     -fx-font-size: 12px;
+}
+
+/* ===== Sincronización con Firebase (barra lateral) ===== */
+.sync-caja {
+    -fx-padding: 0 4 0 12;
+}
+.sync-estado {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+.icono-sync {
+    -fx-stroke: -mc-verde;
 }

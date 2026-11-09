@@ -8,8 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -107,24 +105,6 @@ public class UsuarioDAO {
             return Optional.empty();
         } catch (SQLException e) {
             throw new RuntimeException("Error buscando usuario", e);
-        }
-    }
-
-    /**
-     * Lista todos los usuarios de la base de datos
-     * @return Devuelve una lista de todos los usuarios registrados
-     */
-    public List<Usuario> listarTodos() {
-        String sql = "SELECT * FROM usuarios";
-        List<Usuario> lista = new ArrayList<>();
-        Connection conn = DatabaseManager.getConnection();
-        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(mapear(rs));
-            }
-            return lista;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error listando usuarios", e);
         }
     }
 
