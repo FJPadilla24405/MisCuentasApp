@@ -12,6 +12,11 @@
     -mc-tramo: #e2e8e2;
     -mc-aviso: #d98a1b;
     -mc-error: #c0392b;
+    
+    -resumen-ingresos: #86ff7d;
+    -resumen-gastos: #ffbe7d ;
+    -resumen-balanceok: #7dffcb;
+    -resumen-balancemal: #ff937d;
 
     -fx-font-family: "Segoe UI", "Inter", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     -fx-font-size: 13px;
@@ -551,8 +556,20 @@
     -fx-background-color: -mc-cabecera;
     -fx-border-color: -mc-cabecera;
 }
+.kpi-ingresos {
+    -fx-background-color: -resumen-ingresos;
+    -fx-border-color: -mc-borde-suave;
+}
+.kpi-gastos {
+    -fx-background-color: -resumen-gastos;
+    -fx-border-color: -mc-borde-suave
+}
+.kpi-balance {
+	-fx-background-color: white;
+    -fx-border-color: -mc-borde-suave;
+}
 .kpi-titulo {
-    -fx-text-fill: -mc-suave;
+    -fx-text-fill: -mc-cabecera;
     -fx-font-size: 12px;
 }
 .kpi-valor {

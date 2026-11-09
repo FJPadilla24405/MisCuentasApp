@@ -11,10 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import graficos.GraficoBarras;
-import graficos.GraficoDonut;
-import graficos.GraficoLinea;
-import graficos.Paleta;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -54,6 +50,10 @@ import service.resumen.GraficasService.Mensual;
 import service.resumen.GraficasService.Porcion;
 import util.Formato;
 import util.IconosCategoria;
+import util.graphics.GraficoBarras;
+import util.graphics.GraficoDonut;
+import util.graphics.GraficoLinea;
+import util.graphics.Paleta;
 
 /**
  * Controlador de Graficas.fxml (apartado Gráficas y resúmenes). Es una sola pantalla con dos vistas, la

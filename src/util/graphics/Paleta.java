@@ -1,4 +1,4 @@
-package graficos;
+package util.graphics;
 
 import javafx.scene.paint.Color;
 

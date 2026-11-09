@@ -34,7 +34,7 @@ public class Main extends Application {
 	}
 
 	/**
-	 * Muestra la pantalla de login y registro
+	 * Muestra la pantalla de login y registro	
 	 * @throws Exception si no se puede cargar el FXML
 	 */
 	private void mostrarAcceso() throws Exception {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -11,11 +12,13 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
 <!-- Pantalla de resumen. Sirve para la vista general (todas las cuentas) y para cada cuenta: ResumenController recibe qué mostrar -->
-<ScrollPane fx:id="raiz" fitToWidth="true" hbarPolicy="NEVER" styleClass="resumen-scroll" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ResumenController">
+
+<ScrollPane fx:id="raiz" fitToWidth="true" hbarPolicy="NEVER" styleClass="resumen-scroll" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ResumenController">
    <content>
       <VBox spacing="20.0" styleClass="resumen-contenido">
          <children>
@@ -90,7 +93,7 @@
                         <Label fx:id="lblSaldoDetalle" styleClass="kpi-detalle" wrapText="true" />
                      </children>
                   </VBox>
-                  <VBox spacing="8.0" styleClass="kpi" GridPane.columnIndex="1">
+                  <VBox spacing="8.0" GridPane.columnIndex="1">
                      <children>
                         <HBox alignment="CENTER_LEFT">
                            <children>
@@ -106,8 +109,12 @@
                         <Label fx:id="lblIngresos" styleClass="kpi-valor" text="0,00 €" />
                         <Label fx:id="lblIngresosDetalle" styleClass="kpi-detalle" wrapText="true" />
                      </children>
+                     <styleClass>
+                        <String fx:value="kpi" />
+                        <String fx:value="kpi-ingresos" />
+                     </styleClass>
                   </VBox>
-                  <VBox spacing="8.0" styleClass="kpi" GridPane.columnIndex="2">
+                  <VBox spacing="8.0" GridPane.columnIndex="2">
                      <children>
                         <HBox alignment="CENTER_LEFT">
                            <children>
@@ -123,8 +130,12 @@
                         <Label fx:id="lblGastos" styleClass="kpi-valor" text="0,00 €" />
                         <Label fx:id="lblGastosDetalle" styleClass="kpi-detalle" wrapText="true" />
                      </children>
+                     <styleClass>
+                        <String fx:value="kpi" />
+                        <String fx:value="kpi-gastos" />
+                     </styleClass>
                   </VBox>
-                  <VBox spacing="8.0" styleClass="kpi" GridPane.columnIndex="3">
+                  <VBox spacing="8.0" GridPane.columnIndex="3">
                      <children>
                         <HBox alignment="CENTER_LEFT">
                            <children>
@@ -140,8 +151,15 @@
                         <Label fx:id="lblBalance" styleClass="kpi-valor" text="0,00 €" />
                         <Label fx:id="lblBalanceDetalle" styleClass="kpi-detalle" wrapText="true" />
                      </children>
+                     <styleClass>
+                        <String fx:value="kpi" />
+                        <String fx:value="kpi-balance" />
+                     </styleClass>
                   </VBox>
                </children>
+               <rowConstraints>
+                  <RowConstraints />
+               </rowConstraints>
             </GridPane>
 
             <!-- Una tarjeta por cuenta (solo en la vista general). Las crea ResumenController -->

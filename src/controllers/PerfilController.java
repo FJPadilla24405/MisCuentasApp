@@ -56,7 +56,7 @@ public class PerfilController {
     // 24 de la cuadrícula del icono escalados a 16 píxeles
     private static final double ESCALA_ICONO = 0.67;
     // Alto máximo de las listas de cuentas y de categorías: a partir de ahí tienen scroll
-    private static final double ALTO_MAXIMO_LISTA = 300;
+    private static final double ALTO_MAXIMO_LISTA = 200;
     // Monedas que se pueden elegir
     private static final List<String> MONEDAS = List.of("EUR", "USD", "GBP", "CHF", "MXN", "ARS", "COP", "CLP", "PEN", "BRL", "JPY");
 

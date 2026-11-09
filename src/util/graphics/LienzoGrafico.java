@@ -1,4 +1,4 @@
-package graficos;
+package util.graphics;
 
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;

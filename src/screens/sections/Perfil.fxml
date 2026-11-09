@@ -10,12 +10,14 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
 <!-- Pantalla de editar perfil: datos personales, preferencias y cuentas. Los temas oscuro y sistema solo se guardan: todavía no cambian el aspecto -->
-<ScrollPane fx:id="raiz" fitToWidth="true" hbarPolicy="NEVER" styleClass="resumen-scroll" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PerfilController">
+
+<ScrollPane fx:id="raiz" fitToWidth="true" hbarPolicy="NEVER" styleClass="resumen-scroll" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PerfilController">
    <content>
       <VBox spacing="20.0" styleClass="resumen-contenido">
          <children>
@@ -269,6 +271,9 @@
                      </children>
                   </VBox>
                </children>
+               <rowConstraints>
+                  <RowConstraints />
+               </rowConstraints>
             </GridPane>
          </children>
       </VBox>

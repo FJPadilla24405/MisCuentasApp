@@ -419,7 +419,7 @@ public class GraficasService {
         return balance.multiply(CIEN).divide(ingresos, 1, RoundingMode.HALF_UP);
     }
 
-    /**
+    /** 
      * @param usuario: dueño de las cuentas
      * @param cuenta: la cuenta elegida, o null para todas
      * @return Devuelve las cuentas activas que entran en el resumen
