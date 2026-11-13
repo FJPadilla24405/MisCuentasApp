@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Clase del DAO de la tabla Recurrentes
@@ -126,6 +127,42 @@ public class RecurrenteDAO {
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error actualizando recurrente", e);
+        }
+    }
+
+    /**
+     * Método que busca una regla recurrente por su id (esté activa o no)
+     * @param id: id de la regla
+     * @return Devuelve la regla, o vacío si no existe
+     */
+    public Optional<Recurrente> buscarPorId(int id) {
+        String sql = "SELECT * FROM recurrentes WHERE id = ?";
+        Connection conn = DatabaseManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? Optional.of(mapear(rs)) : Optional.empty();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error buscando recurrente", e);
+        }
+    }
+
+    /**
+     * Método que vuelve a activar una regla recurrente. Se le pone una fecha de última ejecución para que, al
+     * reactivarla, no se añadan de golpe los movimientos de todo el tiempo que ha estado parada.
+     * @param id: id de la regla
+     * @param desde: fecha a partir de la cual se retoma (las repeticiones hasta ese día se dan por hechas)
+     */
+    public void reactivar(int id, String desde) {
+        String sql = "UPDATE recurrentes SET activo = 1, ultima_ejecucion = ? WHERE id = ?";
+        Connection conn = DatabaseManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, desde);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error reactivando recurrente", e);
         }
     }
 

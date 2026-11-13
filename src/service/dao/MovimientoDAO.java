@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Clase del DAO para la tabla Movimientos
@@ -63,6 +64,25 @@ public class MovimientoDAO {
     public List<Movimiento> listarPorCuenta(int cuentaId) {
         String sql = "SELECT * FROM movimientos WHERE cuenta_id = ? ORDER BY fecha DESC";
         return ejecutarListado(sql, cuentaId);
+    }
+
+    /**
+     * Método que busca un movimiento por su id
+     * @param id: id del movimiento
+     * @return Devuelve el movimiento, o vacío si no existe
+     */
+    public Optional<Movimiento> buscarPorId(int id) {
+        return ejecutarListado("SELECT * FROM movimientos WHERE id = ?", id).stream().findFirst();
+    }
+
+    /**
+     * Método que lista los movimientos que nacen de una regla recurrente: el original y los que se han generado solos
+     * @param recurrenteId: id de la regla recurrente
+     * @return Lista con los movimientos de la regla, del más antiguo al más reciente
+     */
+    public List<Movimiento> listarPorRecurrente(int recurrenteId) {
+        String sql = "SELECT * FROM movimientos WHERE recurrente_id = ? ORDER BY fecha ASC, id ASC";
+        return ejecutarListado(sql, recurrenteId);
     }
 
     /**

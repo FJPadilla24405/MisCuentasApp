@@ -1348,3 +1348,172 @@
 .icono-sync {
     -fx-stroke: -mc-verde;
 }
+
+
+/* ===== Diálogo de exportar ===== */
+.exportar-titulo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+/* Campo que abre una lista al pulsarlo (el periodo) */
+.campo-selector {
+    -fx-cursor: hand;
+}
+.campo-selector:hover {
+    -fx-border-color: -mc-verde;
+}
+.campo-selector-texto {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 13px;
+}
+/* Tarjetas de formato: PDF, CSV y Excel */
+.formato-opcion,
+.formato-opcion:focused,
+.formato-opcion:armed {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 12;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 12;
+    -fx-padding: 12 14 12 14;
+    -fx-alignment: TOP_LEFT;
+    -fx-content-display: GRAPHIC_ONLY;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-cursor: hand;
+}
+.formato-opcion:hover {
+    -fx-background-color: #f5f9f6;
+}
+.formato-opcion:selected,
+.formato-opcion:selected:focused,
+.formato-opcion:selected:hover {
+    -fx-background-color: #e8f1ec;
+    -fx-border-color: -mc-verde;
+}
+.formato-nombre {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.formato-detalle {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 11px;
+}
+.formato-icono {
+    -fx-stroke: -mc-verde;
+}
+
+
+/* ===== Informe PDF (páginas que se fotografían para el PDF; los márgenes coinciden con ExportadorPdf) ===== */
+.pdf-pagina {
+    -fx-background-color: white;
+    -fx-padding: 40 48 28 48;
+}
+.pdf-marca {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+.pdf-informe {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 10px;
+}
+.pdf-periodo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+.pdf-subtitulo {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 13px;
+}
+.pdf-seccion-titulo {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+.pdf-saldo {
+    -fx-background-color: #e8f1ec;
+    -fx-background-radius: 14;
+    -fx-padding: 22 26 22 26;
+}
+.pdf-saldo-etiqueta {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+.pdf-saldo-valor {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+}
+.pdf-kpi-etiqueta {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+.pdf-kpi-valor {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+.pdf-kpi-positivo {
+    -fx-text-fill: -mc-verde;
+}
+.pdf-kpi-negativo {
+    -fx-text-fill: #b8443a;
+}
+.pdf-linea {
+    -fx-background-color: -mc-borde-suave;
+}
+.pdf-seccion {
+    -fx-text-fill: -mc-titulo;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+.pdf-leyenda {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 12px;
+}
+.pdf-pie {
+    -fx-text-fill: -mc-suave;
+    -fx-font-size: 11px;
+}
+/* Tablas del PDF: más compactas que las de la pantalla (la altura de las filas la fija ExportadorPdf) */
+.pdf-tabla .tabla-cabecera {
+    -fx-padding: 0 10 0 10;
+}
+.pdf-tabla .tabla-fila {
+    -fx-padding: 0 10 0 10;
+}
+.pdf-tabla .tabla-numero,
+.pdf-tabla .tabla-numero-fuerte,
+.pdf-tabla .tabla-cuenta,
+.pdf-tabla .tabla-concepto,
+.pdf-tabla .balance-positivo,
+.pdf-tabla .balance-negativo,
+.pdf-tabla .balance-cero,
+.pdf-tabla .importe-ingreso,
+.pdf-tabla .importe-gasto {
+    -fx-font-size: 12px;
+}
+.pdf-tabla .tabla-fecha,
+.pdf-tabla .tabla-texto {
+    -fx-font-size: 11px;
+}
+
+
+/* ===== Editar movimientos (lista del diálogo) ===== */
+.editar-fila {
+    -fx-padding: 12 6 12 6;
+    -fx-border-color: -mc-borde-suave;
+    -fx-border-width: 0 0 1 0;
+}
+/* Botones pequeños para las filas (se suman a boton-secundario o boton-peligro) */
+.boton-mini {
+    -fx-min-height: 30;
+    -fx-pref-height: 30;
+    -fx-padding: 0 12 0 12;
+    -fx-font-size: 12px;
+}

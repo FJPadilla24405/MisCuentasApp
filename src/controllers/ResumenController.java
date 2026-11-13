@@ -1,10 +1,6 @@
 package controllers;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -17,7 +13,6 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -34,12 +29,11 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
-import javafx.stage.FileChooser;
 import models.Cuenta;
 import models.Movimiento;
 import models.Usuario;
 import service.auth.SesionActual;
-import service.resumen.ExportadorCsv;
+import service.exportar.OpcionesExportacion;
 import service.resumen.ResumenService;
 import service.resumen.ResumenService.FilaCuenta;
 import service.resumen.ResumenService.FilaMovimiento;
@@ -69,8 +63,6 @@ public class ResumenController {
     private static final int MAX_FILAS = 50;
     // Ancho de cada columna de la tabla en %: fecha, concepto, categoría, cuenta, importe
     private static final double[] ANCHOS = { 10, 38, 18, 18, 16 };
-    // Para que Excel reconozca que el CSV está en UTF-8
-    private static final String BOM = "\uFEFF";
 
     @FXML private ScrollPane raiz;
     @FXML private Button btnAnadirMovimiento;
@@ -169,6 +161,22 @@ public class ResumenController {
     }
 
     /**
+     * Abre la lista para editar o eliminar los movimientos del mes que se está viendo (y desactivar los recurrentes).
+     * Si se cambia algo, se vuelve a pintar la pantalla y se actualizan los saldos de la barra lateral.
+     */
+    @FXML
+    private void editarMovimientos() {
+        Usuario usuario = SesionActual.getUsuario();
+        if (usuario == null) {
+            return;
+        }
+        if (EditarMovimientosController.mostrar(raiz.getScene().getWindow(), usuario, cuenta, mes)) {
+            refrescar();
+            alCambiar.run();
+        }
+    }
+
+    /**
      * Muestra todos los tipos de movimiento
      */
     @FXML
@@ -193,33 +201,17 @@ public class ResumenController {
     }
 
     /**
-     * Guarda en un archivo CSV los movimientos del mes elegido (de la cuenta, o de todas en la vista
-     * general). No tiene en cuenta el buscador ni el filtro de tipo.
+     * Abre el diálogo de exportar con lo que se está viendo (la cuenta o todas, y el mes) y solo el resumen
+     * activado; en el diálogo se puede cambiar todo y activar también las gráficas y los movimientos.
      */
     @FXML
     private void exportar() {
-        if (datos == null) {
+        Usuario usuario = SesionActual.getUsuario();
+        if (usuario == null) {
             return;
         }
-        FileChooser selector = new FileChooser();
-        selector.setTitle("Exportar movimientos");
-        String base = cuenta == null ? "movimientos" : "movimientos-" + cuenta.getNombre().replaceAll("[^\\p{L}\\p{N}-]+", "_");
-        selector.setInitialFileName(base + "-" + mes + ".csv");
-        selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV separado por punto y coma", "*.csv"));
-        File destino = selector.showSaveDialog(raiz.getScene().getWindow());
-        if (destino == null) {
-            return;
-        }
-        try {
-            Files.write(destino.toPath(), (BOM + ExportadorCsv.generar(datos.movimientos())).getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            Alert error = new Alert(Alert.AlertType.ERROR, "No se pudo guardar el archivo: " + e.getMessage());
-            error.setTitle("MisCuentas");
-            error.setHeaderText("No se pudo exportar");
-            error.initOwner(raiz.getScene().getWindow());
-            error.getDialogPane().getStylesheets().add(getClass().getResource("/screens/styles/application.css").toExternalForm());
-            error.showAndWait();
-        }
+        ExportarController.mostrar(raiz.getScene().getWindow(), usuario,
+                OpcionesExportacion.inicial(cuenta, false, mes, mes.getYear(), true, false));
     }
 
     /**

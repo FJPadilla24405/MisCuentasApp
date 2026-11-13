@@ -179,6 +179,15 @@
                         <Label styleClass="tarjeta-titulo" text="Últimos movimientos" />
                         <Label fx:id="lblNumMovimientos" styleClass="pastilla" text="0 movimientos" />
                         <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnEditarMovimientos" mnemonicParsing="false" onAction="#editarMovimientos" styleClass="boton-filtro" text="Editar">
+                           <graphic>
+                              <Group>
+                                 <children>
+                                    <SVGPath content="M4 20 H8 L19 9 A2 2 0 0 0 19 6 L18 5 A2 2 0 0 0 15 5 L4 16 Z M14 6 L18 10" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                                 </children>
+                              </Group>
+                           </graphic>
+                        </Button>
                         <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="boton-filtro, buscador">
                            <children>
                               <Group>

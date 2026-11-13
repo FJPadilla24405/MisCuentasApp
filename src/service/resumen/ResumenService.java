@@ -169,6 +169,37 @@ public class ResumenService {
     }
 
     /**
+     * Movimientos de un periodo, con los nombres de su categoría y su cuenta (los usa la exportación).
+     * @param usuario: dueño de las cuentas
+     * @param cuenta: la cuenta, o null para todas las cuentas activas
+     * @param prefijoFecha: comienzo de las fechas del periodo: yyyy-MM para un mes o yyyy para un año
+     * @return Devuelve los movimientos, del más reciente al más antiguo
+     */
+    public List<FilaMovimiento> movimientos(Usuario usuario, Cuenta cuenta, String prefijoFecha) {
+        Map<Integer, Cuenta> ambito = new HashMap<>();
+        for (Cuenta c : cuentaDAO.listarPorUsuario(usuario.getId())) {
+            if (cuenta == null || c.getId() == cuenta.getId()) {
+                ambito.put(c.getId(), c);
+            }
+        }
+        Map<Integer, String> categorias = new HashMap<>();
+        for (Categoria cat : categoriaDAO.listarPorUsuario(usuario.getId())) {
+            categorias.put(cat.getId(), cat.getNombre());
+        }
+        List<FilaMovimiento> lista = new ArrayList<>();
+        for (Movimiento m : movimientoDAO.listarPorUsuario(usuario.getId())) {
+            Cuenta c = ambito.get(m.getCuentaId());
+            if (c == null || m.getFecha() == null || !m.getFecha().startsWith(prefijoFecha)) {
+                continue;
+            }
+            lista.add(new FilaMovimiento(m, categorias.getOrDefault(m.getCategoriaId(), "Sin categoría"), c.getNombre()));
+        }
+        lista.sort(Comparator.comparing((FilaMovimiento f) -> f.movimiento().getFecha()).reversed()
+                .thenComparing(Comparator.comparingInt((FilaMovimiento f) -> f.movimiento().getId()).reversed()));
+        return lista;
+    }
+
+    /**
      * Añade a la lista de meses el mes de una fecha (yyyy-MM-dd)
      * @param meses: meses ya conocidos
      * @param fecha: fecha de un movimiento

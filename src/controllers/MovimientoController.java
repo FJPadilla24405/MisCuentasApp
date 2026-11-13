@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -21,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -30,6 +32,7 @@ import models.Cuenta;
 import models.Movimiento;
 import models.Usuario;
 import service.DatoInvalido;
+import service.movimiento.Frecuencia;
 import service.movimiento.MovimientoService;
 import util.Campos;
 import util.Formato;
@@ -37,7 +40,9 @@ import util.Importes;
 
 /**
  * Controlador de MovimientoDialog.fxml: ventana para añadir un movimiento a mano (gasto o ingreso, importe,
- * concepto, cuenta, fecha, categoría, nota opcional y marca de recurrente). Se abre con MovimientoController.mostrar(...).
+ * concepto, cuenta, fecha, categoría, nota opcional y, si es recurrente, cada cuánto se repite: a diario, cada semana,
+ * cada mes o cada año). Se abre con MovimientoController.mostrar(...) para añadir uno nuevo o con
+ * MovimientoController.editar(...) para cambiar uno que ya existe (la misma ventana, con sus datos puestos).
  * La lógica está en MovimientoService.
  *
  * @author Fco Padilla
@@ -66,10 +71,22 @@ public class MovimientoController {
     @FXML private ComboBox<Categoria> cmbCategoria;
     @FXML private DatePicker dpFecha;
     @FXML private CheckBox chkRecurrente;
+    @FXML private ToggleGroup grupoFrecuencia;
+    @FXML private ToggleButton tglDiaria;
+    @FXML private ToggleButton tglSemanal;
+    @FXML private ToggleButton tglMensual;
+    @FXML private ToggleButton tglAnual;
+    @FXML private VBox cajaFrecuencia;
+    @FXML private Label lblFrecuencia;
+    @FXML private Label lblBorrador;
+    @FXML private VBox cajaRecurrente;
+    @FXML private Button btnGuardar;
     @FXML private Label lblError;
 
     private final MovimientoService servicio = new MovimientoService();
     private Usuario usuario;
+    // Movimiento que se está editando; null si se está añadiendo uno nuevo
+    private Movimiento editando;
     // Movimiento guardado; vacío si se cancela
     private Optional<Movimiento> resultado = Optional.empty();
 
@@ -133,7 +150,58 @@ public class MovimientoController {
                 cambiarTipo();
             }
         });
+        // Recurrencia: las cuatro frecuencias llevan guardada su Frecuencia, y el aviso se rehace al cambiar la frecuencia o la fecha
+        tglDiaria.setUserData(Frecuencia.DIARIA);
+        tglSemanal.setUserData(Frecuencia.SEMANAL);
+        tglMensual.setUserData(Frecuencia.MENSUAL);
+        tglAnual.setUserData(Frecuencia.ANUAL);
+        grupoFrecuencia.selectedToggleProperty().addListener((obs, antes, ahora) -> {
+            if (ahora == null) {
+                grupoFrecuencia.selectToggle(antes);
+            } else {
+                actualizarFrecuencia();
+            }
+        });
+        dpFecha.valueProperty().addListener((obs, antes, ahora) -> actualizarFrecuencia());
+        chkRecurrente.selectedProperty().addListener((obs, antes, ahora) -> {
+            cajaFrecuencia.setVisible(ahora);
+            cajaFrecuencia.setManaged(ahora);
+            actualizarFrecuencia();
+            // La ventana no se puede estirar a mano, así que se ajusta sola a lo que ahora lleva dentro
+            Platform.runLater(() -> {
+                if (chkRecurrente.getScene() != null && chkRecurrente.getScene().getWindow() != null) {
+                    chkRecurrente.getScene().getWindow().sizeToScene();
+                }
+            });
+        });
         Platform.runLater(txtImporte::requestFocus);
+    }
+
+    /**
+     * @return Devuelve la frecuencia elegida si el movimiento es recurrente, o null si es puntual
+     */
+    private Frecuencia frecuencia() {
+        if (!chkRecurrente.isSelected() || grupoFrecuencia.getSelectedToggle() == null) {
+            return null;
+        }
+        return (Frecuencia) grupoFrecuencia.getSelectedToggle().getUserData();
+    }
+
+    /**
+     * Explica bajo las frecuencias cuándo se repetirá el movimiento y cuándo será la próxima vez
+     */
+    private void actualizarFrecuencia() {
+        Frecuencia frecuencia = frecuencia();
+        if (frecuencia == null) {
+            lblFrecuencia.setText("");
+            return;
+        }
+        LocalDate fecha = dpFecha.getValue();
+        String texto = "Se añadirá un movimiento igual automáticamente " + frecuencia.descripcion(fecha) + ".";
+        if (fecha != null) {
+            texto += " El siguiente será el " + FECHA_ESCRITA.format(frecuencia.fechaDe(fecha, 1)) + ".";
+        }
+        lblFrecuencia.setText(texto);
     }
 
     /**
@@ -144,16 +212,44 @@ public class MovimientoController {
      * @return Devuelve el movimiento guardado, o vacío si se canceló
      */
     public static Optional<Movimiento> mostrar(Window propietario, Usuario usuario, Cuenta cuentaInicial) {
+        return abrir(propietario, usuario, cuentaInicial, null);
+    }
+
+    /**
+     * Abre la ventana con los datos de un movimiento que ya existe y espera a que se cierre. La recurrencia no se
+     * cambia desde aquí.
+     * @param propietario: ventana desde la que se abre (queda bloqueada hasta que se cierre)
+     * @param usuario: usuario de la sesión
+     * @param movimiento: movimiento a editar
+     * @return Devuelve el movimiento con sus cambios, o vacío si se canceló
+     */
+    public static Optional<Movimiento> editar(Window propietario, Usuario usuario, Movimiento movimiento) {
+        return abrir(propietario, usuario, null, movimiento);
+    }
+
+    /**
+     * Carga y muestra la ventana, para añadir (movimiento null) o para editar
+     * @param propietario: ventana desde la que se abre
+     * @param usuario: usuario de la sesión
+     * @param cuentaInicial: cuenta que aparece elegida al añadir (puede ser null)
+     * @param movimiento: movimiento a editar, o null para añadir uno nuevo
+     * @return Devuelve el movimiento guardado, o vacío si se canceló
+     */
+    private static Optional<Movimiento> abrir(Window propietario, Usuario usuario, Cuenta cuentaInicial, Movimiento movimiento) {
         try {
             FXMLLoader loader = new FXMLLoader(MovimientoController.class.getResource("/screens/dialogs/MovimientoDialog.fxml"));
             Parent raiz = loader.load();
             MovimientoController controlador = loader.getController();
-            controlador.preparar(usuario, cuentaInicial);
+            if (movimiento == null) {
+                controlador.preparar(usuario, cuentaInicial);
+            } else {
+                controlador.prepararEdicion(usuario, movimiento);
+            }
 
             Stage ventana = new Stage();
             ventana.initOwner(propietario);
             ventana.initModality(Modality.WINDOW_MODAL);
-            ventana.setTitle("MisCuentas · Añadir movimiento");
+            ventana.setTitle(movimiento == null ? "MisCuentas · Añadir movimiento" : "MisCuentas · Editar movimiento");
             ventana.setResizable(false);
             ventana.setScene(new Scene(raiz));
             ventana.showAndWait();
@@ -161,6 +257,38 @@ public class MovimientoController {
         } catch (IOException e) {
             throw new UncheckedIOException("No se pudo abrir la ventana del movimiento", e);
         }
+    }
+
+    /**
+     * Rellena la ventana con los datos del movimiento que se edita. No se ofrece cambiar la recurrencia.
+     * @param usuario: usuario de la sesión
+     * @param movimiento: movimiento a editar
+     */
+    private void prepararEdicion(Usuario usuario, Movimiento movimiento) {
+        this.usuario = usuario;
+        this.editando = movimiento;
+        lblMoneda.setText(usuario.getMoneda() + " " + Formato.simbolo(usuario.getMoneda()));
+        cmbCuenta.getItems().setAll(servicio.cuentasDisponibles(usuario));
+        cmbCuenta.getItems().stream().filter(c -> c.getId() == movimiento.getCuentaId()).findFirst().ifPresent(cmbCuenta::setValue);
+
+        // Primero el tipo (que decide las categorías) y después la categoría
+        grupoTipo.selectToggle("ingreso".equals(movimiento.getTipo()) ? tglIngreso : tglGasto);
+        cambiarTipo();
+        cmbCategoria.getItems().stream().filter(c -> c.getId() == movimiento.getCategoriaId()).findFirst().ifPresent(cmbCategoria::setValue);
+
+        txtImporte.setText(movimiento.getImporte().toPlainString().replace('.', ','));
+        txtConcepto.setText(movimiento.getDescripcion() == null ? "" : movimiento.getDescripcion());
+        txtNota.setText(movimiento.getNota() == null ? "" : movimiento.getNota());
+        try {
+            dpFecha.setValue(LocalDate.parse(movimiento.getFecha()));
+        } catch (DateTimeParseException e) {
+            dpFecha.setValue(null);
+        }
+
+        cajaRecurrente.setVisible(false);
+        cajaRecurrente.setManaged(false);
+        lblBorrador.setText(servicio.reglaDe(movimiento).isPresent() ? "Editando · recurrente" : "Editando movimiento");
+        btnGuardar.setText("Guardar cambios");
     }
 
     /**
@@ -222,9 +350,13 @@ public class MovimientoController {
         Cuenta cuenta = cmbCuenta.getValue();
         Categoria categoria = cmbCategoria.getValue();
         try {
-            resultado = Optional.of(servicio.guardar(usuario, cuenta == null ? null : cuenta.getId(),
-                    categoria == null ? null : categoria.getId(), tipo(), importe, dpFecha.getValue(),
-                    txtConcepto.getText(), txtNota.getText(), chkRecurrente.isSelected()));
+            Integer cuentaId = cuenta == null ? null : cuenta.getId();
+            Integer categoriaId = categoria == null ? null : categoria.getId();
+            resultado = Optional.of(editando == null
+                    ? servicio.guardar(usuario, cuentaId, categoriaId, tipo(), importe, dpFecha.getValue(),
+                            txtConcepto.getText(), txtNota.getText(), frecuencia())
+                    : servicio.actualizar(usuario, editando.getId(), cuentaId, categoriaId, tipo(), importe,
+                            dpFecha.getValue(), txtConcepto.getText(), txtNota.getText()));
             cerrar();
         } catch (DatoInvalido e) {
             switch (e.getCampo()) {

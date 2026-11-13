@@ -1,11 +1,7 @@
 package controllers;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +13,6 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -36,12 +31,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
-import javafx.stage.FileChooser;
 import models.Cuenta;
 import models.Usuario;
 import service.auth.SesionActual;
 import service.dao.CuentaDAO;
-import service.resumen.ExportadorCsv;
+import service.exportar.OpcionesExportacion;
 import service.resumen.GraficasService;
 import service.resumen.GraficasService.Anual;
 import service.resumen.GraficasService.FilaCuentaMes;
@@ -74,8 +68,6 @@ public class GraficasController {
     private static final String[] TITULOS_MES = { "CUENTA", "SALDO INICIAL", "INGRESOS", "GASTOS", "BALANCE", "SALDO ACTUAL" };
     private static final String[] TITULOS_ANIO = { "MES", "INGRESOS", "GASTOS", "BALANCE NETO", "TASA DE AHORRO" };
     private static final BigDecimal CIEN = BigDecimal.valueOf(100);
-    // Para que Excel reconozca que el CSV está en UTF-8
-    private static final String BOM = "\uFEFF";
     // Signo menos de verdad (el guion de teclado queda corto al lado de las cifras)
     private static final String MENOS = "\u2212";
 
@@ -243,34 +235,17 @@ public class GraficasController {
     }
 
     /**
-     * Guarda en un archivo CSV el resumen que se está viendo: la tabla de la vista (cuenta por cuenta o mes a mes)
-     * y, en la mensual, también el gasto por categoría.
+     * Abre el diálogo de exportar con lo que se está viendo (la cuenta, el mes o el año) y solo las gráficas
+     * activadas; en el diálogo se puede cambiar todo y activar también el resumen y los movimientos.
      */
     @FXML
     private void exportar() {
-        if (anual ? datosAnio == null : datosMes == null) {
+        Usuario usuario = SesionActual.getUsuario();
+        if (usuario == null) {
             return;
         }
-        FileChooser selector = new FileChooser();
-        selector.setTitle("Exportar resumen");
-        String sufijo = cuenta == null ? "" : "-" + cuenta.getNombre().replaceAll("[^\\p{L}\\p{N}-]+", "_");
-        selector.setInitialFileName((anual ? "resumen-anual-" + anio : "resumen-mensual-" + mes) + sufijo + ".csv");
-        selector.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV separado por punto y coma", "*.csv"));
-        File destino = selector.showSaveDialog(raiz.getScene().getWindow());
-        if (destino == null) {
-            return;
-        }
-        String csv = anual ? ExportadorCsv.generarResumenAnual(datosAnio) : ExportadorCsv.generarResumenMensual(datosMes);
-        try {
-            Files.write(destino.toPath(), (BOM + csv).getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            Alert error = new Alert(Alert.AlertType.ERROR, "No se pudo guardar el archivo: " + e.getMessage());
-            error.setTitle("MisCuentas");
-            error.setHeaderText("No se pudo exportar");
-            error.initOwner(raiz.getScene().getWindow());
-            error.getDialogPane().getStylesheets().add(getClass().getResource("/screens/styles/application.css").toExternalForm());
-            error.showAndWait();
-        }
+        ExportarController.mostrar(raiz.getScene().getWindow(), usuario,
+                OpcionesExportacion.inicial(cuenta, anual, mes, anio, false, true));
     }
 
     /**
@@ -477,16 +452,7 @@ public class GraficasController {
      * @return Devuelve los trozos del anillo
      */
     private List<Porcion> agrupar(List<Porcion> categorias) {
-        if (categorias.size() <= MAX_CATEGORIAS) {
-            return categorias;
-        }
-        List<Porcion> trozos = new ArrayList<>(categorias.subList(0, MAX_CATEGORIAS - 1));
-        BigDecimal resto = BigDecimal.ZERO;
-        for (Porcion p : categorias.subList(MAX_CATEGORIAS - 1, categorias.size())) {
-            resto = resto.add(p.importe());
-        }
-        trozos.add(new Porcion("Otras", resto));
-        return trozos;
+        return GraficasService.agrupar(categorias, MAX_CATEGORIAS);
     }
 
     /**

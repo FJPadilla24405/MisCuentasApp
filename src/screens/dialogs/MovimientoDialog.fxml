@@ -20,6 +20,7 @@
    </padding>
    <fx:define>
       <ToggleGroup fx:id="grupoTipo" />
+      <ToggleGroup fx:id="grupoFrecuencia" />
    </fx:define>
    <children>
       <HBox alignment="CENTER_LEFT">
@@ -31,7 +32,7 @@
                </children>
             </HBox>
             <Region HBox.hgrow="ALWAYS" />
-            <Label styleClass="pastilla-alerta" text="Borrador sin guardar" />
+            <Label fx:id="lblBorrador" styleClass="pastilla-alerta" text="Borrador sin guardar" />
          </children>
       </HBox>
 
@@ -95,7 +96,25 @@
          </children>
       </VBox>
 
-      <CheckBox fx:id="chkRecurrente" mnemonicParsing="false" text="Marcar como movimiento recurrente" />
+      <VBox fx:id="cajaRecurrente" spacing="10.0">
+         <children>
+            <CheckBox fx:id="chkRecurrente" mnemonicParsing="false" text="Marcar como movimiento recurrente" />
+            <VBox fx:id="cajaFrecuencia" managed="false" spacing="8.0" visible="false">
+               <children>
+                  <Label styleClass="campo-etiqueta" text="Se repite" />
+                  <HBox maxWidth="-Infinity" spacing="2.0" styleClass="segmentado">
+                     <children>
+                        <ToggleButton fx:id="tglDiaria" mnemonicParsing="false" styleClass="segmento-opcion" text="Diaria" toggleGroup="$grupoFrecuencia" />
+                        <ToggleButton fx:id="tglSemanal" mnemonicParsing="false" styleClass="segmento-opcion" text="Semanal" toggleGroup="$grupoFrecuencia" />
+                        <ToggleButton fx:id="tglMensual" mnemonicParsing="false" selected="true" styleClass="segmento-opcion" text="Mensual" toggleGroup="$grupoFrecuencia" />
+                        <ToggleButton fx:id="tglAnual" mnemonicParsing="false" styleClass="segmento-opcion" text="Anual" toggleGroup="$grupoFrecuencia" />
+                     </children>
+                  </HBox>
+                  <Label fx:id="lblFrecuencia" styleClass="texto-suave-pequeno" wrapText="true" />
+               </children>
+            </VBox>
+         </children>
+      </VBox>
 
       <Region maxHeight="1.0" minHeight="1.0" prefHeight="1.0" styleClass="linea-fina" />
 
@@ -106,7 +125,7 @@
             <Label styleClass="texto-suave-pequeno" text="Tus datos se guardan de forma segura." />
             <Region HBox.hgrow="ALWAYS" />
             <Button cancelButton="true" mnemonicParsing="false" onAction="#cancelar" prefWidth="110.0" styleClass="boton-secundario" text="Cancelar" />
-            <Button defaultButton="true" mnemonicParsing="false" onAction="#guardar" prefWidth="170.0" styleClass="boton-primario" text="Guardar movimiento" />
+            <Button fx:id="btnGuardar" defaultButton="true" mnemonicParsing="false" onAction="#guardar" prefWidth="170.0" styleClass="boton-primario" text="Guardar movimiento" />
          </children>
       </HBox>
    </children>

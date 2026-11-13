@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Lista de los movimientos del mes para editarlos, eliminarlos o (los recurrentes) desactivarlos. Las filas las crea EditarMovimientosController -->
+<VBox prefHeight="640.0" prefWidth="880.0" spacing="14.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EditarMovimientosController">
+   <padding>
+      <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+   </padding>
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="12.0">
+         <children>
+            <VBox spacing="3.0">
+               <children>
+                  <Label styleClass="exportar-titulo" text="Editar movimientos" />
+                  <Label fx:id="lblSubtitulo" styleClass="texto-suave-pequeno" />
+               </children>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="boton-filtro, buscador">
+               <children>
+                  <Group>
+                     <children>
+                        <SVGPath content="M11 4 A7 7 0 1 0 11 18 A7 7 0 1 0 11 4 Z M21 21 L16 16" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                     </children>
+                  </Group>
+                  <TextField fx:id="txtBuscar" prefWidth="170.0" promptText="Buscar movimiento" styleClass="campo-input" />
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+
+      <Label styleClass="texto-suave-pequeno" text="Cambia o elimina cualquier movimiento del mes. En los recurrentes también puedes desactivar la repetición, para que no se añadan más." wrapText="true" />
+
+      <ScrollPane fx:id="scroll" fitToWidth="true" hbarPolicy="NEVER" styleClass="lista-scroll" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox fx:id="lista" />
+         </content>
+      </ScrollPane>
+      <Label fx:id="lblVacio" managed="false" styleClass="tabla-vacia" visible="false" wrapText="true" />
+
+      <Label fx:id="lblError" managed="false" styleClass="mensaje-error" visible="false" wrapText="true" />
+
+      <HBox alignment="CENTER_RIGHT">
+         <children>
+            <Button cancelButton="true" defaultButton="true" mnemonicParsing="false" onAction="#cerrar" prefWidth="140.0" styleClass="boton-primario" text="Cerrar" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Ventana de exportar (la abren Resumen y Gráficas y resúmenes): cuentas, periodo, formato, contenido y nombre del archivo -->
+<VBox prefWidth="560.0" spacing="16.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ExportarController">
+   <padding>
+      <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+   </padding>
+   <fx:define>
+      <ToggleGroup fx:id="grupoPeriodo" />
+   </fx:define>
+   <children>
+      <Label styleClass="exportar-titulo" text="Prepara tu exportación" />
+
+      <!-- Cuentas incluidas -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Cuentas incluidas" />
+            <ComboBox fx:id="cmbCuenta" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+         </children>
+      </VBox>
+
+      <!-- Periodo: mes o año, y cuál -->
+      <HBox alignment="BOTTOM_LEFT" spacing="16.0">
+         <children>
+            <VBox spacing="6.0">
+               <children>
+                  <Label styleClass="campo-etiqueta" text="Periodo" />
+                  <HBox alignment="CENTER" styleClass="vista-segmentada">
+                     <children>
+                        <ToggleButton fx:id="tglMes" mnemonicParsing="false" selected="true" styleClass="vista-opcion" text="Mes" toggleGroup="$grupoPeriodo" />
+                        <ToggleButton fx:id="tglAnio" mnemonicParsing="false" styleClass="vista-opcion" text="Año" toggleGroup="$grupoPeriodo" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="lblPeriodoEtiqueta" styleClass="campo-etiqueta" text="Mes seleccionado" />
+                  <HBox fx:id="cajaPeriodo" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja, campo-selector">
+                     <children>
+                        <Label fx:id="lblPeriodo" maxWidth="1.7976931348623157E308" styleClass="campo-selector-texto" HBox.hgrow="ALWAYS" />
+                        <Group>
+                           <children>
+                              <SVGPath content="M5 5 H19 A2 2 0 0 1 21 7 V19 A2 2 0 0 1 19 21 H5 A2 2 0 0 1 3 19 V7 A2 2 0 0 1 5 5 Z M3 10 H21 M8 3 V7 M16 3 V7" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                           </children>
+                        </Group>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+
+      <Region maxHeight="1.0" minHeight="1.0" prefHeight="1.0" styleClass="linea-fina" />
+
+      <!-- Formato del archivo: las tres tarjetas las crea ExportarController -->
+      <VBox spacing="8.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Formato del archivo" />
+            <HBox fx:id="cajaFormatos" spacing="12.0" />
+         </children>
+      </VBox>
+
+      <Region maxHeight="1.0" minHeight="1.0" prefHeight="1.0" styleClass="linea-fina" />
+
+      <!-- Contenido del informe -->
+      <VBox spacing="10.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Contenido del informe" />
+            <CheckBox fx:id="chkResumen" mnemonicParsing="false" text="Resumen de ingresos, gastos y saldos" />
+            <CheckBox fx:id="chkGraficas" mnemonicParsing="false" text="Gráficas de categorías y evolución" />
+            <CheckBox fx:id="chkMovimientos" mnemonicParsing="false" text="Tabla detallada de los movimientos" />
+            <CheckBox fx:id="chkNotas" mnemonicParsing="false" text="Incluir notas de los movimientos" />
+         </children>
+      </VBox>
+
+      <Region maxHeight="1.0" minHeight="1.0" prefHeight="1.0" styleClass="linea-fina" />
+
+      <!-- Nombre del archivo -->
+      <VBox spacing="6.0">
+         <children>
+            <Label styleClass="campo-etiqueta" text="Nombre del archivo" />
+            <HBox fx:id="cajaNombre" alignment="CENTER_LEFT" spacing="8.0" styleClass="campo-caja">
+               <children>
+                  <TextField fx:id="txtNombre" onAction="#descargar" styleClass="campo-input" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <Label fx:id="lblError" managed="false" styleClass="mensaje-error" visible="false" wrapText="true" />
+
+      <HBox alignment="CENTER_RIGHT" spacing="10.0">
+         <children>
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#cancelar" prefWidth="110.0" styleClass="boton-secundario" text="Cancelar" />
+            <Button fx:id="btnDescargar" defaultButton="true" mnemonicParsing="false" onAction="#descargar" prefWidth="170.0" styleClass="boton-primario, boton-primario-icono" text="Descargar">
+               <graphic>
+                  <Group>
+                     <children>
+                        <SVGPath content="M12 4 V15 M7 11 L12 16 L17 11 M5 20 H19" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                     </children>
+                  </Group>
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
+   </children>
+</VBox>

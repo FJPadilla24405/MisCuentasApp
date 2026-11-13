@@ -232,6 +232,25 @@ public class GraficasService {
         }
     }
 
+    /**
+     * Deja como mucho un número de trozos: si hay más categorías, las últimas se suman en una llamada "Otras"
+     * @param categorias: gasto por categoría, de mayor a menor
+     * @param max: máximo de trozos (el último es "Otras" si hay que agrupar)
+     * @return Devuelve los trozos del anillo
+     */
+    public static List<Porcion> agrupar(List<Porcion> categorias, int max) {
+        if (categorias.size() <= max) {
+            return categorias;
+        }
+        List<Porcion> trozos = new ArrayList<>(categorias.subList(0, max - 1));
+        BigDecimal resto = Dinero.CERO;
+        for (Porcion p : categorias.subList(max - 1, categorias.size())) {
+            resto = resto.add(p.importe());
+        }
+        trozos.add(new Porcion("Otras", resto));
+        return trozos;
+    }
+
     private final CuentaDAO cuentaDAO = new CuentaDAO();
     private final MovimientoDAO movimientoDAO = new MovimientoDAO();
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
