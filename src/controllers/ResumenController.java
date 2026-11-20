@@ -29,6 +29,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
+import javafx.stage.Window;
 import models.Cuenta;
 import models.Movimiento;
 import models.Usuario;
@@ -142,21 +143,36 @@ public class ResumenController {
     }
 
     /**
-     * Añade un movimiento a la cuenta que se está viendo. Primero se pregunta si se quiere añadir a mano o
-     * importar un archivo (importar todavía no está hecho) y después se abre el formulario. Al guardar, se
-     * muestra el mes del movimiento y se actualizan los saldos.
+     * Añade movimientos a la cuenta que se está viendo. Primero se pregunta si se quiere añadir uno a mano o
+     * importar un archivo y después se abre el formulario o el importador. Al terminar, se muestra el mes del
+     * movimiento (o del más reciente de los importados) y se actualizan los saldos.
      */
     @FXML
     private void anadirMovimiento() {
         Usuario usuario = SesionActual.getUsuario();
-        if (cuenta == null || usuario == null || !ElegirMovimientoController.preguntar(raiz.getScene().getWindow())) {
+        if (cuenta == null || usuario == null) {
             return;
         }
-        Optional<Movimiento> guardado = MovimientoController.mostrar(raiz.getScene().getWindow(), usuario, cuenta);
-        if (guardado.isPresent()) {
-            mes = YearMonth.from(LocalDate.parse(guardado.get().getFecha()));
-            refrescar();
-            alCambiar.run();
+        Window ventana = raiz.getScene().getWindow();
+        switch (ElegirMovimientoController.preguntar(ventana)) {
+            case MANUAL -> {
+                Optional<Movimiento> guardado = MovimientoController.mostrar(ventana, usuario, cuenta);
+                if (guardado.isPresent()) {
+                    mes = YearMonth.from(LocalDate.parse(guardado.get().getFecha()));
+                    refrescar();
+                    alCambiar.run();
+                }
+            }
+            case IMPORTAR -> {
+                // Se muestra el mes del movimiento más reciente de los importados
+                Optional<YearMonth> ultimoMes = ImportarMovimientosController.mostrar(ventana, usuario, cuenta);
+                if (ultimoMes.isPresent()) {
+                    mes = ultimoMes.get();
+                    refrescar();
+                    alCambiar.run();
+                }
+            }
+            default -> { }
         }
     }
 

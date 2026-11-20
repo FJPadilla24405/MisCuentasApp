@@ -4,14 +4,21 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Window;
+import javafx.util.Duration;
 import models.Cuenta;
+import models.Usuario;
 import service.auth.SesionActual;
+import service.movimiento.RecurrenteService;
 import util.Formato;
 import util.Seccion;
 
@@ -35,6 +42,11 @@ public class MainController {
     // Controlador de la barra lateral incluida con fx:include fx:id="barraLateral"
     @FXML private BarraLateralController barraLateralController;
 
+    // Cada cuánto se mira si algún movimiento recurrente ya toca (por si la aplicación se queda abierta de un día para otro)
+    private static final Duration REVISION_RECURRENTES = Duration.minutes(15);
+
+    private final RecurrenteService recurrentes = new RecurrenteService();
+    private Timeline revisionRecurrentes;
     private Runnable alCerrarSesion = () -> { };
 
     /**
@@ -55,7 +67,51 @@ public class MainController {
                 lblInicialesSuperior.setText(Formato.iniciales(SesionActual.getUsuario().getNombre()));
             }
         });
+        // Los movimientos recurrentes que ya tocan se añaden antes de pintar nada, y después se revisan cada cierto tiempo
+        if (generarRecurrentes() > 0) {
+            barraLateralController.refrescarCuentas();
+        }
         barraLateralController.seleccionarSeccion(Seccion.VISTA_GENERAL);
+        revisionRecurrentes = new Timeline(new KeyFrame(REVISION_RECURRENTES, e -> revisarRecurrentes()));
+        revisionRecurrentes.setCycleCount(Animation.INDEFINITE);
+        revisionRecurrentes.play();
+    }
+
+    /**
+     * Añade los movimientos recurrentes que ya tocan hasta hoy. Si falla, no impide usar la aplicación.
+     * @return Devuelve cuántos movimientos se han añadido
+     */
+    private int generarRecurrentes() {
+        Usuario usuario = SesionActual.getUsuario();
+        if (usuario == null) {
+            return 0;
+        }
+        try {
+            return recurrentes.generarPendientes(usuario);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    /**
+     * Revisión periódica de los movimientos recurrentes. Si se han añadido movimientos, se vuelve a abrir lo que se
+     * estaba viendo para que aparezcan y se actualizan los saldos. No hace nada mientras haya una ventana abierta
+     * encima (por ejemplo, añadiendo un movimiento): se queda para la próxima revisión. Se detiene sola cuando se
+     * cierra la sesión.
+     */
+    private void revisarRecurrentes() {
+        if (SesionActual.getUsuario() == null || contenido.getScene() == null) {
+            revisionRecurrentes.stop();
+            return;
+        }
+        long ventanasAbiertas = Window.getWindows().stream().filter(Window::isShowing).count();
+        if (ventanasAbiertas > 1) {
+            return;
+        }
+        if (generarRecurrentes() > 0) {
+            barraLateralController.recargarActivo();
+        }
     }
 
     /**

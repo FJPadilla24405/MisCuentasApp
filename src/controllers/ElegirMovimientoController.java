@@ -14,23 +14,34 @@ import javafx.stage.Window;
 
 /**
  * Controlador de ElegirMovimientoDialog.fxml: primera ventana de "Añadir movimiento". Pregunta si se
- * quiere añadir a mano o importar un archivo. Importar todavía no está hecho: su opción sale desactivada.
+ * quiere añadir a mano o importar un archivo.
  *
  * @author Fco Padilla
  */
 public class ElegirMovimientoController {
 
+    /**
+     * Lo que se ha elegido en la ventana.
+     */
+    public enum Opcion {
+        // Se ha cerrado la ventana sin elegir
+        NINGUNA,
+        // Escribir el movimiento a mano
+        MANUAL,
+        // Cargar varios movimientos desde un archivo
+        IMPORTAR
+    }
+
     @FXML private Button btnManual;
 
-    // true si se ha elegido añadir manualmente
-    private boolean manual = false;
+    private Opcion elegida = Opcion.NINGUNA;
 
     /**
      * Abre la ventana y espera a que se cierre.
      * @param propietario: ventana desde la que se abre (queda bloqueada hasta que se cierre)
-     * @return Devuelve true si se ha elegido añadir manualmente, false si se ha cancelado
+     * @return Devuelve la opción elegida (NINGUNA si se ha cancelado)
      */
-    public static boolean preguntar(Window propietario) {
+    public static Opcion preguntar(Window propietario) {
         try {
             FXMLLoader loader = new FXMLLoader(ElegirMovimientoController.class.getResource("/screens/dialogs/ElegirMovimientoDialog.fxml"));
             Parent raiz = loader.load();
@@ -43,7 +54,7 @@ public class ElegirMovimientoController {
             ventana.setResizable(false);
             ventana.setScene(new Scene(raiz));
             ventana.showAndWait();
-            return controlador.manual;
+            return controlador.elegida;
         } catch (IOException e) {
             throw new UncheckedIOException("No se pudo abrir la ventana de añadir movimiento", e);
         }
@@ -54,7 +65,16 @@ public class ElegirMovimientoController {
      */
     @FXML
     private void elegirManual() {
-        manual = true;
+        elegida = Opcion.MANUAL;
+        cerrar();
+    }
+
+    /**
+     * Elige importar un archivo y cierra la ventana
+     */
+    @FXML
+    private void elegirImportar() {
+        elegida = Opcion.IMPORTAR;
         cerrar();
     }
 

@@ -1517,3 +1517,74 @@
     -fx-padding: 0 12 0 12;
     -fx-font-size: 12px;
 }
+
+
+/* ===== Importar movimientos ===== */
+.importar-raiz {
+    -fx-background-color: -mc-fondo;
+}
+.importar-tarjeta {
+    -fx-padding: 20 24 20 24;
+}
+.importar-barra {
+    -fx-background-color: white;
+    -fx-border-color: -mc-borde-suave;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 14 28 14 28;
+}
+.importar-panel-formato {
+    -fx-background-color: -mc-fondo;
+    -fx-background-radius: 10;
+    -fx-padding: 14 16 14 16;
+}
+/* Zona donde se arrastra el archivo */
+.zona-archivo {
+    -fx-background-color: #f7faf8;
+    -fx-background-radius: 14;
+    -fx-border-color: -mc-borde;
+    -fx-border-radius: 14;
+    -fx-border-style: dashed;
+    -fx-border-width: 1.5;
+    -fx-padding: 24;
+}
+.zona-archivo-activa {
+    -fx-background-color: #e8f1ec;
+    -fx-border-color: -mc-verde;
+}
+/* Una columna obligatoria sin elegir */
+.combo-campo.combo-error {
+    -fx-border-color: -mc-error;
+}
+/* Categoría de una fila de la vista previa: se pulsa para cambiarla */
+.importar-categoria {
+    -fx-text-fill: -mc-texto;
+    -fx-cursor: hand;
+}
+.importar-categoria:hover {
+    -fx-text-fill: -mc-verde;
+    -fx-underline: true;
+}
+.importar-categoria-nueva {
+    -fx-text-fill: -mc-aviso;
+}
+.estado-valido {
+    -fx-text-fill: -mc-verde;
+    -fx-font-size: 12px;
+}
+.estado-duplicado {
+    -fx-text-fill: -mc-aviso;
+    -fx-font-size: 12px;
+}
+.estado-error {
+    -fx-text-fill: -mc-error;
+    -fx-font-size: 12px;
+}
+.estado-icono-valido {
+    -fx-stroke: -mc-verde;
+}
+.estado-icono-duplicado {
+    -fx-stroke: -mc-aviso;
+}
+.estado-icono-error {
+    -fx-stroke: -mc-error;
+}

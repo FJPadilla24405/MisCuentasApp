@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
-<!-- Primera ventana de "Añadir movimiento": añadirlo a mano o importar un archivo (importar todavía no está hecho) -->
+<!-- Primera ventana de "Añadir movimiento": añadirlo a mano o importar un archivo -->
 <VBox prefWidth="460.0" spacing="14.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ElegirMovimientoController">
    <padding>
       <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
@@ -42,7 +42,7 @@
          </graphic>
       </Button>
 
-      <Button disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="opcion-movimiento">
+      <Button fx:id="btnImportar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#elegirImportar" styleClass="opcion-movimiento">
          <graphic>
             <HBox alignment="CENTER_LEFT" spacing="14.0">
                <children>
@@ -58,7 +58,7 @@
                   <VBox spacing="3.0">
                      <children>
                         <Label styleClass="tarjeta-cuenta-nombre" text="Importar un archivo" />
-                        <Label styleClass="tarjeta-cuenta-tipo" text="Próximamente: carga varios movimientos de una vez." />
+                        <Label styleClass="tarjeta-cuenta-tipo" text="Carga varios movimientos de una vez desde un CSV o un Excel." />
                      </children>
                   </VBox>
                </children>

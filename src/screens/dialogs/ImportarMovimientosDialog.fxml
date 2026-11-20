@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<!-- Segundo paso de importar: el archivo elegido, la asignación de columnas y la vista previa con un check por movimiento. Las filas de la vista previa las crea ImportarMovimientosController -->
+<VBox prefHeight="740.0" prefWidth="1020.0" styleClass="importar-raiz" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ImportarMovimientosController">
+   <children>
+      <ScrollPane fx:id="scroll" fitToWidth="true" hbarPolicy="NEVER" styleClass="resumen-scroll" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="18.0">
+               <padding>
+                  <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+               </padding>
+               <children>
+
+                  <!-- Archivo -->
+                  <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="tarjeta, importar-tarjeta">
+                     <children>
+                        <StackPane styleClass="icono-caja">
+                           <children>
+                              <Group>
+                                 <children>
+                                    <SVGPath content="M14 3 H7 A2 2 0 0 0 5 5 V19 A2 2 0 0 0 7 21 H17 A2 2 0 0 0 19 19 V8 Z M14 3 V8 H19 M9 13 H15 M9 17 H13" scaleX="0.67" scaleY="0.67" styleClass="icono" />
+                                 </children>
+                              </Group>
+                           </children>
+                        </StackPane>
+                        <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label fx:id="lblArchivo" styleClass="tarjeta-cuenta-nombre" />
+                              <Label fx:id="lblArchivoDetalle" styleClass="texto-suave-pequeno" />
+                           </children>
+                        </VBox>
+                        <Label styleClass="pastilla" text="Archivo válido" />
+                        <Button mnemonicParsing="false" onAction="#cambiarArchivo" styleClass="boton-secundario" text="Cambiar archivo" />
+                     </children>
+                  </HBox>
+
+                  <!-- Asignación de columnas -->
+                  <VBox spacing="16.0" styleClass="tarjeta, importar-tarjeta">
+                     <children>
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label styleClass="tarjeta-titulo" text="Asignación de columnas" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Label fx:id="lblReconocido" styleClass="texto-suave-pequeno" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="16.0">
+                           <children>
+                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Fecha *" />
+                                    <ComboBox fx:id="cmbFecha" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Concepto *" />
+                                    <ComboBox fx:id="cmbConcepto" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Importe *" />
+                                    <ComboBox fx:id="cmbImporte" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox spacing="16.0">
+                           <children>
+                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Categoría (opcional)" />
+                                    <ComboBox fx:id="cmbCategoria" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Subcategoría (opcional)" />
+                                    <ComboBox fx:id="cmbSubcategoria" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Nota (opcional)" />
+                                    <ComboBox fx:id="cmbNota" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="14.0">
+                           <children>
+                              <Label fx:id="lblFormato" styleClass="texto-suave-pequeno" />
+                              <Hyperlink fx:id="enlaceFormato" onAction="#alternarFormato" styleClass="enlace" text="Configurar formato" />
+                           </children>
+                        </HBox>
+                        <VBox fx:id="panelFormato" managed="false" spacing="12.0" styleClass="importar-panel-formato" visible="false">
+                           <children>
+                              <HBox spacing="16.0">
+                                 <children>
+                                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="campo-etiqueta" text="Fila de títulos" />
+                                          <ComboBox fx:id="cmbTitulos" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                       </children>
+                                    </VBox>
+                                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="campo-etiqueta" text="Formato de fecha" />
+                                          <ComboBox fx:id="cmbFormatoFecha" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                       </children>
+                                    </VBox>
+                                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="campo-etiqueta" text="Separador decimal" />
+                                          <ComboBox fx:id="cmbDecimal" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                       </children>
+                                    </VBox>
+                                    <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="campo-etiqueta" text="Gastos" />
+                                          <ComboBox fx:id="cmbSigno" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <Label styleClass="texto-suave-pequeno" text="Las fechas y los importes de un Excel ya vienen bien: estas opciones solo importan cuando están escritos como texto." wrapText="true" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+
+                  <!-- Vista previa -->
+                  <VBox spacing="14.0" styleClass="tarjeta, importar-tarjeta">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                           <children>
+                              <Label styleClass="tarjeta-titulo" text="Vista previa de los movimientos" />
+                              <Region HBox.hgrow="ALWAYS" />
+                              <Label fx:id="lblAvisos" styleClass="texto-suave-pequeno" />
+                              <Label fx:id="pastillaValidos" styleClass="pastilla" />
+                           </children>
+                        </HBox>
+                        <Label fx:id="lblMensaje" managed="false" styleClass="texto-suave" visible="false" wrapText="true" />
+                        <VBox fx:id="vistaPrevia" />
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+
+      <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="importar-barra">
+         <children>
+            <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="lblSeleccion" maxWidth="1.7976931348623157E308" styleClass="texto-suave" wrapText="true" />
+                  <Label fx:id="lblError" managed="false" styleClass="mensaje-error" visible="false" wrapText="true" />
+               </children>
+            </VBox>
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#cancelar" prefWidth="110.0" styleClass="boton-secundario" text="Cancelar" />
+            <Button fx:id="btnImportar" defaultButton="true" mnemonicParsing="false" onAction="#importar" prefWidth="230.0" styleClass="boton-primario" text="Importar" />
+         </children>
+      </HBox>
+   </children>
+</VBox>
