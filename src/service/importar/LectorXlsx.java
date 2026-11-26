@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamReader;
  * Lee un libro de Excel moderno (.xlsx) sin ninguna librería: es un zip con XML dentro. Se lee la primera hoja visible
  * que tenga datos, con sus textos compartidos y los estilos de número para saber qué celdas son fechas.
  *
- * @author Fco Padilla
+ * @author Fco Padilla + Claude
  */
 final class LectorXlsx {
 

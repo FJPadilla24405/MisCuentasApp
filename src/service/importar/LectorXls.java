@@ -15,7 +15,7 @@ import java.util.Map;
  * compartidos, y una celda por registro (texto, número, fecha, fórmula...). Solo lee los datos de las celdas de la
  * primera hoja visible que tenga algo; ignora formatos, imágenes, combinaciones de celdas y todo lo demás.
  *
- * @author Fco Padilla
+ * @author Claude
  */
 final class LectorXls {
 

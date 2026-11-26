@@ -59,7 +59,7 @@ import util.tema.Tema;
  * si se sale de la pantalla sin guardar, vuelve el tema guardado. Los colores del tema personalizado se guardan en un
  * archivo de este equipo (TemaService), no en la base de datos.
  *
- * @author Fco Padilla
+ * @author Fco Padilla + Claude
  */
 public class PerfilController {
 

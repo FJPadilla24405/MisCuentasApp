@@ -65,7 +65,7 @@ import service.importar.ImportacionService.SignoGasto;
  * quieran. Los duplicados salen sin marcar y los que tienen errores no se pueden marcar. Se abre con
  * ImportarMovimientosController.mostrar(...), que antes pide el archivo.
  *
- * @author Fco Padilla
+ * @author Fco Padilla + Claude
  */
 public class ImportarMovimientosController {
 

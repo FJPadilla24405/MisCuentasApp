@@ -31,7 +31,7 @@ import util.Dinero;
  * elegidos; relaciona las categorías del archivo con las de la aplicación; avisa de lo que ya existe; y, al final,
  * guarda en una sola transacción las filas marcadas (si algo falla, no se guarda ninguna).
  *
- * @author Fco Padilla
+ * @author Claude
  */
 public class ImportacionService {
 

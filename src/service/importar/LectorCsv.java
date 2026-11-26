@@ -13,7 +13,7 @@ import java.util.List;
  * o Windows-1252, que es la de los CSV que se guardan en Excel en español), el separador (punto y coma, coma,
  * tabulador o barra vertical) y las comillas. Todas las celdas se devuelven como texto.
  *
- * @author Fco Padilla
+ * @author Fco Padilla + Claude
  */
 final class LectorCsv {
 

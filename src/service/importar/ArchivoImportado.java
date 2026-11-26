@@ -12,6 +12,7 @@ import java.util.List;
  * @param tipo: tipo de archivo detectado
  * @param hoja: nombre de la hoja leída (null en un CSV)
  * @param filas: filas con datos, sin filas vacías (cada fila tiene tantas celdas como columnas haya hasta su última celda con algo)
+ * 
  * @author Fco Padilla
  */
 public record ArchivoImportado(String nombre, long bytes, TipoArchivo tipo, String hoja, List<List<Object>> filas) {
