@@ -1,4 +1,4 @@
-package service.presupuesto;
+package service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,7 +16,6 @@ import models.Cuenta;
 import models.Movimiento;
 import models.Presupuesto;
 import models.Usuario;
-import service.categoria.CategoriaService;
 import service.dao.CuentaDAO;
 import service.dao.MovimientoDAO;
 import service.dao.PresupuestoDAO;

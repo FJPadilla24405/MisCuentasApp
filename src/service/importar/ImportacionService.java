@@ -19,8 +19,9 @@ import models.Categoria;
 import models.Cuenta;
 import models.Movimiento;
 import models.Usuario;
-import service.categoria.CategoriaService;
-import service.connections.DatabaseManager;
+import service.CategoriaService;
+import service.DatabaseManager;
+import service.dao.CuentaDAO;
 import service.dao.MovimientoDAO;
 import util.Dinero;
 
@@ -136,8 +137,9 @@ public class ImportacionService {
      * @param categoria: columna de la categoría (opcional)
      * @param subcategoria: columna de la subcategoría (opcional)
      * @param nota: columna de la nota (opcional)
+     * @param saldo: columna del saldo de la cuenta después de cada movimiento (opcional)
      */
-    public record Columnas(int fecha, int concepto, int importe, int categoria, int subcategoria, int nota) {
+    public record Columnas(int fecha, int concepto, int importe, int categoria, int subcategoria, int nota, int saldo) {
 
         /**
          * @return Devuelve true si están asignadas las tres columnas obligatorias (fecha, concepto e importe)
@@ -152,8 +154,17 @@ public class ImportacionService {
      * @param importados: movimientos creados
      * @param categoriasNuevas: categorías creadas por no existir
      * @param ultimoMes: mes del movimiento más reciente de los importados
+     * @param saldoAjustado: true si se ha ajustado el saldo de la cuenta al del archivo
      */
-    public record Resultado(int importados, int categoriasNuevas, YearMonth ultimoMes) {
+    public record Resultado(int importados, int categoriasNuevas, YearMonth ultimoMes, boolean saldoAjustado) {
+    }
+
+    /**
+     * El saldo que figura en el archivo: el que tenía la cuenta después de su movimiento más reciente.
+     * @param saldo: saldo de la cuenta
+     * @param fecha: fecha de ese movimiento (el saldo es el de la cuenta al terminar ese día)
+     */
+    public record SaldoArchivo(BigDecimal saldo, LocalDate fecha) {
     }
 
     // Tope de movimientos por archivo
@@ -170,6 +181,7 @@ public class ImportacionService {
 
     private final CategoriaService categoriaService = new CategoriaService();
     private final MovimientoDAO movimientoDAO = new MovimientoDAO();
+    private final CuentaDAO cuentaDAO = new CuentaDAO();
 
     // ===== Títulos y columnas =====
 
@@ -292,6 +304,7 @@ public class ImportacionService {
         int concepto = mejor(claves, usada, ImportacionService::puntosConcepto);
         // La nota se busca la última: "observaciones" puede ser el concepto si no hay otra columna que lo sea
         int nota = mejor(claves, usada, ImportacionService::puntosNota);
+        int saldo = mejor(claves, usada, ImportacionService::puntosSaldo);
 
         // Lo que no se encuentra por el título, se busca por el contenido
         int desde = filaTitulos + 1;
@@ -304,7 +317,7 @@ public class ImportacionService {
         if (concepto < 0) {
             concepto = porContenido(archivo, desde, usada, c -> longitudMediaDeTexto(archivo, desde, c));
         }
-        return new Columnas(fecha, concepto, importe, categoria, subcategoria, nota);
+        return new Columnas(fecha, concepto, importe, categoria, subcategoria, nota, saldo);
     }
 
     // Cada una puntúa un título de columna ya normalizado: más puntos, mejor candidato (0 = no sirve)
@@ -347,6 +360,13 @@ public class ImportacionService {
             return 45;
         }
         return t.contains("referencia") ? 40 : 0;
+    }
+
+    private static int puntosSaldo(String t) {
+        if (t.contains("saldo") || t.contains("balance")) {
+            return t.contains("disponible") || t.contains("contable") || t.contains("final") || t.startsWith("saldo") ? 100 : 80;
+        }
+        return 0;
     }
 
     private static int puntosSubcategoria(String t) {
@@ -601,6 +621,7 @@ public class ImportacionService {
             fila.setFecha(fecha);
             fila.setConcepto(conceptoDe(celda(celdas, columnas.concepto()), celda(celdas, columnas.categoria())));
             fila.setNota(notaDe(celda(celdas, columnas.nota())));
+            fila.setSaldo(importeDe(celda(celdas, columnas.saldo()), decimales));
 
             if (fecha == null) {
                 fila.setEstado(FilaImportada.Estado.ERROR, "Fecha no válida");
@@ -861,6 +882,78 @@ public class ImportacionService {
         return sinTildes.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", " ").trim();
     }
 
+    // ===== Saldo =====
+
+    /**
+     * Busca el saldo del archivo: el de la fila con la fecha más reciente (cualquier fila con fecha y saldo, esté marcada o no,
+     * porque el saldo es el de la cuenta en el banco). Si hay varias del mismo día, se queda con la última según el orden en
+     * que el banco las escribe: la primera si el archivo va de lo más reciente a lo más antiguo, y la última si va al revés.
+     * @param filas: filas interpretadas
+     * @return Devuelve el saldo y su fecha, o null si ninguna fila trae saldo
+     */
+    public SaldoArchivo saldoDelArchivo(List<FilaImportada> filas) {
+        LocalDate primera = null;
+        LocalDate ultima = null;
+        for (FilaImportada f : filas) {
+            if (f.getFecha() != null) {
+                if (primera == null) {
+                    primera = f.getFecha();
+                }
+                ultima = f.getFecha();
+            }
+        }
+        // Va de lo más reciente a lo más antiguo si la primera fecha no es anterior a la última
+        boolean descendente = primera != null && !primera.isBefore(ultima);
+        FilaImportada elegida = null;
+        for (FilaImportada f : filas) {
+            if (f.getFecha() == null || f.getSaldo() == null) {
+                continue;
+            }
+            if (elegida == null || f.getFecha().isAfter(elegida.getFecha())
+                    || (f.getFecha().isEqual(elegida.getFecha()) && !descendente)) {
+                elegida = f;
+            }
+        }
+        return elegida == null ? null : new SaldoArchivo(elegida.getSaldo(), elegida.getFecha());
+    }
+
+    /**
+     * Calcula lo que ya suma la cuenta hasta una fecha sin contar lo que se va a importar: su saldo inicial más sus ingresos
+     * menos sus gastos de ese día y de los anteriores.
+     * @param cuenta: cuenta a la que se importa
+     * @param hasta: fecha (incluida)
+     * @return Devuelve el saldo de la cuenta a esa fecha con los movimientos que ya tiene
+     */
+    public BigDecimal saldoBase(Cuenta cuenta, LocalDate hasta) {
+        BigDecimal saldo = saldoInicialActual(cuenta);
+        for (Movimiento m : movimientoDAO.listarPorCuenta(cuenta.getId())) {
+            if (m.getFecha() != null && m.getFecha().compareTo(hasta.toString()) <= 0) {
+                saldo = saldo.add("ingreso".equals(m.getTipo()) ? m.getImporte() : m.getImporte().negate());
+            }
+        }
+        return saldo;
+    }
+
+    /**
+     * Suma lo que aportan unas filas (ingresos menos gastos) hasta una fecha
+     * @param filas: filas a sumar (las que se van a importar)
+     * @param hasta: fecha (incluida)
+     * @return Devuelve la suma con signo
+     */
+    public static BigDecimal sumaHasta(List<FilaImportada> filas, LocalDate hasta) {
+        BigDecimal suma = Dinero.CERO;
+        for (FilaImportada f : filas) {
+            if (f.getFecha() != null && !f.getFecha().isAfter(hasta) && f.getImporteConSigno() != null) {
+                suma = suma.add(f.getImporteConSigno());
+            }
+        }
+        return suma;
+    }
+
+    private BigDecimal saldoInicialActual(Cuenta cuenta) {
+        return cuentaDAO.buscarPorId(cuenta.getId()).map(Cuenta::getSaldoInicial).orElse(cuenta.getSaldoInicial());
+    }
+
     // ===== Importar =====
 
     /**
@@ -873,6 +966,22 @@ public class ImportacionService {
      * @throws RuntimeException si falla la base de datos (no se ha guardado nada)
      */
     public Resultado importar(Usuario usuario, Cuenta cuenta, List<FilaImportada> filas) {
+        return importar(usuario, cuenta, filas, null);
+    }
+
+    /**
+     * Igual que importar sin más, y además, si se pasa el saldo del archivo, ajusta el saldo de la cuenta al terminar. El
+     * ajuste cambia el saldo inicial de la cuenta para que, a la fecha del saldo del archivo, la cuenta tenga justo ese saldo
+     * (con los movimientos que ya tenía y los importados). Los movimientos posteriores a esa fecha siguen sumándose encima.
+     * Todo va en la misma transacción.
+     * @param usuario: usuario de la sesión
+     * @param cuenta: cuenta a la que se importa
+     * @param filas: filas marcadas en la vista previa
+     * @param ajustarAlSaldo: saldo del archivo al que se ajusta la cuenta, o null para no tocar el saldo
+     * @return Devuelve cuántos movimientos y categorías se han creado, el mes del más reciente y si se ha ajustado el saldo
+     * @throws RuntimeException si falla la base de datos o el saldo no es válido (no se ha guardado nada)
+     */
+    public Resultado importar(Usuario usuario, Cuenta cuenta, List<FilaImportada> filas, SaldoArchivo ajustarAlSaldo) {
         Connection conn = DatabaseManager.getConnection();
         boolean autoCommit;
         try {
@@ -905,8 +1014,13 @@ public class ImportacionService {
                     ultima = f.getFecha();
                 }
             }
+            boolean ajustado = false;
+            if (ajustarAlSaldo != null) {
+                ajustarSaldoInicial(cuenta, ajustarAlSaldo);
+                ajustado = true;
+            }
             conn.commit();
-            return new Resultado(importados, creadas.size(), ultima == null ? YearMonth.now() : YearMonth.from(ultima));
+            return new Resultado(importados, creadas.size(), ultima == null ? YearMonth.now() : YearMonth.from(ultima), ajustado);
         } catch (SQLException | RuntimeException e) {
             try {
                 conn.rollback();
@@ -921,6 +1035,27 @@ public class ImportacionService {
                 // La conexión se vuelve a configurar al abrir la siguiente operación
             }
         }
+    }
+
+    /**
+     * Cambia el saldo inicial de la cuenta para que, a la fecha del saldo del archivo, la cuenta tenga ese saldo: el saldo
+     * inicial pasa a ser el saldo del archivo menos lo que suman los movimientos de la cuenta hasta esa fecha (los que
+     * tenía y los recién importados, que ya están en la base de datos dentro de la misma transacción).
+     */
+    private void ajustarSaldoInicial(Cuenta cuenta, SaldoArchivo saldoArchivo) {
+        Cuenta actual = cuentaDAO.buscarPorId(cuenta.getId()).orElseThrow(() -> new IllegalStateException("La cuenta ya no existe"));
+        BigDecimal movimientos = Dinero.CERO;
+        for (Movimiento m : movimientoDAO.listarPorCuenta(cuenta.getId())) {
+            if (m.getFecha() != null && m.getFecha().compareTo(saldoArchivo.fecha().toString()) <= 0) {
+                movimientos = movimientos.add("ingreso".equals(m.getTipo()) ? m.getImporte() : m.getImporte().negate());
+            }
+        }
+        try {
+            actual.setSaldoInicial(Dinero.normalizar(saldoArchivo.saldo().subtract(movimientos)));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("El saldo del archivo no es válido: es demasiado grande.", e);
+        }
+        cuentaDAO.actualizar(actual);
     }
 
     private Categoria crearCategoria(Usuario usuario, String nombre, String tipo, String subcategoria) {

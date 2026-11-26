@@ -1,7 +1,7 @@
 package service.dao;
 
 import models.Usuario;
-import service.connections.DatabaseManager;
+import service.DatabaseManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

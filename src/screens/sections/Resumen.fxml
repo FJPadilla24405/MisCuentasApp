@@ -143,7 +143,7 @@
                               <Region HBox.hgrow="ALWAYS" />
                               <Group>
                                  <children>
-                                    <SVGPath content="M12 21 V11 M12 12 C12 8 9 6 5 6 C5 10 8 12 12 12 Z M12 14 C12 11 14.5 9 18 9 C18 12.5 15.5 14 12 14 Z" scaleX="0.67" scaleY="0.67" styleClass="icono, icono-ingreso" />
+                                    <SVGPath content="m 0 0 L 4 0 C 12 0 12 -22 4 -22 L 0 -22 C -8 -22 -8 0 0 0 M 0 -22 C 8 -22 8 0 0 0" scaleX="0.60" scaleY="0.60" styleClass="icono, icono-ingreso" />
                                  </children>
                               </Group>
                            </children>

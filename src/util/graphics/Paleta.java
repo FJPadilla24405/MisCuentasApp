@@ -1,37 +1,99 @@
 package util.graphics;
 
+import java.util.List;
+
 import javafx.scene.paint.Color;
+import util.tema.ColoresTema;
+import util.tema.ColoresTema.Grafica;
 
 /**
- * Colores de las gráficas, sacados de la maqueta (verdes de la aplicación y un azul grisáceo para variar).
+ * Colores de las gráficas. Cambian con el tema de la aplicación (ver util.Tema): las gráficas se dibujan en un
+ * lienzo y no pueden usar las variables de CSS. Los informes PDF son siempre claros, así que el exportador
+ * pide el tema claro mientras los dibuja (soloClaro).
  *
  * @author Fco Padilla
  */
 public final class Paleta {
 
-    // Barras de ingresos, línea del balance acumulado y primer trozo del donut
-    public static final Color INGRESOS = Color.web("#287a57");
-    // Barras de gastos
-    public static final Color GASTOS = Color.web("#a9c7b3");
-    // Textos de los ejes
-    public static final Color TEXTO_SUAVE = Color.web("#6b7a72");
-    // Texto del elemento resaltado
-    public static final Color TITULO = Color.web("#1b3a2d");
-    // Líneas de la cuadrícula
-    public static final Color CUADRICULA = Color.web("#e6ebe8");
-    // Línea del cero y anillo vacío del donut
-    public static final Color BASE = Color.web("#d3dbd6");
-    // Trozo del donut que agrupa las categorías pequeñas
-    public static final Color OTRAS = Color.web("#c3cbc6");
+    /**
+     * Los colores de un tema, ya como Color
+     */
+    private record Juego(Color ingresos, Color gastos, Color textoSuave, Color titulo, Color cuadricula, Color base,
+            Color otras, Color superficie, List<Color> categorias) {
 
-    // Colores de las categorías del donut, de la más gastada a la menos
-    private static final Color[] CATEGORIAS = {
-            Color.web("#287a57"), Color.web("#a9c7b3"), Color.web("#8aa4c2"),
-            Color.web("#cfe0d4"), Color.web("#6fa383"), Color.web("#d6dcd8")
-    };
+        static Juego de(Grafica g) {
+            return new Juego(Color.web(g.ingresos()), Color.web(g.gastos()), Color.web(g.textoSuave()),
+                    Color.web(g.titulo()), Color.web(g.cuadricula()), Color.web(g.base()), Color.web(g.otras()),
+                    Color.web(g.superficie()), g.categorias().stream().map(Color::web).toList());
+        }
+    }
+
+    private static final Juego CLARO = Juego.de(ColoresTema.GRAFICA_CLARA);
+    private static Juego actual = CLARO;
+    private static boolean soloClaro;
 
     // No se instancia
     private Paleta() {
+    }
+
+    /**
+     * Cambia los colores de las gráficas (lo hace Tema al cambiar de tema)
+     * @param grafica: colores nuevos
+     */
+    public static void usar(Grafica grafica) {
+        actual = Juego.de(grafica);
+    }
+
+    /**
+     * Fuerza, o deja de forzar, los colores del tema claro (para los informes PDF, que son siempre claros)
+     * @param activo: true para usar siempre los colores claros
+     */
+    public static void soloClaro(boolean activo) {
+        soloClaro = activo;
+    }
+
+    private static Juego juego() {
+        return soloClaro ? CLARO : actual;
+    }
+
+    /** @return Barras de ingresos, línea del balance acumulado y primer trozo del donut */
+    public static Color ingresos() {
+        return juego().ingresos();
+    }
+
+    /** @return Barras de gastos */
+    public static Color gastos() {
+        return juego().gastos();
+    }
+
+    /** @return Textos de los ejes */
+    public static Color textoSuave() {
+        return juego().textoSuave();
+    }
+
+    /** @return Texto del elemento resaltado */
+    public static Color titulo() {
+        return juego().titulo();
+    }
+
+    /** @return Líneas de la cuadrícula */
+    public static Color cuadricula() {
+        return juego().cuadricula();
+    }
+
+    /** @return Línea del cero y anillo vacío del donut */
+    public static Color base() {
+        return juego().base();
+    }
+
+    /** @return Trozo del donut que agrupa las categorías pequeñas */
+    public static Color otras() {
+        return juego().otras();
+    }
+
+    /** @return Color de las tarjetas, para rellenar los puntos de la línea */
+    public static Color superficie() {
+        return juego().superficie();
     }
 
     /**
@@ -39,6 +101,7 @@ public final class Paleta {
      * @return Devuelve el color que le toca (se repiten si hay más categorías que colores)
      */
     public static Color categoria(int posicion) {
-        return CATEGORIAS[posicion % CATEGORIAS.length];
+        List<Color> categorias = juego().categorias();
+        return categorias.get(posicion % categorias.size());
     }
 }

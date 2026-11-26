@@ -36,6 +36,7 @@ public final class FilaImportada {
     private String nombreCategoriaNueva;
     private String subcategoriaNueva;
     private String nota;
+    private BigDecimal saldo;
     private Estado estado;
     private String motivo;
 
@@ -149,6 +150,17 @@ public final class FilaImportada {
      */
     public String getSubcategoriaNueva() {
         return subcategoriaNueva;
+    }
+
+    /**
+     * @return Devuelve el saldo que el archivo dice que tenía la cuenta después de este movimiento, o null si no lo trae
+     */
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
+    void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
     }
 
     /**

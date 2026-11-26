@@ -1,7 +1,7 @@
 package service.auth;
 
 import models.Usuario;
-import service.categoria.CategoriaService;
+import service.CategoriaService;
 import service.dao.UsuarioDAO;
 import service.sync.FirebaseAuthClient;
 import service.sync.FirebaseAuthClient.AuthException;

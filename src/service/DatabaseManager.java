@@ -1,4 +1,4 @@
-package service.connections;
+package service;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +45,8 @@ public class DatabaseManager {
                 }
                 aplicarEsquema();
                 migrar();
+                // Desde aquí se apunta cuándo cambian los datos (se usa en los avisos de subir y descargar)
+                service.sync.CambiosLocales.vigilar(connection);
             } catch (IOException | SQLException e) {
                 throw new RuntimeException("No se pudo inicializar la base de datos", e);
             }

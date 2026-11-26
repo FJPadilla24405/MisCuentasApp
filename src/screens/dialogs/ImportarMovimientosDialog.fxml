@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
@@ -59,46 +60,53 @@
                         </HBox>
                         <HBox spacing="16.0">
                            <children>
-                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                              <VBox prefWidth="10.0" spacing="6.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <Label styleClass="campo-etiqueta" text="Fecha *" />
                                     <ComboBox fx:id="cmbFecha" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
                                  </children>
                               </VBox>
-                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                              <VBox prefWidth="10.0" spacing="6.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <Label styleClass="campo-etiqueta" text="Concepto *" />
                                     <ComboBox fx:id="cmbConcepto" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
                                  </children>
                               </VBox>
-                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                              <VBox prefWidth="10.0" spacing="6.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <Label styleClass="campo-etiqueta" text="Importe *" />
                                     <ComboBox fx:id="cmbImporte" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
+                                 </children>
+                              </VBox>
+                              <VBox prefWidth="10.0" spacing="6.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="campo-etiqueta" text="Saldo (opcional)" />
+                                    <ComboBox fx:id="cmbSaldo" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
                                  </children>
                               </VBox>
                            </children>
                         </HBox>
                         <HBox spacing="16.0">
                            <children>
-                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                              <VBox prefWidth="10.0" spacing="6.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <Label styleClass="campo-etiqueta" text="Categoría (opcional)" />
                                     <ComboBox fx:id="cmbCategoria" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
                                  </children>
                               </VBox>
-                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                              <VBox prefWidth="10.0" spacing="6.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <Label styleClass="campo-etiqueta" text="Subcategoría (opcional)" />
                                     <ComboBox fx:id="cmbSubcategoria" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
                                  </children>
                               </VBox>
-                              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                              <VBox prefWidth="10.0" spacing="6.0" HBox.hgrow="ALWAYS">
                                  <children>
                                     <Label styleClass="campo-etiqueta" text="Nota (opcional)" />
                                     <ComboBox fx:id="cmbNota" maxWidth="1.7976931348623157E308" styleClass="combo-campo" />
                                  </children>
                               </VBox>
+                              <Region prefWidth="10.0" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="14.0">
@@ -140,6 +148,15 @@
                               <Label styleClass="texto-suave-pequeno" text="Las fechas y los importes de un Excel ya vienen bien: estas opciones solo importan cuando están escritos como texto." wrapText="true" />
                            </children>
                         </VBox>
+                     </children>
+                  </VBox>
+
+                  <!-- Saldo: solo se ve si el archivo trae una columna de saldo -->
+                  <VBox fx:id="cajaSaldo" managed="false" spacing="10.0" styleClass="tarjeta, importar-tarjeta" visible="false">
+                     <children>
+                        <Label styleClass="tarjeta-titulo" text="Saldo de la cuenta" />
+                        <CheckBox fx:id="chkAjustarSaldo" mnemonicParsing="false" />
+                        <Label fx:id="lblSaldoDetalle" styleClass="texto-suave-pequeno" wrapText="true" />
                      </children>
                   </VBox>
 

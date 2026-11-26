@@ -12,7 +12,22 @@
     -mc-tramo: #e2e8e2;
     -mc-aviso: #d98a1b;
     -mc-error: #c0392b;
-    
+
+    /* Variables que completan la paleta. Los temas oscuro y personalizado las redefinen (ver util/Tema.java) */
+    -mc-superficie: #ffffff;
+    -mc-sobre-verde: #ffffff;
+    -mc-sobre-cabecera: #ffffff;
+    -mc-sobre-cabecera-suave: #cfe0d6;
+    -mc-acento-texto: #153f30;
+    -mc-tenue: #8a9a92;
+    -mc-icono: #7a8a82;
+    -mc-borde-fuerte: #b9c6bf;
+    -mc-pista: #e9eeea;
+    -mc-gasto: #d9732b;
+    -mc-negativo: #b8443a;
+    -mc-error-fondo: #fdeeea;
+    -mc-error-borde: #f3cfc8;
+
     -resumen-ingresos: #86ff7d;
     -resumen-gastos: #ffbe7d ;
     -resumen-balanceok: #7dffcb;
@@ -20,7 +35,7 @@
 
     -fx-font-family: "Segoe UI", "Inter", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     -fx-font-size: 13px;
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
 }
 
 /* ----- Cabecera ----- */
@@ -32,7 +47,7 @@
     -fx-max-height: 56;
 }
 .cabecera-titulo {
-    -fx-text-fill: white;
+    -fx-text-fill: -mc-sobre-cabecera;
     -fx-font-size: 18px;
     -fx-font-weight: bold;
 }
@@ -41,21 +56,21 @@
     -fx-background-radius: 20;
     -fx-min-width: 34;
     -fx-min-height: 34;
-    -fx-pref-width: 34;
-    -fx-pref-height: 34;
+    -fx-pref-width: 50;
+    -fx-pref-height: 50;
 }
 .logo .icono {
-    -fx-stroke: white;
+    -fx-stroke: -mc-sobre-cabecera;
 }
 
 /* ----- Contenedor de la pantalla de acceso ----- */
 .auth-raiz {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
 }
 .auth-scroll,
 .auth-scroll > .viewport {
-    -fx-background: white;
-    -fx-background-color: white;
+    -fx-background: -mc-superficie;
+    -fx-background-color: -mc-superficie;
     -fx-padding: 0;
 }
 
@@ -86,7 +101,7 @@
     -fx-font-size: 11px;
 }
 .campo-caja {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 8;
     -fx-border-color: -mc-borde;
     -fx-border-radius: 8;
@@ -107,15 +122,15 @@
     -fx-background-radius: 0;
     -fx-padding: 0;
     -fx-text-fill: -mc-texto;
-    -fx-prompt-text-fill: #9aa8a0;
-    -fx-highlight-fill: #cfe5da;
+    -fx-prompt-text-fill: -mc-tenue;
+    -fx-highlight-fill: derive(-mc-activo, -6%);
     -fx-highlight-text-fill: -mc-texto;
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
 }
 .icono {
     -fx-fill: transparent;
-    -fx-stroke: #7a8a82;
+    -fx-stroke: -mc-icono;
     -fx-stroke-width: 2;
     -fx-stroke-line-cap: round;
     -fx-stroke-line-join: round;
@@ -155,10 +170,10 @@
     -fx-font-size: 12px;
 }
 .check-box > .box {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 4;
     -fx-background-insets: 0;
-    -fx-border-color: #b9c6bf;
+    -fx-border-color: -mc-borde-fuerte;
     -fx-border-radius: 4;
     -fx-padding: 3 4 3 4;
 }
@@ -170,14 +185,14 @@
     -fx-background-color: transparent;
 }
 .check-box:selected > .box > .mark {
-    -fx-background-color: white;
+    -fx-background-color: -mc-sobre-verde;
 }
 
 /* ----- Botones y enlaces ----- */
 .boton-primario {
     -fx-background-color: -mc-verde;
     -fx-background-radius: 8;
-    -fx-text-fill: white;
+    -fx-text-fill: -mc-sobre-verde;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-min-height: 40;
@@ -192,7 +207,7 @@
     -fx-opacity: 0.7;
 }
 .boton-secundario {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 8;
     -fx-border-color: -mc-borde;
     -fx-border-radius: 8;
@@ -203,7 +218,7 @@
     -fx-cursor: hand;
 }
 .boton-secundario:hover {
-    -fx-background-color: #f3f6f4;
+    -fx-background-color: -mc-hover;
 }
 .enlace,
 .enlace:visited {
@@ -219,10 +234,10 @@
 
 /* ----- Popups (Alert) ----- */
 .dialog-pane {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
 }
 .dialog-pane > .header-panel {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-padding: 20 24 0 24;
 }
 .dialog-pane > .header-panel > .label {
@@ -235,7 +250,7 @@
     -fx-padding: 10 24 18 24;
 }
 .dialog-pane > .button-bar > .container {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-padding: 0 24 20 24;
 }
 .dialog-pane .button {
@@ -255,8 +270,8 @@
 /* ===== Ventana legal (condiciones y privacidad) ===== */
 .legal-scroll,
 .legal-scroll > .viewport {
-    -fx-background: white;
-    -fx-background-color: white;
+    -fx-background: -mc-superficie;
+    -fx-background-color: -mc-superficie;
     -fx-padding: 0;
 }
 .legal-contenido {
@@ -286,7 +301,7 @@
     -fx-border-color: -mc-borde transparent transparent transparent;
 }
 .legal-tabs > .tab-header-area > .tab-header-background {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
 }
 .legal-tabs > .tab-header-area > .headers-region > .tab {
     -fx-background-color: transparent;
@@ -323,7 +338,7 @@
     -fx-background-color: -mc-fondo;
 }
 .barra-lateral {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-border-color: transparent -mc-borde-suave transparent transparent;
     -fx-border-width: 0 1 0 0;
 }
@@ -339,7 +354,7 @@
     -fx-pref-height: 38;
 }
 .logo-barra .icono {
-    -fx-stroke: white;
+    -fx-stroke: -mc-sobre-cabecera;
 }
 .barra-titulo {
     -fx-text-fill: -mc-titulo;
@@ -347,16 +362,16 @@
 }
 .barra-scroll,
 .barra-scroll > .viewport {
-    -fx-background: white;
-    -fx-background-color: white;
+    -fx-background: -mc-superficie;
+    -fx-background-color: -mc-superficie;
     -fx-padding: 0;
 }
 .barra-contenido {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-padding: 0 12 12 12;
 }
 .barra-seccion {
-    -fx-text-fill: #8a9a92;
+    -fx-text-fill: -mc-tenue;
     -fx-font-size: 10px;
     -fx-padding: 16 8 6 8;
 }
@@ -383,17 +398,17 @@
 .nav-item.activo:hover,
 .nav-item.activo:focused {
     -fx-background-color: -mc-activo;
-    -fx-text-fill: -mc-cabecera;
+    -fx-text-fill: -mc-acento-texto;
 }
 .nav-item.activo .icono {
-    -fx-stroke: -mc-cabecera;
+    -fx-stroke: -mc-acento-texto;
 }
 .nav-cuenta-nombre {
     -fx-text-fill: -mc-texto;
     -fx-font-size: 13px;
 }
 .nav-item.activo .nav-cuenta-nombre {
-    -fx-text-fill: -mc-cabecera;
+    -fx-text-fill: -mc-acento-texto;
 }
 .nav-saldo {
     -fx-text-fill: -mc-suave;
@@ -410,7 +425,7 @@
     -fx-padding: 6 4 0 12;
 }
 .avatar {
-    -fx-background-color: #d8eadf;
+    -fx-background-color: derive(-mc-activo, -4%);
     -fx-background-radius: 16;
     -fx-min-width: 32;
     -fx-min-height: 32;
@@ -445,7 +460,7 @@
 
 /* Ventana "Añadir cuenta": selector de tipo */
 .opcion-tipo {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-background-radius: 8;
     -fx-border-color: -mc-borde;
@@ -463,15 +478,15 @@
 .opcion-tipo:selected {
     -fx-background-color: -mc-activo;
     -fx-border-color: -mc-verde;
-    -fx-text-fill: -mc-cabecera;
+    -fx-text-fill: -mc-acento-texto;
 }
 .opcion-tipo:selected .icono {
-    -fx-stroke: -mc-cabecera;
+    -fx-stroke: -mc-acento-texto;
 }
 
 /* ===== Barra superior de la pantalla principal ===== */
 .barra-superior {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-border-color: transparent transparent -mc-borde-suave transparent;
     -fx-border-width: 0 0 1 0;
     -fx-padding: 0 28 0 28;
@@ -512,7 +527,7 @@
 
 /* Botones blancos con borde: mes, exportar, buscador y filtro */
 .boton-filtro {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-background-radius: 10;
     -fx-border-color: -mc-borde;
@@ -534,18 +549,18 @@
     -fx-padding: 0 0 0 2;
 }
 .boton-filtro > .arrow-button > .arrow {
-    -fx-background-color: #7a8a82;
+    -fx-background-color: -mc-icono;
 }
 .buscador,
 .buscador:hover {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-cursor: text;
     -fx-padding: 0 12 0 14;
 }
 
 /* Tarjetas de resumen */
 .kpi {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 14;
     -fx-border-color: -mc-borde-suave;
     -fx-border-radius: 14;
@@ -565,7 +580,7 @@
     -fx-border-color: -mc-borde-suave
 }
 .kpi-balance {
-	-fx-background-color: white;
+	-fx-background-color: -mc-superficie;
     -fx-border-color: -mc-borde-suave;
 }
 .kpi-balance-ok {
@@ -575,7 +590,7 @@
     -fx-background-color: -resumen-balancemal;
 }
 .kpi-titulo {
-    -fx-text-fill: -mc-cabecera;
+    -fx-text-fill: -mc-acento-texto;
     -fx-font-size: 12px;
 }
 .kpi-valor {
@@ -588,27 +603,27 @@
     -fx-font-size: 12px;
 }
 .kpi-principal .kpi-titulo {
-    -fx-text-fill: #cfe0d6;
+    -fx-text-fill: -mc-sobre-cabecera-suave;
 }
 .kpi-principal .kpi-valor {
-    -fx-text-fill: white;
+    -fx-text-fill: -mc-sobre-cabecera;
 }
 .kpi-principal .kpi-detalle {
-    -fx-text-fill: #a9c4b5;
+    -fx-text-fill: derive(-mc-sobre-cabecera-suave, -20%);
 }
 .kpi-principal .icono {
-    -fx-stroke: white;
+    -fx-stroke: -mc-sobre-cabecera;
 }
 .icono-ingreso {
     -fx-stroke: -mc-verde;
 }
 .icono-gasto {
-    -fx-stroke: #d9732b;
+    -fx-stroke: -mc-gasto;
 }
 
 /* Tarjeta de cada cuenta */
 .tarjeta-cuenta {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-background-radius: 14;
     -fx-border-color: -mc-borde-suave;
@@ -619,7 +634,7 @@
 }
 .tarjeta-cuenta:hover,
 .tarjeta-cuenta:focused {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-border-color: -mc-verde;
 }
 .tarjeta-cuenta-nombre {
@@ -637,7 +652,7 @@
     -fx-font-weight: bold;
 }
 .icono-caja {
-    -fx-background-color: #e8f1ec;
+    -fx-background-color: -mc-activo;
     -fx-background-radius: 10;
     -fx-min-width: 34;
     -fx-min-height: 34;
@@ -647,12 +662,12 @@
     -fx-max-height: 34;
 }
 .icono-caja .icono {
-    -fx-stroke: -mc-cabecera;
+    -fx-stroke: -mc-acento-texto;
 }
 
 /* Tarjeta de movimientos y tabla */
 .tarjeta {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 14;
     -fx-border-color: -mc-borde-suave;
     -fx-border-radius: 14;
@@ -667,18 +682,18 @@
     -fx-font-weight: bold;
 }
 .pastilla {
-    -fx-background-color: #e3efe8;
+    -fx-background-color: -mc-activo;
     -fx-background-radius: 20;
     -fx-text-fill: -mc-verde;
     -fx-font-size: 11px;
     -fx-padding: 3 10 3 10;
 }
 .tabla-cabecera {
-    -fx-background-color: #f1f5f2;
+    -fx-background-color: -mc-hover;
     -fx-padding: 9 20 9 20;
 }
 .tabla-titulo {
-    -fx-text-fill: #8a9a92;
+    -fx-text-fill: -mc-tenue;
     -fx-font-size: 10px;
 }
 .tabla-fila {
@@ -688,7 +703,7 @@
     -fx-alignment: CENTER_LEFT;
 }
 .tabla-fila:hover {
-    -fx-background-color: #fafcfb;
+    -fx-background-color: -mc-hover;
 }
 .tabla-fecha,
 .tabla-texto {
@@ -721,7 +736,7 @@
     -fx-spacing: 16;
 }
 .avatar-grande {
-    -fx-background-color: #d8eadf;
+    -fx-background-color: derive(-mc-activo, -4%);
     -fx-background-radius: 24;
     -fx-min-width: 48;
     -fx-min-height: 48;
@@ -744,16 +759,16 @@
     -fx-font-weight: bold;
 }
 .campo-caja.solo-lectura {
-    -fx-background-color: #f5f7f5;
+    -fx-background-color: -mc-fondo;
 }
 .campo-caja.solo-lectura .campo-input {
     -fx-text-fill: -mc-suave;
 }
 .boton-suave {
-    -fx-background-color: #e8f1ec;
+    -fx-background-color: -mc-activo;
     -fx-background-insets: 0;
     -fx-background-radius: 10;
-    -fx-text-fill: -mc-cabecera;
+    -fx-text-fill: -mc-acento-texto;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-min-height: 38;
@@ -763,15 +778,15 @@
 }
 .boton-suave:hover,
 .boton-suave:focused {
-    -fx-background-color: #dcebe2;
+    -fx-background-color: derive(-mc-activo, -4%);
 }
 .boton-suave .icono {
-    -fx-stroke: -mc-cabecera;
+    -fx-stroke: -mc-acento-texto;
 }
 
 /* Selector de moneda */
 .combo-campo {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-background-radius: 10;
     -fx-border-color: -mc-borde;
@@ -783,7 +798,7 @@
 }
 .combo-campo:focused,
 .combo-campo:showing {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-border-color: -mc-verde;
 }
 .combo-campo > .list-cell {
@@ -796,12 +811,12 @@
     -fx-padding: 0 12 0 0;
 }
 .combo-campo > .arrow-button > .arrow {
-    -fx-background-color: #7a8a82;
+    -fx-background-color: -mc-icono;
 }
 
-/* Tarjetas de tema (solo se guarda la elección) */
+/* Tarjetas de tema: claro, oscuro y personalizado */
 .tema-card {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 10;
     -fx-border-color: -mc-borde;
     -fx-border-radius: 10;
@@ -809,7 +824,7 @@
     -fx-cursor: hand;
 }
 .tema-card:hover {
-    -fx-border-color: #b9c6bf;
+    -fx-border-color: -mc-borde-fuerte;
 }
 .tema-card.seleccionado {
     -fx-border-color: -mc-verde;
@@ -862,15 +877,28 @@
 .tema-oscuro .tv-barra {
     -fx-background-color: #a9c4b5;
 }
-.tema-sistema {
-    -fx-background-color: #d5dcd7;
+/* El tema personalizado no tiene colores aquí: su vista previa los toma de lo que el usuario elige (PerfilController) */
+
+/* Editor de colores del tema personalizado */
+.panel-colores {
+    -fx-background-color: -mc-fondo;
+    -fx-background-radius: 10;
+    -fx-padding: 14 16 14 16;
 }
-.tema-sistema .tv-lateral,
-.tema-sistema .tv-bloque {
-    -fx-background-color: #e8ece9;
+.color-grupo {
+    -fx-text-fill: -mc-tenue;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 0 0 0;
 }
-.tema-sistema .tv-barra {
-    -fx-background-color: #7a8a82;
+.color-etiqueta {
+    -fx-text-fill: -mc-texto;
+    -fx-font-size: 12px;
+}
+.selector-color {
+    -fx-color-label-visible: false;
+    -fx-min-width: 56;
+    -fx-pref-width: 56;
 }
 
 /* Lista de cuentas del perfil */
@@ -908,12 +936,12 @@
     -fx-graphic-text-gap: 8;
 }
 .boton-primario .icono {
-    -fx-stroke: white;
+    -fx-stroke: -mc-sobre-verde;
 }
 .pastilla-alerta {
-    -fx-background-color: #fbe6e2;
+    -fx-background-color: -mc-error-fondo;
     -fx-background-radius: 20;
-    -fx-text-fill: #b0392f;
+    -fx-text-fill: -mc-negativo;
     -fx-font-size: 11px;
     -fx-padding: 3 10 3 10;
 }
@@ -925,31 +953,31 @@
     -fx-padding: 12 16 12 16;
 }
 .aviso-alerta {
-    -fx-background-color: #fdeeea;
-    -fx-border-color: #f3cfc8;
+    -fx-background-color: -mc-error-fondo;
+    -fx-border-color: -mc-error-borde;
 }
 .aviso-alerta .icono {
-    -fx-stroke: #b0392f;
+    -fx-stroke: -mc-negativo;
 }
 .aviso-alerta .aviso-texto {
-    -fx-text-fill: #b0392f;
+    -fx-text-fill: -mc-negativo;
     -fx-font-size: 12px;
 }
 .aviso-ok {
-    -fx-background-color: #e8f1ec;
-    -fx-border-color: #cfe3d7;
+    -fx-background-color: -mc-activo;
+    -fx-border-color: derive(-mc-activo, -8%);
 }
 .aviso-ok .icono {
     -fx-stroke: -mc-verde;
 }
 .aviso-ok .aviso-texto {
-    -fx-text-fill: -mc-cabecera;
+    -fx-text-fill: -mc-acento-texto;
     -fx-font-size: 12px;
 }
 
 /* Tarjeta de cada presupuesto */
 .presupuesto-card {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 14;
     -fx-border-color: -mc-borde-suave;
     -fx-border-radius: 14;
@@ -976,7 +1004,7 @@
     -fx-font-weight: bold;
 }
 .presupuesto-valor-alerta {
-    -fx-text-fill: #b0392f;
+    -fx-text-fill: -mc-negativo;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
@@ -986,7 +1014,7 @@
     -fx-max-height: 8;
 }
 .barra-presupuesto > .track {
-    -fx-background-color: #e8ece9;
+    -fx-background-color: -mc-pista;
     -fx-background-insets: 0;
     -fx-background-radius: 4;
 }
@@ -997,7 +1025,7 @@
     -fx-padding: 0;
 }
 .barra-presupuesto.alerta > .bar {
-    -fx-background-color: #b8443a;
+    -fx-background-color: -mc-negativo;
 }
 
 /* Ventana del presupuesto */
@@ -1019,7 +1047,7 @@
     -fx-padding: 0;
     -fx-text-fill: -mc-titulo;
     -fx-font-size: 30px;
-    -fx-prompt-text-fill: #b9c6bf;
+    -fx-prompt-text-fill: -mc-borde-fuerte;
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
 }
@@ -1032,7 +1060,7 @@
     -fx-border-color: -mc-error;
 }
 .opcion-alcance {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 10;
     -fx-border-color: -mc-borde;
     -fx-border-radius: 10;
@@ -1046,14 +1074,14 @@
     -fx-background-color: -mc-hover;
 }
 .opcion-alcance:selected {
-    -fx-background-color: #e8f1ec;
+    -fx-background-color: -mc-activo;
     -fx-border-color: -mc-verde;
 }
 .opcion-alcance .radio {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-background-radius: 8;
-    -fx-border-color: #b9c6bf;
+    -fx-border-color: -mc-borde-fuerte;
     -fx-border-radius: 8;
 }
 .opcion-alcance:selected .radio {
@@ -1066,14 +1094,14 @@
     -fx-background-color: -mc-verde;
 }
 .opcion-alcance:selected .icono {
-    -fx-stroke: -mc-cabecera;
+    -fx-stroke: -mc-acento-texto;
 }
 .boton-peligro {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-radius: 8;
-    -fx-border-color: #f3cfc8;
+    -fx-border-color: -mc-error-borde;
     -fx-border-radius: 8;
-    -fx-text-fill: #b0392f;
+    -fx-text-fill: -mc-negativo;
     -fx-font-size: 13px;
     -fx-min-height: 40;
     -fx-pref-height: 40;
@@ -1081,14 +1109,14 @@
     -fx-cursor: hand;
 }
 .boton-peligro:hover {
-    -fx-background-color: #fdeeea;
+    -fx-background-color: -mc-error-fondo;
 }
 
 /* ===== Listas con scroll en el perfil (cuentas y categorías) ===== */
 .lista-scroll,
 .lista-scroll > .viewport {
-    -fx-background: white;
-    -fx-background-color: white;
+    -fx-background: -mc-superficie;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-padding: 0;
 }
@@ -1103,7 +1131,7 @@
     -fx-border-color: transparent;
 }
 .lista-scroll > .scroll-bar > .thumb {
-    -fx-background-color: #cdd8d1;
+    -fx-background-color: -mc-borde-fuerte;
     -fx-background-radius: 4;
     -fx-background-insets: 0;
 }
@@ -1130,7 +1158,7 @@
 
 /* ===== Añadir movimiento ===== */
 .segmentado {
-    -fx-background-color: #eef1ee;
+    -fx-background-color: -mc-pista;
     -fx-background-radius: 10;
     -fx-padding: 3;
 }
@@ -1144,7 +1172,7 @@
     -fx-cursor: hand;
 }
 .segmento-opcion:selected {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-text-fill: -mc-verde;
     -fx-font-weight: bold;
 }
@@ -1153,7 +1181,7 @@
     -fx-font-size: 30px;
 }
 .date-campo {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-background-radius: 10;
     -fx-border-color: -mc-borde;
@@ -1183,10 +1211,10 @@
     -fx-padding: 0 12 0 0;
 }
 .date-campo > .arrow-button > .arrow {
-    -fx-background-color: #7a8a82;
+    -fx-background-color: -mc-icono;
 }
 .opcion-movimiento {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-background-radius: 12;
     -fx-border-color: -mc-borde;
@@ -1198,7 +1226,7 @@
 }
 .opcion-movimiento:hover,
 .opcion-movimiento:focused {
-    -fx-background-color: #f5f9f6;
+    -fx-background-color: -mc-hover;
     -fx-border-color: -mc-verde;
 }
 .opcion-movimiento:disabled {
@@ -1211,7 +1239,7 @@
 
 /* Interruptor Mes / Año */
 .vista-segmentada {
-    -fx-background-color: #e9efeb;
+    -fx-background-color: -mc-pista;
     -fx-background-radius: 10;
     -fx-padding: 3;
     -fx-spacing: 2;
@@ -1234,7 +1262,7 @@
 .vista-opcion:selected,
 .vista-opcion:selected:focused,
 .vista-opcion:selected:armed {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-text-fill: -mc-titulo;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(21, 63, 48, 0.14), 4, 0, 0, 1);
@@ -1266,7 +1294,7 @@
     -fx-font-weight: bold;
 }
 .nota-insight {
-    -fx-background-color: #f1f6f3;
+    -fx-background-color: -mc-hover;
     -fx-background-radius: 10;
     -fx-padding: 9 12 9 12;
 }
@@ -1274,7 +1302,7 @@
     -fx-stroke: -mc-verde;
 }
 .pastilla-destacada {
-    -fx-background-color: #e3efe8;
+    -fx-background-color: -mc-activo;
     -fx-background-radius: 20;
     -fx-padding: 5 12 5 10;
 }
@@ -1317,7 +1345,7 @@
     -fx-font-weight: bold;
 }
 .balance-negativo {
-    -fx-text-fill: #b8443a;
+    -fx-text-fill: -mc-negativo;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
 }
@@ -1328,7 +1356,7 @@
 }
 .tabla-total,
 .tabla-total:hover {
-    -fx-background-color: #e8f1ec;
+    -fx-background-color: -mc-activo;
 }
 
 /* Barra superior: moneda y tema (solo en la vista anual) */
@@ -1371,7 +1399,7 @@
 .formato-opcion,
 .formato-opcion:focused,
 .formato-opcion:armed {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-background-insets: 0;
     -fx-background-radius: 12;
     -fx-border-color: -mc-borde;
@@ -1384,12 +1412,12 @@
     -fx-cursor: hand;
 }
 .formato-opcion:hover {
-    -fx-background-color: #f5f9f6;
+    -fx-background-color: -mc-hover;
 }
 .formato-opcion:selected,
 .formato-opcion:selected:focused,
 .formato-opcion:selected:hover {
-    -fx-background-color: #e8f1ec;
+    -fx-background-color: -mc-activo;
     -fx-border-color: -mc-verde;
 }
 .formato-nombre {
@@ -1435,7 +1463,7 @@
     -fx-font-weight: bold;
 }
 .pdf-saldo {
-    -fx-background-color: #e8f1ec;
+    -fx-background-color: -mc-activo;
     -fx-background-radius: 14;
     -fx-padding: 22 26 22 26;
 }
@@ -1462,7 +1490,7 @@
     -fx-text-fill: -mc-verde;
 }
 .pdf-kpi-negativo {
-    -fx-text-fill: #b8443a;
+    -fx-text-fill: -mc-negativo;
 }
 .pdf-linea {
     -fx-background-color: -mc-borde-suave;
@@ -1517,6 +1545,16 @@
     -fx-padding: 0 12 0 12;
     -fx-font-size: 12px;
 }
+/* Todavía más pequeño: el de desactivar una recurrencia, junto a su etiqueta */
+.boton-micro {
+    -fx-min-height: 22;
+    -fx-pref-height: 22;
+    -fx-max-height: 22;
+    -fx-padding: 0 8 0 8;
+    -fx-font-size: 11px;
+    -fx-background-radius: 11;
+    -fx-border-radius: 11;
+}
 
 
 /* ===== Importar movimientos ===== */
@@ -1527,7 +1565,7 @@
     -fx-padding: 20 24 20 24;
 }
 .importar-barra {
-    -fx-background-color: white;
+    -fx-background-color: -mc-superficie;
     -fx-border-color: -mc-borde-suave;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 14 28 14 28;
@@ -1539,7 +1577,7 @@
 }
 /* Zona donde se arrastra el archivo */
 .zona-archivo {
-    -fx-background-color: #f7faf8;
+    -fx-background-color: -mc-fondo;
     -fx-background-radius: 14;
     -fx-border-color: -mc-borde;
     -fx-border-radius: 14;
@@ -1548,7 +1586,7 @@
     -fx-padding: 24;
 }
 .zona-archivo-activa {
-    -fx-background-color: #e8f1ec;
+    -fx-background-color: -mc-activo;
     -fx-border-color: -mc-verde;
 }
 /* Una columna obligatoria sin elegir */

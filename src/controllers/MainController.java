@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -19,7 +18,7 @@ import models.Cuenta;
 import models.Usuario;
 import service.auth.SesionActual;
 import service.movimiento.RecurrenteService;
-import util.Formato;
+import service.perfil.TemaService;
 import util.Seccion;
 
 /**
@@ -34,11 +33,6 @@ import util.Seccion;
 public class MainController {
 
     @FXML private StackPane contenido;
-    // Barra superior: apartado actual (migas de pan) e iniciales del usuario
-    @FXML private Label lblMiga;
-    @FXML private Label lblInicialesSuperior;
-    // Moneda y tema (solo se enseña en la vista anual de Gráficas y resúmenes)
-    @FXML private Label lblInfoSuperior;
     // Controlador de la barra lateral incluida con fx:include fx:id="barraLateral"
     @FXML private BarraLateralController barraLateralController;
 
@@ -54,18 +48,14 @@ public class MainController {
      */
     @FXML
     private void initialize() {
-        if (SesionActual.getUsuario() != null) {
-            lblInicialesSuperior.setText(Formato.iniciales(SesionActual.getUsuario().getNombre()));
-        }
         barraLateralController.setAlElegirSeccion(this::mostrarSeccion);
-        barraLateralController.setAlElegirCuenta(this::mostrarCuenta);
+        barraLateralController.setAlElegirCuenta(this::mostrarResumen);
         barraLateralController.setAlCerrarSesion(() -> alCerrarSesion.run());
         // Tras descargar datos de Firebase se vuelve a abrir lo que se estaba viendo y se rehacen nombre, iniciales y cuentas
         barraLateralController.setAlDescargar(() -> {
+            // La descarga puede haber cambiado el tema elegido
+            TemaService.aplicar(SesionActual.getUsuario());
             barraLateralController.recargarActivo();
-            if (SesionActual.getUsuario() != null) {
-                lblInicialesSuperior.setText(Formato.iniciales(SesionActual.getUsuario().getNombre()));
-            }
         });
         // Los movimientos recurrentes que ya tocan se añaden antes de pintar nada, y después se revisan cada cierto tiempo
         if (generarRecurrentes() > 0) {
@@ -143,8 +133,6 @@ public class MainController {
      * @param seccion: apartado elegido en la barra lateral
      */
     private void mostrarSeccion(Seccion seccion) {
-        lblMiga.setText(seccion.getTitulo());
-        ponerInfoSuperior("");
         if (seccion == Seccion.VISTA_GENERAL) {
             mostrarResumen(null);
             return;
@@ -154,7 +142,6 @@ public class MainController {
             return;
         }
         if (seccion == Seccion.PERFIL) {
-            lblMiga.setText("Mi perfil");
             mostrarPerfil();
             return;
         }
@@ -193,20 +180,9 @@ public class MainController {
     private void alCambiarPerfil() {
         barraLateralController.refrescarUsuario();
         barraLateralController.refrescarCuentas();
-        if (SesionActual.getUsuario() != null) {
-            lblInicialesSuperior.setText(Formato.iniciales(SesionActual.getUsuario().getNombre()));
-        }
     }
 
-    /**
-     * Muestra una cuenta con la misma pantalla de resumen que la vista general, pero solo con sus datos.
-     * @param cuenta: cuenta elegida en la barra lateral
-     */
-    private void mostrarCuenta(Cuenta cuenta) {
-        lblMiga.setText(cuenta.getNombre());
-        ponerInfoSuperior("");
-        mostrarResumen(cuenta);
-    }
+
 
     /**
      * Carga la pantalla de resumen (screens/sections/Resumen.fxml). Es una sola pantalla para la vista
@@ -241,24 +217,11 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/sections/Graficas.fxml"));
             Parent panel = loader.load();
             GraficasController graficas = loader.getController();
-            graficas.setAlCambiarMiga(lblMiga::setText);
-            graficas.setAlCambiarInfo(this::ponerInfoSuperior);
             graficas.iniciar();
             mostrarContenido(panel);
         } catch (IOException e) {
             throw new UncheckedIOException("No se pudo cargar las gráficas", e);
         }
-    }
-
-    /**
-     * Escribe el texto pequeño que va junto a la campana de la barra superior, o lo esconde si está vacío
-     * @param texto: por ejemplo "EUR · Tema claro"
-     */
-    private void ponerInfoSuperior(String texto) {
-        boolean hayTexto = texto != null && !texto.isBlank();
-        lblInfoSuperior.setText(hayTexto ? texto : "");
-        lblInfoSuperior.setVisible(hayTexto);
-        lblInfoSuperior.setManaged(hayTexto);
     }
 
     /**

@@ -100,10 +100,10 @@ public class GraficoBarras extends LienzoGrafico {
         for (int i = 0; i <= 2; i++) {
             double y = p.abajo() - (p.abajo() - p.arriba()) * i / 2;
             double linea = Math.round(y) + 0.5;
-            gc.setStroke(i == 0 ? Paleta.BASE : Paleta.CUADRICULA);
+            gc.setStroke(i == 0 ? Paleta.base() : Paleta.cuadricula());
             gc.setLineWidth(1);
             gc.strokeLine(p.izquierda(), linea, p.derecha(), linea);
-            gc.setFill(Paleta.TEXTO_SUAVE);
+            gc.setFill(Paleta.textoSuave());
             gc.fillText(Formato.monedaCorta(BigDecimal.valueOf(p.techo() * i / 2), moneda), p.izquierda() - SEPARACION_EJE + 2, y);
         }
 
@@ -117,13 +117,13 @@ public class GraficoBarras extends LienzoGrafico {
 
         for (int i = 0; i < n; i++) {
             double centro = p.izquierda() + anchoGrupo * (i + 0.5);
-            barra(gc, centro - hueco / 2 - anchoBarra, anchoBarra, ingresos.get(i), Paleta.INGRESOS, p);
-            barra(gc, centro + hueco / 2, anchoBarra, gastos.get(i), Paleta.GASTOS, p);
+            barra(gc, centro - hueco / 2 - anchoBarra, anchoBarra, ingresos.get(i), Paleta.ingresos(), p);
+            barra(gc, centro + hueco / 2, anchoBarra, gastos.get(i), Paleta.gastos(), p);
 
             gc.setTextAlign(TextAlignment.CENTER);
             gc.setTextBaseline(VPos.TOP);
             gc.setFont(i == resaltado ? FUENTE_EJE_NEGRITA : FUENTE_EJE);
-            gc.setFill(i == resaltado ? Paleta.TITULO : Paleta.TEXTO_SUAVE);
+            gc.setFill(i == resaltado ? Paleta.titulo() : Paleta.textoSuave());
             gc.fillText(etiquetas.get(i), centro, p.abajo() + 8);
         }
     }

@@ -1,4 +1,4 @@
-package service.categoria;
+package service;
 
 import java.util.Comparator;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.Locale;
 
 import models.Categoria;
 import models.Usuario;
-import service.DatoInvalido;
 import service.dao.CategoriaDAO;
 import service.dao.PresupuestoDAO;
 

@@ -20,8 +20,6 @@ import java.util.Map;
 final class LectorXls {
 
     private static final byte[] FIRMA_OLE2 = { (byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0, (byte) 0xA1, (byte) 0xB1, 0x1A, (byte) 0xE1 };
-    private static final int FIN_DE_CADENA = -2;
-    private static final int LIBRE = -1;
 
     // Registros de BIFF que se leen
     private static final int BOF = 0x0809;

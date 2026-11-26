@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
-<!-- Pantalla de editar perfil: datos personales, preferencias y cuentas. Los temas oscuro y sistema solo se guardan: todavía no cambian el aspecto -->
+<!-- Pantalla de editar perfil: datos personales, preferencias (moneda y tema: claro, oscuro o personalizado) y cuentas -->
 
 <ScrollPane fx:id="raiz" fitToWidth="true" hbarPolicy="NEVER" styleClass="resumen-scroll" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PerfilController">
    <content>
@@ -174,24 +174,25 @@
                               </HBox>
                            </children>
                         </VBox>
-                        <VBox fx:id="cardSistema" maxWidth="1.7976931348623157E308" onMouseClicked="#elegirSistema" prefWidth="100.0" spacing="8.0" styleClass="tema-card" HBox.hgrow="ALWAYS">
+                        <VBox fx:id="cardPersonal" maxWidth="1.7976931348623157E308" onMouseClicked="#elegirPersonal" prefWidth="100.0" spacing="8.0" styleClass="tema-card" HBox.hgrow="ALWAYS">
                            <children>
-                              <HBox spacing="6.0" styleClass="tema-vista, tema-sistema">
+                              <!-- Los colores de esta vista previa los pone PerfilController según lo que se elija abajo -->
+                              <HBox fx:id="vistaPersonal" spacing="6.0" styleClass="tema-vista">
                                  <children>
-                                    <Region styleClass="tv-lateral" />
+                                    <Region fx:id="vpLateral" styleClass="tv-lateral" />
                                     <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                        <children>
-                                          <Region styleClass="tv-barra" />
-                                          <Region styleClass="tv-bloque" VBox.vgrow="ALWAYS" />
+                                          <Region fx:id="vpBarra" styleClass="tv-barra" />
+                                          <Region fx:id="vpBloque" styleClass="tv-bloque" VBox.vgrow="ALWAYS" />
                                        </children>
                                     </VBox>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_LEFT">
                                  <children>
-                                    <Label styleClass="tema-nombre" text="Sistema" />
+                                    <Label styleClass="tema-nombre" text="Personalizado" />
                                     <Region HBox.hgrow="ALWAYS" />
-                                    <Group fx:id="checkSistema">
+                                    <Group fx:id="checkPersonal">
                                        <children>
                                           <SVGPath content="M12 3 A9 9 0 1 0 12 21 A9 9 0 1 0 12 3 Z M8 12 L11 15 L16 9" scaleX="0.75" scaleY="0.75" styleClass="icono, icono-ingreso" />
                                        </children>
@@ -202,6 +203,20 @@
                         </VBox>
                                        </children>
                                     </HBox>
+                                    <!-- Editor del tema personalizado: solo se ve con ese tema. Las filas las crea PerfilController -->
+                                    <VBox fx:id="panelPersonal" managed="false" spacing="10.0" styleClass="panel-colores" visible="false">
+                                       <children>
+                                          <Label styleClass="campo-etiqueta-fuerte" text="Colores del tema personalizado" />
+                                          <Label styleClass="texto-suave-pequeno" text="Elige el color de cada elemento y verás el resultado al momento. Pulsa «Guardar cambios» para conservarlo. Los colores se guardan solo en este equipo." wrapText="true" />
+                                          <VBox fx:id="listaColores" spacing="6.0" />
+                                          <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                             <children>
+                                                <Button mnemonicParsing="false" onAction="#basarEnClaro" styleClass="boton-filtro, boton-mini" text="Partir del claro" />
+                                                <Button mnemonicParsing="false" onAction="#basarEnOscuro" styleClass="boton-filtro, boton-mini" text="Partir del oscuro" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
                            </children>

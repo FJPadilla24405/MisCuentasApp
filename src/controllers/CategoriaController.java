@@ -19,7 +19,7 @@ import javafx.stage.Window;
 import models.Categoria;
 import models.Usuario;
 import service.DatoInvalido;
-import service.categoria.CategoriaService;
+import service.CategoriaService;
 import util.Campos;
 
 /**

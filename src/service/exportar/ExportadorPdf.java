@@ -106,24 +106,30 @@ public final class ExportadorPdf {
      * @throws IOException si no se puede escribir el archivo
      */
     public static void escribir(Path destino, DatosExportacion datos, List<Seccion> secciones) throws IOException {
-        List<Hoja> hojas = new ArrayList<>();
-        for (Seccion seccion : secciones) {
-            switch (seccion.nombre()) {
-                case ExportacionService.SECCION_RESUMEN -> hojas.add(hojaResumen(datos, seccion));
-                case ExportacionService.SECCION_GRAFICAS -> hojas.add(hojaGraficas(datos));
-                case ExportacionService.SECCION_MOVIMIENTOS ->
-                        hojas.addAll(hojasMovimientos(seccion.tablas().get(0), hojas.isEmpty(), datos.moneda()));
-                default -> { }
+        // El informe es siempre claro, aunque la aplicación esté en otro tema: las gráficas leen sus colores de Paleta
+        Paleta.soloClaro(true);
+        try {
+            List<Hoja> hojas = new ArrayList<>();
+            for (Seccion seccion : secciones) {
+                switch (seccion.nombre()) {
+                    case ExportacionService.SECCION_RESUMEN -> hojas.add(hojaResumen(datos, seccion));
+                    case ExportacionService.SECCION_GRAFICAS -> hojas.add(hojaGraficas(datos));
+                    case ExportacionService.SECCION_MOVIMIENTOS ->
+                            hojas.addAll(hojasMovimientos(seccion.tablas().get(0), hojas.isEmpty(), datos.moneda()));
+                    default -> { }
+                }
             }
-        }
-        String css = ExportadorPdf.class.getResource(CSS).toExternalForm();
-        List<Pagina> paginas = new ArrayList<>();
-        for (int i = 0; i < hojas.size(); i++) {
-            VBox pagina = montarPagina(hojas.get(i), i, hojas.size(), datos);
-            paginas.add(fotografiar(pagina, css));
-        }
-        try (var salida = Files.newOutputStream(destino)) {
-            PdfWriter.escribir(salida, "MisCuentas \u00b7 " + datos.periodo(), paginas);
+            String css = ExportadorPdf.class.getResource(CSS).toExternalForm();
+            List<Pagina> paginas = new ArrayList<>();
+            for (int i = 0; i < hojas.size(); i++) {
+                VBox pagina = montarPagina(hojas.get(i), i, hojas.size(), datos);
+                paginas.add(fotografiar(pagina, css));
+            }
+            try (var salida = Files.newOutputStream(destino)) {
+                PdfWriter.escribir(salida, "MisCuentas \u00b7 " + datos.periodo(), paginas);
+            }
+        } finally {
+            Paleta.soloClaro(false);
         }
     }
 
@@ -307,7 +313,7 @@ public final class ExportadorPdf {
         leyenda.setPrefWrapLength(ANCHO_UTIL);
         for (int i = 0; i < trozos.size(); i++) {
             Porcion p = trozos.get(i);
-            Color color = agrupado && i == trozos.size() - 1 ? Paleta.OTRAS : Paleta.categoria(i);
+            Color color = agrupado && i == trozos.size() - 1 ? Paleta.otras() : Paleta.categoria(i);
             double ancho = Math.max(3, disponible * p.importe().doubleValue() / total);
             Region trozo = new Region();
             trozo.setMinSize(ancho, 14);
@@ -368,7 +374,7 @@ public final class ExportadorPdf {
         StackPane huecoBarras = new StackPane(barras);
         fijarAlto(huecoBarras, 240);
 
-        HBox leyendaBarras = new HBox(14, puntoLeyenda(Paleta.INGRESOS, "Ingresos"), puntoLeyenda(Paleta.GASTOS, "Gastos"));
+        HBox leyendaBarras = new HBox(14, puntoLeyenda(Paleta.ingresos(), "Ingresos"), puntoLeyenda(Paleta.gastos(), "Gastos"));
         leyendaBarras.setAlignment(Pos.CENTER_RIGHT);
         VBox titulos = new VBox(2, etiqueta("Ingresos y gastos", "tarjeta-titulo"), etiqueta(subtitulo, "texto-suave-pequeno"));
         HBox.setHgrow(titulos, Priority.ALWAYS);
@@ -397,7 +403,7 @@ public final class ExportadorPdf {
         leyenda.setAlignment(Pos.CENTER_LEFT);
         for (int i = 0; i < trozos.size(); i++) {
             Porcion t = trozos.get(i);
-            Color color = agrupado && i == trozos.size() - 1 ? Paleta.OTRAS : Paleta.categoria(i);
+            Color color = agrupado && i == trozos.size() - 1 ? Paleta.otras() : Paleta.categoria(i);
             nombres.add(t.categoria());
             valores.add(t.importe());
             colores.add(color);

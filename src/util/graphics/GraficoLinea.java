@@ -109,12 +109,12 @@ public class GraficoLinea extends LienzoGrafico {
         }
         // Línea del cero
         double yCero = Math.round(posicionY(0, alto)) + 0.5;
-        gc.setStroke(Paleta.BASE);
+        gc.setStroke(Paleta.base());
         gc.setLineWidth(1);
         gc.strokeLine(MARGEN_LATERAL, yCero, ancho - MARGEN_LATERAL, yCero);
 
         // Línea del balance
-        gc.setStroke(Paleta.INGRESOS);
+        gc.setStroke(Paleta.ingresos());
         gc.setLineWidth(2.5);
         gc.setLineCap(StrokeLineCap.ROUND);
         gc.setLineJoin(StrokeLineJoin.ROUND);
@@ -133,16 +133,16 @@ public class GraficoLinea extends LienzoGrafico {
         // Punto en el último valor
         double xFinal = posicionX(n - 1, ancho);
         double yFinal = posicionY(valores.get(n - 1).doubleValue(), alto);
-        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.setFill(Paleta.superficie());
         gc.fillOval(xFinal - 4.5, yFinal - 4.5, 9, 9);
-        gc.setStroke(Paleta.INGRESOS);
+        gc.setStroke(Paleta.ingresos());
         gc.setLineWidth(2.5);
         gc.strokeOval(xFinal - 4.5, yFinal - 4.5, 9, 9);
 
         // Primera y última etiqueta
         double yEtiqueta = Math.max(alto - ALTO_ETIQUETAS, MARGEN_SUPERIOR + 10) + 12;
         gc.setFont(FUENTE_EJE);
-        gc.setFill(Paleta.TEXTO_SUAVE);
+        gc.setFill(Paleta.textoSuave());
         gc.setTextBaseline(VPos.TOP);
         gc.setTextAlign(TextAlignment.LEFT);
         gc.fillText(etiquetas.get(0), 2, yEtiqueta);

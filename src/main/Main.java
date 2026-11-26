@@ -12,7 +12,9 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import models.Usuario;
 import service.auth.SesionActual;
-import service.connections.DatabaseManager;
+import service.DatabaseManager;
+import service.perfil.TemaService;
+import util.tema.Tema;
 
 public class Main extends Application {
 
@@ -25,6 +27,8 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			// Hace que todas las ventanas lleven el tema elegido (claro, oscuro o personalizado)
+			Tema.iniciar();
 			ventana = primaryStage;
 			ventana.setTitle("MisCuentas");
 			// Al cerrar con datos sin subir a Firebase se avisa; el cierre real lo hace cerrarVentana() cuando se confirma
@@ -44,6 +48,8 @@ public class Main extends Application {
 	 * @throws Exception si no se puede cargar el FXML
 	 */
 	private void mostrarAcceso() throws Exception {
+		// La pantalla de acceso es siempre clara: el tema es de cada usuario y todavía no se sabe quién entra
+		Tema.usarClaro();
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/AuthScreen.fxml"));
 		Parent raiz = loader.load();
 		AuthController acceso = loader.getController();
@@ -57,6 +63,8 @@ public class Main extends Application {
 	 */
 	private void mostrarPrincipal(Usuario usuario) {
 		try {
+			// Tema del usuario que ha entrado
+			TemaService.aplicar(usuario);
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/screens/MainScreen.fxml"));
 			Parent raiz = loader.load();
 			MainController principal = loader.getController();

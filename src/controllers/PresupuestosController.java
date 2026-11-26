@@ -25,10 +25,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import models.Usuario;
 import service.auth.SesionActual;
-import service.presupuesto.PresupuestoService;
-import service.presupuesto.PresupuestoService.Estado;
-import service.presupuesto.PresupuestoService.FilaPresupuesto;
-import service.presupuesto.PresupuestoService.ResumenPresupuestos;
+import service.PresupuestoService;
+import service.PresupuestoService.Estado;
+import service.PresupuestoService.FilaPresupuesto;
+import service.PresupuestoService.ResumenPresupuestos;
 import util.Formato;
 import util.IconosCategoria;
 

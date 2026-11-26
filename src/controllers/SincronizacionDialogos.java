@@ -1,6 +1,9 @@
 package controllers;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -21,6 +24,7 @@ import models.Usuario;
 import service.auth.AuthService;
 import service.auth.SesionActual;
 import service.dao.UsuarioDAO;
+import service.sync.FechasSync;
 import service.sync.FirebaseAuthClient.AuthException;
 import service.sync.SincronizacionService;
 
@@ -34,6 +38,7 @@ import service.sync.SincronizacionService;
 public final class SincronizacionDialogos {
 
     private static final String CSS = "/screens/styles/application.css";
+    private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // No se instancia
     private SincronizacionDialogos() {
@@ -76,7 +81,9 @@ public final class SincronizacionDialogos {
     }
 
     /**
-     * Sube los datos locales a Firebase después de pedir confirmación
+     * Sube los datos locales a Firebase después de pedir confirmación. En la confirmación salen las fechas del último cambio
+     * de los datos de este equipo y de los de Firebase. Si en Firebase hay datos más recientes que los de este equipo (los subió
+     * otro equipo, o este nunca se ha sincronizado), se avisa de que se perderían.
      * @param owner: ventana sobre la que se muestran los diálogos
      * @param alTerminar: se ejecuta cuando se han subido los datos
      */
@@ -85,22 +92,30 @@ public final class SincronizacionDialogos {
         if (usuario == null || !SesionActual.isConectado()) {
             return;
         }
-        if (!confirmar(owner, "¿Subir tus datos a Firebase?",
-                "Los datos de este equipo reemplazarán a los que hay ahora en Firebase.", "Subir")) {
-            return;
-        }
-        ejecutar(owner, tarea(() -> {
-            new SincronizacionService().subir(usuario);
-            return Boolean.TRUE;
-        }), ok -> {
-            informar(owner, "Datos subidos", "Tus datos se han subido a Firebase.");
-            alTerminar.run();
+        // Primero se leen las fechas de Firebase (la ventana queda bloqueada un momento) y con ellas se pregunta
+        ejecutar(owner, tarea(() -> new SincronizacionService().fechas(usuario)), fechas -> {
+            boolean antiguos = fechas.firebaseConNovedades();
+            String titulo = antiguos ? "Los datos de este equipo son más antiguos" : "¿Subir tus datos a Firebase?";
+            String explicacion = antiguos
+                    ? "En Firebase hay datos más recientes que no están en este equipo. Si subes igualmente, se perderán."
+                    : "Los datos de este equipo reemplazarán a los que hay ahora en Firebase.";
+            if (!confirmar(owner, titulo, explicacion + "\n\n" + textoFechas(fechas), antiguos ? "Subir igualmente" : "Subir")) {
+                return;
+            }
+            ejecutar(owner, tarea(() -> {
+                new SincronizacionService().subir(usuario);
+                return Boolean.TRUE;
+            }), ok -> {
+                informar(owner, "Datos subidos", "Tus datos se han subido a Firebase.");
+                alTerminar.run();
+            });
         });
     }
 
     /**
-     * Descarga los datos de Firebase después de pedir confirmación. Si en este equipo hay cambios que no se han
-     * subido (es decir, lo que hay en Firebase está desactualizado), pide una segunda confirmación.
+     * Descarga los datos de Firebase después de pedir confirmación. En la confirmación salen las fechas del último cambio de
+     * los datos de este equipo y de los de Firebase. Si en este equipo hay cambios que no se han subido (es decir, lo que hay
+     * en Firebase está desactualizado), pide una segunda confirmación, también con las fechas.
      * @param owner: ventana sobre la que se muestran los diálogos
      * @param alTerminar: se ejecuta cuando se han descargado los datos, para que la pantalla se actualice
      */
@@ -109,31 +124,33 @@ public final class SincronizacionDialogos {
         if (usuario == null || !SesionActual.isConectado()) {
             return;
         }
-        if (!confirmar(owner, "¿Descargar los datos de Firebase?",
-                "Los datos de Firebase reemplazarán a los de este equipo.", "Descargar")) {
-            return;
-        }
-        boolean desactualizado;
-        try {
-            desactualizado = new SincronizacionService().hayCambiosSinSubir(usuario);
-        } catch (RuntimeException e) {
-            desactualizado = false;
-        }
-        if (desactualizado && !confirmar(owner, "Los datos de Firebase están desactualizados",
-                "En este equipo hay cambios que no se han subido a Firebase. Si descargas igualmente, "
-                        + "esos cambios se perderán.", "Descargar igualmente")) {
-            return;
-        }
-        ejecutar(owner, tarea(() -> new SincronizacionService().descargar(usuario)), hayDatos -> {
-            if (!hayDatos) {
+        // Primero se leen las fechas de Firebase (la ventana queda bloqueada un momento) y con ellas se pregunta
+        ejecutar(owner, tarea(() -> new SincronizacionService().fechas(usuario)), fechas -> {
+            if (!fechas.hayDatosEnFirebase()) {
                 informar(owner, "No hay datos en Firebase", "Todavía no has subido datos a Firebase, así que no hay nada que descargar. "
                         + "No se ha cambiado nada en este equipo.");
                 return;
             }
-            // La descarga puede cambiar el nombre, la moneda o el tema: se vuelve a leer el usuario
-            new UsuarioDAO().buscarPorId(usuario.getId()).ifPresent(SesionActual::actualizarUsuario);
-            informar(owner, "Datos descargados", "Los datos de Firebase ya están en este equipo.");
-            alTerminar.run();
+            if (!confirmar(owner, "¿Descargar los datos de Firebase?",
+                    "Los datos de Firebase reemplazarán a los de este equipo.\n\n" + textoFechas(fechas), "Descargar")) {
+                return;
+            }
+            if (fechas.cambiosLocalesSinSubir() && !confirmar(owner, "Los datos de Firebase están desactualizados",
+                    "En este equipo hay cambios que no se han subido a Firebase. Si descargas igualmente, "
+                            + "esos cambios se perderán.\n\n" + textoFechas(fechas), "Descargar igualmente")) {
+                return;
+            }
+            ejecutar(owner, tarea(() -> new SincronizacionService().descargar(usuario)), hayDatos -> {
+                if (!hayDatos) {
+                    informar(owner, "No hay datos en Firebase", "Todavía no has subido datos a Firebase, así que no hay nada que descargar. "
+                            + "No se ha cambiado nada en este equipo.");
+                    return;
+                }
+                // La descarga puede cambiar el nombre, la moneda o el tema: se vuelve a leer el usuario
+                new UsuarioDAO().buscarPorId(usuario.getId()).ifPresent(SesionActual::actualizarUsuario);
+                informar(owner, "Datos descargados", "Los datos de Firebase ya están en este equipo.");
+                alTerminar.run();
+            });
         });
     }
 
@@ -268,6 +285,24 @@ public final class SincronizacionDialogos {
         dialogo.getDialogPane().lookupButton(ok).getStyleClass().add("boton-primario");
         dialogo.getDialogPane().lookupButton(cancelar).getStyleClass().add("boton-secundario");
         return dialogo.showAndWait().filter(b -> b == ok).isPresent();
+    }
+
+    /**
+     * @param fechas: fechas del último cambio de los datos de este equipo y de los de Firebase
+     * @return Devuelve las dos fechas escritas en dos líneas, para enseñarlas en una confirmación
+     */
+    private static String textoFechas(FechasSync fechas) {
+        return "Último cambio en este equipo: " + escribirFecha(fechas.local(), "no se sabe") + "\n"
+                + "Último cambio en Firebase: " + (fechas.hayDatosEnFirebase() ? escribirFecha(fechas.firebase(), "sin fecha") : "todavía no hay datos");
+    }
+
+    /**
+     * @param fecha: instante, o null
+     * @param sinFecha: texto que se escribe si no hay fecha
+     * @return Devuelve la fecha y la hora en la zona horaria del equipo (por ejemplo 23/11/2026 09:38)
+     */
+    private static String escribirFecha(Instant fecha, String sinFecha) {
+        return fecha == null ? sinFecha : FORMATO_FECHA.format(fecha.atZone(ZoneId.systemDefault()));
     }
 
     /**

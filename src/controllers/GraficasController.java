@@ -44,6 +44,7 @@ import service.resumen.GraficasService.Mensual;
 import service.resumen.GraficasService.Porcion;
 import util.Formato;
 import util.IconosCategoria;
+import util.tema.Tema;
 import util.graphics.GraficoBarras;
 import util.graphics.GraficoDonut;
 import util.graphics.GraficoLinea;
@@ -94,6 +95,9 @@ public class GraficasController {
     @FXML private Label lblTasaDetalle;
     @FXML private GridPane gridGraficos;
     @FXML private Label lblBarrasSubtitulo;
+    // Puntos de la leyenda de las barras: toman el color de las barras según el tema
+    @FXML private Circle puntoIngresos;
+    @FXML private Circle puntoGastos;
     @FXML private StackPane huecoBarras;
     @FXML private VBox tarjetaCategorias;
     @FXML private Label lblCategoriasMes;
@@ -149,6 +153,8 @@ public class GraficasController {
         huecoDonut.getChildren().add(donut);
         linea = new GraficoLinea();
         huecoLinea.getChildren().add(linea);
+        puntoIngresos.setFill(Paleta.ingresos());
+        puntoGastos.setFill(Paleta.gastos());
 
         tglMes.setToggleGroup(grupoVista);
         tglAnio.setToggleGroup(grupoVista);
@@ -423,7 +429,7 @@ public class GraficasController {
         List<Color> colores = new ArrayList<>();
         for (int i = 0; i < trozos.size(); i++) {
             Porcion t = trozos.get(i);
-            Color color = agrupado && i == trozos.size() - 1 ? Paleta.OTRAS : Paleta.categoria(i);
+            Color color = agrupado && i == trozos.size() - 1 ? Paleta.otras() : Paleta.categoria(i);
             nombres.add(t.categoria());
             valores.add(t.importe());
             colores.add(color);
@@ -531,8 +537,7 @@ public class GraficasController {
      */
     private void pintarAnual(Usuario usuario, Anual d) {
         alCambiarMiga.accept("Gráficas / Resumen anual");
-        String tema = usuario.getTema() == null || usuario.getTema().isBlank() ? "claro" : usuario.getTema();
-        alCambiarInfo.accept(moneda + " · Tema " + tema);
+        alCambiarInfo.accept(moneda + " · Tema " + Tema.nombre(usuario.getTema()));
 
         // Cabecera
         mostrar(lblEtiqueta, true);

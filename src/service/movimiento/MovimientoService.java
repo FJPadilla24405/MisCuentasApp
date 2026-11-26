@@ -11,7 +11,7 @@ import models.Movimiento;
 import models.Recurrente;
 import models.Usuario;
 import service.DatoInvalido;
-import service.categoria.CategoriaService;
+import service.CategoriaService;
 import service.dao.CuentaDAO;
 import service.dao.MovimientoDAO;
 import service.dao.RecurrenteDAO;

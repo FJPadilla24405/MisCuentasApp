@@ -84,7 +84,7 @@ public class GraficoDonut extends LienzoGrafico {
         gc.setLineWidth(grosor);
         gc.setLineCap(StrokeLineCap.BUTT);
         if (total <= 0) {
-            gc.setStroke(Paleta.CUADRICULA);
+            gc.setStroke(Paleta.cuadricula());
             gc.strokeOval(cx - radio, cy - radio, radio * 2, radio * 2);
         } else {
             double inicio = 90;
@@ -111,11 +111,11 @@ public class GraficoDonut extends LienzoGrafico {
         }
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
-        gc.setFill(Paleta.TITULO);
+        gc.setFill(Paleta.titulo());
         gc.setFont(grande);
         gc.fillText(centro, cx, etiquetaCentro.isEmpty() ? cy : cy - 6);
         if (!etiquetaCentro.isEmpty()) {
-            gc.setFill(Paleta.TEXTO_SUAVE);
+            gc.setFill(Paleta.textoSuave());
             gc.setFont(FUENTE_ETIQUETA);
             gc.fillText(etiquetaCentro, cx, cy + 12);
         }

@@ -31,6 +31,18 @@ public class SincronizacionService {
     }
 
     /**
+     * Lee las fechas del último cambio de los datos de este equipo y de los de Firebase, para enseñarlas al confirmar una
+     * subida o una descarga.
+     * @param usuario: usuario de la sesión
+     * @return Devuelve las fechas y si algún lado perdería datos
+     * @throws IOException si no hay conexión o Firebase rechaza la petición
+     * @throws InterruptedException
+     */
+    public FechasSync fechas(Usuario usuario) throws IOException, InterruptedException {
+        return preparar(usuario).fechas(usuario);
+    }
+
+    /**
      * Sube los datos locales a Firebase, que reemplazan a los que hubiera allí.
      * @param usuario: usuario de la sesión
      * @throws IOException si no hay conexión o Firebase rechaza la petición

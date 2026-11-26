@@ -1,7 +1,7 @@
 package service.dao;
 
 import models.Cuenta;
-import service.connections.DatabaseManager;
+import service.DatabaseManager;
 import util.Dinero;
 
 import java.math.BigDecimal;

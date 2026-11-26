@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -171,7 +172,17 @@ public class EditarMovimientosController {
         Label concepto = etiqueta(fila.concepto(), "tabla-concepto");
         HBox titulo = new HBox(8, concepto);
         titulo.setAlignment(Pos.CENTER_LEFT);
-        regla.ifPresent(r -> titulo.getChildren().add(pastillaRecurrente(r)));
+        // La etiqueta de recurrente y su botón de desactivar o reactivar van juntos, pegados al concepto: así la parte derecha
+        // de la fila (importe, Editar y Eliminar) queda igual de alineada en todas las filas
+        regla.ifPresent(r -> {
+            Button alternar = boton(r.isActivo() ? "Desactivar" : "Reactivar", "boton-secundario", "boton-micro");
+            alternar.setOnAction(e -> alternarRecurrencia(m, r.isActivo()));
+            alternar.setTooltip(new Tooltip(r.isActivo() ? "Deja de añadir este movimiento automáticamente" : "Vuelve a añadir este movimiento automáticamente"));
+            HBox recurrente = new HBox(4, pastillaRecurrente(r), alternar);
+            recurrente.setAlignment(Pos.CENTER_LEFT);
+            recurrente.setMinWidth(Region.USE_PREF_SIZE);
+            titulo.getChildren().add(recurrente);
+        });
         Label detalle = etiqueta(Formato.fechaCorta(m.getFecha()) + " · " + fila.categoria() + " · " + fila.cuenta(), "texto-suave-pequeno");
         VBox textos = new VBox(3, titulo, detalle);
         textos.setMinWidth(0);
@@ -197,11 +208,6 @@ public class EditarMovimientosController {
             Button botonEditar = boton("Editar", "boton-secundario");
             botonEditar.setOnAction(e -> editar(m));
             acciones.getChildren().add(botonEditar);
-            regla.ifPresent(r -> {
-                Button alternar = boton(r.isActivo() ? "Desactivar" : "Reactivar", "boton-secundario");
-                alternar.setOnAction(e -> alternarRecurrencia(m, r.isActivo()));
-                acciones.getChildren().add(alternar);
-            });
             Button botonEliminar = boton("Eliminar", "boton-peligro");
             botonEliminar.setOnAction(e -> {
                 confirmando = m.getId();
@@ -296,9 +302,19 @@ public class EditarMovimientosController {
      * @return Devuelve un botón pequeño para una fila
      */
     private static Button boton(String texto, String clase) {
+        return boton(texto, clase, "boton-mini");
+    }
+
+    /**
+     * @param texto: texto del botón
+     * @param clase: boton-secundario o boton-peligro
+     * @param tamano: boton-mini (botones de las filas) o boton-micro (el de desactivar, pegado a la etiqueta de recurrente)
+     * @return Devuelve un botón pequeño
+     */
+    private static Button boton(String texto, String clase, String tamano) {
         Button boton = new Button(texto);
         boton.setMnemonicParsing(false);
-        boton.getStyleClass().addAll(clase, "boton-mini");
+        boton.getStyleClass().addAll(clase, tamano);
         return boton;
     }
 

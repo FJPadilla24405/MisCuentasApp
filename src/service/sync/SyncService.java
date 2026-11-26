@@ -1,7 +1,7 @@
 package service.sync;
 
 import models.Usuario;
-import service.connections.DatabaseManager;
+import service.DatabaseManager;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -241,6 +241,53 @@ public class SyncService {
             return local.containsKey("cuentas") || local.containsKey("movimientos") || local.containsKey("presupuestos");
         }
         return !marca.get().huella().equals(huella(local));
+    }
+
+    /**
+     * Reúne las fechas que se enseñan al confirmar una subida o una descarga: cuándo se cambiaron por última vez los datos
+     * de este equipo y los de Firebase. Lee de Firebase solo la fecha de la última subida (y las claves del nodo, para saber
+     * si hay datos), no los datos.
+     * <ul>
+     * <li>Datos de Firebase: la fecha que se escribió en la última subida.</li>
+     * <li>Datos de este equipo: si hay cambios sin subir, la hora del último cambio (CambiosLocales); si no los hay, son
+     * iguales a los de la última sincronización, así que vale la fecha de esa sincronización.</li>
+     * <li>Novedades en Firebase: hay datos allí y este equipo nunca se ha sincronizado, o la fecha de Firebase es posterior a
+     * la de la última sincronización de este equipo (alguien subió datos desde otro sitio).</li>
+     * </ul>
+     * @param usuario: usuario de la sesión (con cuenta en Firebase)
+     * @return Devuelve las fechas y los avisos
+     * @throws IOException si no hay conexión o Firebase rechaza la petición
+     * @throws InterruptedException
+     */
+    public FechasSync fechas(Usuario usuario) throws IOException, InterruptedException {
+        exigirUid(usuario);
+        String uid = usuario.getFirebaseUid();
+        Object claves = firebase.leerSuperficial(RAIZ + "/" + uid);
+        boolean hayDatos = claves instanceof Map<?, ?> m && !m.isEmpty();
+        java.time.Instant remota = hayDatos ? leerFecha(firebase.leer(RAIZ + "/" + uid + "/ultimaSync")) : null;
+
+        boolean cambios = hayCambiosSinSubir(usuario);
+        java.util.Optional<MarcaSync.Marca> marca = MarcaSync.leer(uid);
+        java.time.Instant ultimaPropia = marca.map(x -> leerFecha(x.ultimaSync())).orElse(null);
+        java.time.Instant local = cambios ? MarcaSync.leerCambioLocal(uid).orElse(null) : ultimaPropia;
+
+        boolean novedades = hayDatos && (marca.isEmpty() || (remota != null && (ultimaPropia == null || remota.isAfter(ultimaPropia))));
+        return new FechasSync(local, remota, hayDatos, cambios, novedades);
+    }
+
+    /**
+     * @param valor: fecha escrita en ISO (como se guarda en Firebase) o null
+     * @return Devuelve la fecha, o null si no hay o no se entiende
+     */
+    private static java.time.Instant leerFecha(Object valor) {
+        if (valor == null || valor.toString().isBlank()) {
+            return null;
+        }
+        try {
+            return java.time.Instant.parse(valor.toString().trim());
+        } catch (java.time.format.DateTimeParseException e) {
+            return null;
+        }
     }
 
     /**

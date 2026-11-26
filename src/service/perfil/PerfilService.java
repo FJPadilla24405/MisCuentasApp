@@ -13,6 +13,7 @@ import service.auth.SesionActual;
 import service.dao.CuentaDAO;
 import service.dao.UsuarioDAO;
 import service.resumen.ResumenService.FilaCuenta;
+import util.tema.Tema;
 
 /**
  * Lógica de la pantalla de editar perfil: datos personales, preferencias y cuentas.
@@ -46,8 +47,6 @@ public class PerfilService {
         }
     }
 
-    // Temas que se pueden elegir (de momento solo se guarda la elección, no cambia el aspecto)
-    public static final List<String> TEMAS = List.of("claro", "oscuro", "sistema");
     // Longitud máxima de nombre y email, la misma que los VARCHAR(50) del esquema
     private static final int MAX = 50;
     private static final Pattern EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
@@ -64,7 +63,7 @@ public class PerfilService {
      * @param nombre: nombre de usuario
      * @param email: email
      * @param moneda: código de moneda de tres letras
-     * @param tema: "claro", "oscuro" o "sistema"
+     * @param tema: "claro", "oscuro" o "personal" (los colores de este último se guardan aparte, ver TemaService)
      * @return Devuelve el usuario con los datos nuevos
      * @throws DatoInvalido si algún dato no es válido
      */
@@ -95,7 +94,7 @@ public class PerfilService {
         } catch (IllegalArgumentException | NullPointerException e) {
             throw new DatoInvalido("moneda", "Elige una moneda válida.");
         }
-        if (!TEMAS.contains(tema)) {
+        if (!Tema.TEMAS.contains(tema)) {
             throw new DatoInvalido("tema", "Elige un tema válido.");
         }
 

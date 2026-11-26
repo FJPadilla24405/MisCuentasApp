@@ -2,6 +2,8 @@ package controllers;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -101,6 +103,10 @@ public class ImportarMovimientosController {
     @FXML private ComboBox<OpcionColumna> cmbCategoria;
     @FXML private ComboBox<OpcionColumna> cmbSubcategoria;
     @FXML private ComboBox<OpcionColumna> cmbNota;
+    @FXML private ComboBox<OpcionColumna> cmbSaldo;
+    @FXML private VBox cajaSaldo;
+    @FXML private CheckBox chkAjustarSaldo;
+    @FXML private Label lblSaldoDetalle;
     @FXML private Label lblFormato;
     @FXML private Hyperlink enlaceFormato;
     @FXML private VBox panelFormato;
@@ -127,6 +133,9 @@ public class ImportarMovimientosController {
     private final Map<FilaImportada, CheckBox> casillas = new IdentityHashMap<>();
     private final Map<String, List<Categoria>> categoriasPorTipo = new java.util.HashMap<>();
     private CheckBox casillaTodas;
+    // Saldo que figura en el archivo (null si no trae) y lo que la cuenta ya suma a esa fecha sin lo que se importa
+    private ImportacionService.SaldoArchivo saldoArchivo;
+    private BigDecimal saldoBase;
     // true mientras se rellenan las listas: los cambios no recalculan la vista previa hasta el final
     private boolean cargando = false;
     private boolean ajustandoCasillas = false;
@@ -144,10 +153,11 @@ public class ImportarMovimientosController {
         cmbSigno.getItems().setAll(SignoGasto.values());
         cmbSigno.setConverter(convertidor(SignoGasto::getEtiqueta));
 
-        for (ComboBox<OpcionColumna> combo : List.of(cmbFecha, cmbConcepto, cmbImporte, cmbCategoria, cmbSubcategoria, cmbNota)) {
+        for (ComboBox<OpcionColumna> combo : List.of(cmbFecha, cmbConcepto, cmbImporte, cmbCategoria, cmbSubcategoria, cmbNota, cmbSaldo)) {
             combo.valueProperty().addListener((obs, antes, ahora) -> recalcular());
         }
         cmbFormatoFecha.valueProperty().addListener((obs, antes, ahora) -> recalcular());
+        chkAjustarSaldo.selectedProperty().addListener((obs, antes, ahora) -> actualizarResumen());
         cmbDecimal.valueProperty().addListener((obs, antes, ahora) -> recalcular());
         cmbSigno.valueProperty().addListener((obs, antes, ahora) -> recalcular());
         // Cambiar la fila de títulos cambia los nombres de las columnas, así que se vuelven a proponer
@@ -222,6 +232,7 @@ public class ImportarMovimientosController {
         cmbFormatoFecha.setValue(FormatoFecha.AUTO);
         cmbDecimal.setValue(SeparadorDecimal.AUTO);
         cmbSigno.setValue(SignoGasto.NEGATIVO);
+        chkAjustarSaldo.setSelected(false);
         cargando = false;
 
         lblReconocido.setText(propuesta.completas() ? "Se han reconocido las columnas automáticamente"
@@ -260,7 +271,7 @@ public class ImportarMovimientosController {
         for (int c = 0; c < nombres.size(); c++) {
             opciones.add(new OpcionColumna(c, recortar(nombres.get(c), 40)));
         }
-        for (ComboBox<OpcionColumna> combo : List.of(cmbFecha, cmbConcepto, cmbImporte, cmbCategoria, cmbSubcategoria, cmbNota)) {
+        for (ComboBox<OpcionColumna> combo : List.of(cmbFecha, cmbConcepto, cmbImporte, cmbCategoria, cmbSubcategoria, cmbNota, cmbSaldo)) {
             combo.getItems().setAll(opciones);
         }
     }
@@ -272,6 +283,7 @@ public class ImportarMovimientosController {
         elegir(cmbCategoria, columnas.categoria());
         elegir(cmbSubcategoria, columnas.subcategoria());
         elegir(cmbNota, columnas.nota());
+        elegir(cmbSaldo, columnas.saldo());
     }
 
     private static void elegir(ComboBox<OpcionColumna> combo, int indice) {
@@ -284,7 +296,7 @@ public class ImportarMovimientosController {
 
     private Columnas columnasElegidas() {
         return new Columnas(indice(cmbFecha), indice(cmbConcepto), indice(cmbImporte), indice(cmbCategoria),
-                indice(cmbSubcategoria), indice(cmbNota));
+                indice(cmbSubcategoria), indice(cmbNota), indice(cmbSaldo));
     }
 
     private Formato formatoElegido() {
@@ -352,6 +364,9 @@ public class ImportarMovimientosController {
                 marcadas.add(fila);
             }
         }
+        // Si el archivo trae saldo, se calcula lo que la cuenta ya suma a esa fecha para poder ofrecer el ajuste
+        saldoArchivo = servicio.saldoDelArchivo(filas);
+        saldoBase = saldoArchivo == null ? null : servicio.saldoBase(cuenta, saldoArchivo.fecha());
         pintarVistaPrevia();
         actualizarResumen();
     }
@@ -633,10 +648,14 @@ public class ImportarMovimientosController {
             texto += " · " + (nuevas.size() == 1 ? "Se creará 1 categoría nueva" : "Se crearán " + nuevas.size() + " categorías nuevas")
                     + " (" + String.join(", ", nuevas) + ")";
         }
+        if (chkAjustarSaldo.isSelected()) {
+            texto += " · Se ajustará el saldo de la cuenta";
+        }
         lblSeleccion.setText(texto);
         btnImportar.setText(n == 0 ? "Importar" : "Importar " + n + (n == 1 ? " movimiento" : " movimientos"));
         btnImportar.setDisable(n == 0);
 
+        actualizarSaldo();
         if (casillaTodas != null) {
             ajustandoCasillas = true;
             long seleccionables = filas.stream().filter(f -> f.getEstado() != Estado.ERROR).count();
@@ -648,6 +667,38 @@ public class ImportarMovimientosController {
                 + (archivo.hoja() != null ? " · hoja «" + archivo.hoja() + "»" : "")
                 + " · " + filas.size() + (filas.size() == 1 ? " fila" : " filas")
                 + " · Destino: " + cuenta.getNombre() + " · Aún no importado");
+    }
+
+    /**
+     * Enseña u oculta la tarjeta del saldo. Solo se ve si el archivo trae saldo. Explica lo que pasaría con la cuenta a la
+     * fecha del saldo del archivo según los movimientos marcados, y ofrece ajustar el saldo inicial de la cuenta para que
+     * coincida con el del archivo. Si ya coincide, no hace falta y la casilla se desactiva.
+     */
+    private void actualizarSaldo() {
+        boolean hay = saldoArchivo != null && saldoBase != null;
+        cajaSaldo.setVisible(hay);
+        cajaSaldo.setManaged(hay);
+        if (!hay) {
+            chkAjustarSaldo.setSelected(false);
+            return;
+        }
+        List<FilaImportada> elegidas = filas.stream().filter(marcadas::contains).toList();
+        BigDecimal prevision = saldoBase.add(ImportacionService.sumaHasta(elegidas, saldoArchivo.fecha()));
+        BigDecimal diferencia = saldoArchivo.saldo().subtract(prevision);
+        String moneda = cuenta.getMoneda();
+        LocalDate fecha = saldoArchivo.fecha();
+        chkAjustarSaldo.setText("Ajustar el saldo de «" + cuenta.getNombre() + "» al del archivo: "
+                + util.Formato.moneda(saldoArchivo.saldo(), moneda) + " (a " + FECHA.format(fecha) + ")");
+        if (diferencia.signum() == 0) {
+            chkAjustarSaldo.setSelected(false);
+            chkAjustarSaldo.setDisable(true);
+            lblSaldoDetalle.setText("Con los movimientos marcados, la cuenta ya tendría ese saldo a esa fecha: no hace falta ajustarlo.");
+        } else {
+            chkAjustarSaldo.setDisable(false);
+            lblSaldoDetalle.setText("Con los movimientos marcados, la cuenta tendría " + util.Formato.moneda(prevision, moneda) + " a esa fecha. "
+                    + "Si lo ajustas, el saldo inicial de la cuenta cambia en " + util.Formato.monedaConSigno(diferencia, moneda)
+                    + " para que sean " + util.Formato.moneda(saldoArchivo.saldo(), moneda) + ". Si no, solo se añaden los movimientos y el saldo se calcula con ellos.");
+        }
     }
 
     // ===== Importar =====
@@ -665,7 +716,8 @@ public class ImportarMovimientosController {
         btnImportar.setDisable(true);
         btnImportar.setText("Importando…");
         try {
-            Resultado importado = servicio.importar(usuario, cuenta, seleccion);
+            ImportacionService.SaldoArchivo ajuste = chkAjustarSaldo.isSelected() && !chkAjustarSaldo.isDisabled() ? saldoArchivo : null;
+            Resultado importado = servicio.importar(usuario, cuenta, seleccion, ajuste);
             resultado = Optional.of(importado.ultimoMes());
             cerrar();
         } catch (RuntimeException e) {

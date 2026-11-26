@@ -3,8 +3,11 @@ package controllers;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Currency;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
@@ -15,6 +18,7 @@ import javafx.scene.Group;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -22,29 +26,38 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 import javafx.util.StringConverter;
 import models.Categoria;
 import models.Cuenta;
 import models.Usuario;
 import service.auth.SesionActual;
-import service.categoria.CategoriaService;
-import service.categoria.CategoriaService.Usos;
+import service.CategoriaService;
+import service.CategoriaService.Usos;
 import service.perfil.PerfilService;
 import service.perfil.PerfilService.DatoInvalido;
+import service.perfil.TemaService;
 import service.resumen.ResumenService.FilaCuenta;
 import util.Campos;
+import util.tema.ColoresTema;
+import util.tema.ColoresTema.Elemento;
 import util.Formato;
 import util.IconosCategoria;
+import util.tema.Tema;
 
 /**
  * Controlador de Perfil.fxml: datos personales, cambio de contraseña, preferencias (moneda y tema) y
  * gestión de las cuentas (añadir, renombrar, activar y desactivar). La lógica está en PerfilService.
- * El tema oscuro y el del sistema solo se guardan: todavía no cambian el aspecto de la aplicación.
+ * El tema (claro, oscuro o personalizado) se ve al momento en toda la aplicación como vista previa y se queda al guardar;
+ * si se sale de la pantalla sin guardar, vuelve el tema guardado. Los colores del tema personalizado se guardan en un
+ * archivo de este equipo (TemaService), no en la base de datos.
  *
  * @author Fco Padilla
  */
@@ -72,10 +85,16 @@ public class PerfilController {
     @FXML private ComboBox<String> cmbMoneda;
     @FXML private VBox cardClaro;
     @FXML private VBox cardOscuro;
-    @FXML private VBox cardSistema;
+    @FXML private VBox cardPersonal;
     @FXML private Group checkClaro;
     @FXML private Group checkOscuro;
-    @FXML private Group checkSistema;
+    @FXML private Group checkPersonal;
+    @FXML private HBox vistaPersonal;
+    @FXML private Region vpLateral;
+    @FXML private Region vpBarra;
+    @FXML private Region vpBloque;
+    @FXML private VBox panelPersonal;
+    @FXML private VBox listaColores;
     @FXML private Label lblError;
     @FXML private Label lblOk;
     @FXML private Label lblActivas;
@@ -87,10 +106,15 @@ public class PerfilController {
 
     private final PerfilService servicio = new PerfilService();
     private final CategoriaService categoriaService = new CategoriaService();
+    private final TemaService temaService = new TemaService();
+    // Un selector de color por cada color del tema personalizado
+    private final Map<Elemento, ColorPicker> selectores = new EnumMap<>(Elemento.class);
+    // true mientras se ponen los colores guardados, para que no cuente como un cambio del usuario
+    private boolean cargandoColores;
     private Runnable alCambiar = () -> { };
     private Usuario usuario;
     // Tema elegido en pantalla (todavía sin guardar)
-    private String tema = "claro";
+    private String tema = Tema.CLARO;
 
     /**
      * Prepara el selector de moneda, quita el borde rojo al escribir y carga los datos del usuario
@@ -110,6 +134,13 @@ public class PerfilController {
         });
         limitarAlto(scrollCuentas, listaCuentas);
         limitarAlto(scrollCategorias, listaCategorias);
+        crearSelectoresColor();
+        // Si se sale de esta pantalla sin guardar, la vista previa del tema se quita y vuelve el tema guardado
+        raiz.sceneProperty().addListener((o, antes, ahora) -> {
+            if (ahora == null) {
+                TemaService.aplicar(SesionActual.getUsuario());
+            }
+        });
         Campos.configurar(cajaNombre, txtNombre);
         Campos.configurar(cajaEmail, txtEmail);
         cargar();
@@ -140,7 +171,8 @@ public class PerfilController {
      */
     @FXML
     private void elegirClaro() {
-        elegirTema("claro");
+        elegirTema(Tema.CLARO);
+        vistaPrevia();
     }
 
     /**
@@ -148,15 +180,33 @@ public class PerfilController {
      */
     @FXML
     private void elegirOscuro() {
-        elegirTema("oscuro");
+        elegirTema(Tema.OSCURO);
+        vistaPrevia();
     }
 
     /**
-     * Elige el tema del sistema
+     * Elige el tema personalizado y enseña el editor de colores
      */
     @FXML
-    private void elegirSistema() {
-        elegirTema("sistema");
+    private void elegirPersonal() {
+        elegirTema(Tema.PERSONAL);
+        vistaPrevia();
+    }
+
+    /**
+     * Pone en el editor los colores del tema claro como punto de partida
+     */
+    @FXML
+    private void basarEnClaro() {
+        ponerColores(ColoresTema.baseClara());
+    }
+
+    /**
+     * Pone en el editor los colores del tema oscuro como punto de partida
+     */
+    @FXML
+    private void basarEnOscuro() {
+        ponerColores(ColoresTema.baseOscura());
     }
 
     /**
@@ -165,6 +215,8 @@ public class PerfilController {
     @FXML
     private void cancelar() {
         cargar();
+        // Quita la vista previa: vuelve el tema guardado
+        TemaService.aplicar(usuario);
     }
 
     /**
@@ -175,8 +227,11 @@ public class PerfilController {
         ocultarMensajes();
         Campos.marcarError(cajaNombre, false);
         Campos.marcarError(cajaEmail, false);
+        Map<String, String> colores = coloresElegidos();
         try {
             servicio.guardar(usuario, txtNombre.getText(), txtEmail.getText(), cmbMoneda.getValue(), tema);
+            // Los colores van a un archivo de este equipo, no a la base de datos
+            temaService.guardarColores(usuario, colores);
         } catch (DatoInvalido e) {
             if ("nombre".equals(e.getCampo())) {
                 Campos.marcarError(cajaNombre, true);
@@ -186,6 +241,7 @@ public class PerfilController {
             mostrarError(e.getMessage());
             return;
         }
+        Tema.usar(tema, colores);
         alCambiar.run();
         cargar();
         mostrarOk("Cambios guardados.");
@@ -236,20 +292,139 @@ public class PerfilController {
         cmbMoneda.getItems().setAll(monedas);
         cmbMoneda.setValue(usuario.getMoneda());
 
-        elegirTema(usuario.getTema() == null ? "claro" : usuario.getTema());
+        elegirTema(usuario.getTema());
+        ponerColoresGuardados();
         pintarCuentas();
         pintarCategorias();
     }
 
     /**
-     * Marca una de las tres tarjetas de tema (todavía sin guardar)
-     * @param nuevo: "claro", "oscuro" o "sistema"
+     * Marca una de las tres tarjetas de tema (todavía sin guardar) y enseña el editor de colores solo con el personalizado
+     * @param nuevo: "claro", "oscuro" o "personal" (cualquier otro valor, como el antiguo "sistema", se trata como "claro")
      */
     private void elegirTema(String nuevo) {
-        tema = PerfilService.TEMAS.contains(nuevo) ? nuevo : "claro";
-        marcarTema(cardClaro, checkClaro, "claro".equals(tema));
-        marcarTema(cardOscuro, checkOscuro, "oscuro".equals(tema));
-        marcarTema(cardSistema, checkSistema, "sistema".equals(tema));
+        tema = Tema.normalizar(nuevo);
+        marcarTema(cardClaro, checkClaro, Tema.CLARO.equals(tema));
+        marcarTema(cardOscuro, checkOscuro, Tema.OSCURO.equals(tema));
+        marcarTema(cardPersonal, checkPersonal, Tema.PERSONAL.equals(tema));
+        panelPersonal.setVisible(Tema.PERSONAL.equals(tema));
+        panelPersonal.setManaged(Tema.PERSONAL.equals(tema));
+    }
+
+    /**
+     * Enseña en toda la aplicación el tema elegido en pantalla, sin guardarlo (hasta que se guarde, es solo una vista previa)
+     */
+    private void vistaPrevia() {
+        Tema.usar(tema, coloresElegidos());
+    }
+
+    /**
+     * Crea el editor de colores: un selector por cada color del tema personalizado, agrupados y en dos columnas
+     */
+    private void crearSelectoresColor() {
+        String grupoActual = null;
+        GridPane rejilla = null;
+        int enGrupo = 0;
+        for (Elemento e : Elemento.values()) {
+            if (!e.getGrupo().equals(grupoActual)) {
+                grupoActual = e.getGrupo();
+                Label titulo = new Label(grupoActual.toUpperCase(Locale.forLanguageTag("es-ES")));
+                titulo.getStyleClass().add("color-grupo");
+                rejilla = new GridPane();
+                rejilla.setHgap(10);
+                rejilla.setVgap(6);
+                rejilla.getColumnConstraints().addAll(columna(38), columna(12), columna(38), columna(12));
+                listaColores.getChildren().addAll(titulo, rejilla);
+                enGrupo = 0;
+            }
+            Label etiqueta = new Label(e.getEtiqueta());
+            etiqueta.getStyleClass().add("color-etiqueta");
+            etiqueta.setWrapText(true);
+            ColorPicker selector = new ColorPicker(Color.web(e.getClaro()));
+            selector.getStyleClass().add("selector-color");
+            selector.valueProperty().addListener((o, antes, ahora) -> {
+                if (!cargandoColores) {
+                    actualizarVistaPersonal();
+                    if (Tema.PERSONAL.equals(tema)) {
+                        vistaPrevia();
+                    }
+                }
+            });
+            selectores.put(e, selector);
+            rejilla.add(etiqueta, (enGrupo % 2) * 2, enGrupo / 2);
+            rejilla.add(selector, (enGrupo % 2) * 2 + 1, enGrupo / 2);
+            GridPane.setValignment(etiqueta, javafx.geometry.VPos.CENTER);
+            enGrupo++;
+        }
+    }
+
+    /**
+     * @param porcentaje: ancho de la columna
+     * @return Devuelve una columna de la rejilla con ese ancho
+     */
+    private ColumnConstraints columna(double porcentaje) {
+        ColumnConstraints c = new ColumnConstraints();
+        c.setPercentWidth(porcentaje);
+        return c;
+    }
+
+    /**
+     * Pone en los selectores los colores guardados del usuario (los del tema claro si no ha guardado ninguno)
+     */
+    private void ponerColoresGuardados() {
+        ponerSelectores(temaService.cargarColores(usuario));
+    }
+
+    /**
+     * Pone unos colores en los selectores y los enseña como vista previa si el tema elegido es el personalizado
+     * @param colores: colores a poner
+     */
+    private void ponerColores(Map<String, String> colores) {
+        ponerSelectores(colores);
+        if (Tema.PERSONAL.equals(tema)) {
+            vistaPrevia();
+        }
+    }
+
+    /**
+     * Cambia el valor de los selectores sin que cuente como un cambio del usuario
+     * @param colores: colores a poner (los que falten son los del tema claro)
+     */
+    private void ponerSelectores(Map<String, String> colores) {
+        Map<String, String> completos = ColoresTema.completar(colores);
+        cargandoColores = true;
+        try {
+            for (Map.Entry<Elemento, ColorPicker> par : selectores.entrySet()) {
+                par.getValue().setValue(Color.web(completos.get(par.getKey().getClave())));
+            }
+        } finally {
+            cargandoColores = false;
+        }
+        actualizarVistaPersonal();
+    }
+
+    /**
+     * @return Devuelve los colores que hay ahora en los selectores, como texto "#rrggbb"
+     */
+    private Map<String, String> coloresElegidos() {
+        Map<String, String> colores = new LinkedHashMap<>();
+        for (Map.Entry<Elemento, ColorPicker> par : selectores.entrySet()) {
+            Color c = par.getValue().getValue();
+            colores.put(par.getKey().getClave(), String.format(Locale.ROOT, "#%02x%02x%02x",
+                    Math.round(c.getRed() * 255), Math.round(c.getGreen() * 255), Math.round(c.getBlue() * 255)));
+        }
+        return colores;
+    }
+
+    /**
+     * Pinta la miniatura de la tarjeta "Personalizado" con los colores elegidos
+     */
+    private void actualizarVistaPersonal() {
+        Map<String, String> c = coloresElegidos();
+        vistaPersonal.setStyle("-fx-background-color: " + c.get("fondo") + ";");
+        vpLateral.setStyle("-fx-background-color: " + c.get("superficie") + ";");
+        vpBloque.setStyle("-fx-background-color: " + c.get("superficie") + ";");
+        vpBarra.setStyle("-fx-background-color: " + c.get("principal") + ";");
     }
 
     /**

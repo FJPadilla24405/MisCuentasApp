@@ -49,6 +49,18 @@ public class FirebaseClient {
     }
 
     /**
+     * Lee solo las claves de un nodo, sin sus datos (una petición ligera para saber si existe y si tiene algo).
+     * @param ruta: ruta del nodo
+     * @return Devuelve un mapa clave -> true, o null si el nodo no existe
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public Object leerSuperficial(String ruta) throws IOException, InterruptedException {
+        HttpRequest req = peticion(ruta, "shallow=true").GET().build();
+        return Json.leer(enviar(req));
+    }
+
+    /**
      * Escribe un nodo, reemplazando todo lo que hubiera debajo.
      * @param ruta: ruta al a que hacer la peticion
      * @param valor: valor que escribir en el json
@@ -69,9 +81,24 @@ public class FirebaseClient {
      * @return Devuelve un httprequest
      */
     private HttpRequest.Builder peticion(String ruta) {
+        return peticion(ruta, null);
+    }
+
+    /**
+     * Hace una peticion a una ruta especificada, con un parámetro más en la dirección
+     * @param ruta: ruta a la que hacer la peticion
+     * @param parametro: parámetro extra (por ejemplo shallow=true), o null
+     * @return Devuelve un httprequest
+     */
+    private HttpRequest.Builder peticion(String ruta, String parametro) {
         String url = baseUrl + "/" + ruta + ".json";
+        String separador = "?";
         if (idToken != null && !idToken.isBlank()) {
-            url += "?auth=" + URLEncoder.encode(idToken, StandardCharsets.UTF_8);
+            url += separador + "auth=" + URLEncoder.encode(idToken, StandardCharsets.UTF_8);
+            separador = "&";
+        }
+        if (parametro != null) {
+            url += separador + parametro;
         }
         return HttpRequest.newBuilder(URI.create(url)).timeout(Duration.ofSeconds(30));
     }
